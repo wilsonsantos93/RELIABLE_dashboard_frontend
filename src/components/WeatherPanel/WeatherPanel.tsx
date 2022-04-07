@@ -1,5 +1,5 @@
 import React from 'react';
-import {PanelProperties} from "../../models/PanelProperties";
+import {PanelProperties} from "../../models/WeatherPanelProperties";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../styles/WeatherPanel.css';
 import {Stack} from "react-bootstrap";

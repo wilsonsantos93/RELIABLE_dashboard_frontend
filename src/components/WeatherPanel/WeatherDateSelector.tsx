@@ -1,5 +1,5 @@
 import React from 'react';
-import {PanelProperties} from "../../models/PanelProperties";
+import {PanelProperties} from "../../models/WeatherPanelProperties";
 import Form from 'react-bootstrap/Form'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../styles/WeatherPanel.css';
@@ -9,10 +9,10 @@ import {Col, Row} from "react-bootstrap";
 function WeatherDateSelector(props: PanelProperties): JSX.Element {
 
     return (
-        <Row>
-            <Col><Form.Text>Weather date</Form.Text></Col>
-            <Col>
-                <Form.Select className="WeatherInfoSelector" onChange={(event) => {
+        <Row style={{margin:0, padding:0}}>
+            <Col style={{margin:0, padding:0}}><Form.Text>Weather date</Form.Text></Col>
+            <Col style={{margin:0, padding:0}}>
+                <Form.Select onChange={(event) => {
                     props.setSelectedInfo(event.target.value as "Temperature" | "WindSpeed" | undefined)
                 }}>
                     <option value={undefined}> No selected</option>

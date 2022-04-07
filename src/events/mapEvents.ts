@@ -1,5 +1,7 @@
-import {GeoJSON as geoJSONLayer, Layer, LeafletMouseEvent, Map as LeafletMap} from "leaflet";
+import {GeoJSON as GeoJSONLayer, Layer, LeafletMouseEvent, Map as LeafletMap} from "leaflet";
 import {Feature, Geometry, Polygon} from "geojson";
+import React, {Dispatch} from "react";
+import {MapFeatureStyle} from "../styles/MapFeatureStyle";
 
 
 // TODO: Make the geoJSON property field name more dynamic
@@ -56,14 +58,12 @@ function highlightFeature(event: LeafletMouseEvent, mapInformationMenu: HTMLElem
     let mapFeatureHoveredEvent = event.target;
     let mapFeatureHovered = mapFeatureHoveredEvent.feature;
 
-    mapFeatureHoveredEvent.setStyle({
+    let mapFeatureHoveredStyle: MapFeatureStyle = {
         weight: 5,
-        // color: "#666",
         dashArray: "",
-        fillOpacity: 0.7,
-    });
-
-    // mapFeatureHoveredEvent.bringToFront();
+    }
+    mapFeatureHoveredEvent.setStyle(mapFeatureHoveredStyle);
+    mapFeatureHoveredEvent.bringToFront();
 
     if ("weather" in mapFeatureHovered) {
         updateInformationMenuWithWeather(mapFeatureHovered, mapInformationMenu);
@@ -73,22 +73,20 @@ function highlightFeature(event: LeafletMouseEvent, mapInformationMenu: HTMLElem
 }
 
 // Stops highlighting a feature when it stops being hovered over
-function resetHighlight(event: LeafletMouseEvent, mapInformationMenu: HTMLElement, geoJSONLayer: geoJSONLayer) {
+function resetHighlight(event: LeafletMouseEvent, layer: Layer, setMapFeatureInformation: Dispatch<React.SetStateAction<string>> ) {
 
     console.log("Reset highlighted feature.")
     console.log(event.target)
-    console.log(mapInformationMenu)
-    console.log(geoJSONLayer)
+    console.log(layer)
     console.log("Finished reset highlighted feature.")
 
     let mapFeatureCurrentlyHovered = event.target;
-    geoJSONLayer.resetStyle(mapFeatureCurrentlyHovered);
+    let mapFeatureNotHoveredStyle: MapFeatureStyle = {
+        weight: 2,
+        dashArray: "3",
+    };
+    mapFeatureCurrentlyHovered.setStyle(mapFeatureNotHoveredStyle);
 
-    if ("weather" in mapFeatureCurrentlyHovered) {
-        updateInformationMenuWithWeather(mapFeatureCurrentlyHovered, mapInformationMenu);
-    } else if (!("weather" in mapFeatureCurrentlyHovered)) {
-        updateInformationMenuWithName(mapFeatureCurrentlyHovered, mapInformationMenu);
-    }
 }
 
 // Zooms to the feature clicked
@@ -99,12 +97,18 @@ function zoomToFeature(event: LeafletMouseEvent, worldMap: LeafletMap) {
 /**
  * The events associated with each feature
  */
-export function onEachFeature(feature: Feature<Geometry, any>, layer: Layer) {
+export function onEachFeature(feature: Feature<Geometry, any>, layer: Layer, setMapFeatureInformation: Dispatch<React.SetStateAction<string>>) {
+
+    // console.log("Feature begin")
+    // console.log(feature)
+    // console.log(layer)
+    // console.log("Feature end")
+
     layer.on({
         // @ts-ignore
-        mouseover: highlightFeature,
+        mouseover: (event) => {highlightFeature(event, layer, setMapFeatureInformation)},
         // @ts-ignore
-        mouseout: (event) => {resetHighlight(layer)},
+        mouseout: (event) => {resetHighlight(event, layer, setMapFeatureInformation)},
         // @ts-ignore
         click: zoomToFeature,
     });

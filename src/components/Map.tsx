@@ -1,14 +1,14 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {GeoJSON, LayerGroup, MapContainer, TileLayer, useMap} from 'react-leaflet';
+import {GeoJSON, LayerGroup, MapContainer, TileLayer} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../styles/Map.css'
-import {GeoJsonObject} from "geojson";
+import {Feature, GeoJsonObject, Geometry} from "geojson";
 import {fetchGeoJSON} from "../data/fetchGeoJSON";
 import {onEachFeature} from "../events/mapEvents";
-import {PanelProperties} from "../models/PanelProperties";
-import {Feature} from "../models/GeoJSON/Feature";
+import {PanelProperties} from "../models/WeatherPanelProperties";
 import {GeoJSON as geoJSONLayer, Map as LeafletMap, PathOptions} from "leaflet";
-import MapInformation from "./MapInformation";
+import MapFeatureInformation from "./MapFeatureInformation";
+import {MapFeatureStyle} from "../styles/MapFeatureStyle";
 
 function Map(props: PanelProperties): JSX.Element {
 
@@ -17,22 +17,24 @@ function Map(props: PanelProperties): JSX.Element {
      * Returns the style of a feature in the map.
      * @param feature The feature to return the style of.
      */
-    function getStyle(feature: Feature) {
+    function getStyle(feature: Feature<Geometry, { "weather": any }>) {
 
         let featureColor = "#808080";
 
-        if ("weather" in feature && feature.weather && props.selectedInfo === "Temperature") {
-            featureColor = getTemperatureColor(feature.weather.current.temp_c);
+        if ("weather" in feature && feature.properties.weather && props.selectedInfo === "Temperature") {
+            featureColor = getTemperatureColor(feature.properties.weather.current.temp_c);
         }
 
-        return {
+        let mapFeatureNotHoveredStyle: MapFeatureStyle = {
             fillColor: featureColor,
             weight: 2,
             opacity: 1,
             color: "white",
-            dashArray: 3,
+            dashArray: "3",
             fillOpacity: 0.7,
-        } as unknown as PathOptions;
+        };
+
+        return mapFeatureNotHoveredStyle as PathOptions;
     }
 
     let mapRef = createRef<LeafletMap>()
@@ -54,19 +56,21 @@ function Map(props: PanelProperties): JSX.Element {
         }
 
     })
+
+    /**
+     * Create geoJSON layer.
+     */
+    const [mapFeatureInformation, setMapFeatureInformation] = useState<string>("No weather");
     let geoJSONLayer;
     if (geoJSON) {
         geoJSONLayer = <GeoJSON
             ref={geoJSONRef}
             data={geoJSON}
-            onEachFeature={onEachFeature}
+            onEachFeature={(feature, layer) => onEachFeature(feature, layer, setMapFeatureInformation)}
             // @ts-ignore
             style={getStyle}
         />
     }
-
-
-    const [mapFeatureInformation, setMapFeatureInformation] = useState<string>("Weather");
 
 
     return (
@@ -79,8 +83,10 @@ function Map(props: PanelProperties): JSX.Element {
                 zoom={8}
                 scrollWheelZoom={true}
                 bounceAtZoomLimits={true}
-                maxZoom={10}
                 attributionControl={false}
+                minZoom={4}
+                maxBounds={[[-90, -180],[90, 180]]}
+                maxBoundsViscosity={0.8}
 
             >
                 <TileLayer
@@ -91,7 +97,7 @@ function Map(props: PanelProperties): JSX.Element {
                     {geoJSONLayer}
                 </LayerGroup>
 
-                <MapInformation/>
+                <MapFeatureInformation mapFeatureInformation={mapFeatureInformation}/>
 
             </MapContainer>
 
