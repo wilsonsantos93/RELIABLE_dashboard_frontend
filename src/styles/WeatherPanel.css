@@ -1,0 +1,32 @@
+*{
+    text-align: center;
+    font-size: 30px;
+}
+
+.WeatherPanel {
+    /*display: flex;*/
+    height: 100vh;
+    /*width: 40vh;*/
+    /*min-width: 300px;*/
+    /*max-width: 1000px;*/
+    color: #fff;
+    background: #333
+}
+
+.WeatherInfoSelector {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    min-width: 100px;
+    height: 10%;
+    min-height: 100px;
+}
+
+.WeatherInfoLabel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin: auto;
+}
