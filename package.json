@@ -16,7 +16,10 @@
     "react-bootstrap": "^2.2.3",
     "react-pro-sidebar": "^0.7.1",
     "cdbreact": "^1.5.1",
-    "react-router-dom": "^6.3.0"
+    "react-router-dom": "^6.3.0",
+    "react-leaflet-glify": "^1.0.1",
+    "leaflet-glify-layer": "^0.0.6",
+    "zustand": "^4.0.0-rc.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.3",

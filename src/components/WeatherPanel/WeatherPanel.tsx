@@ -6,7 +6,7 @@ import {Stack} from "react-bootstrap";
 import WeatherInfoSelector from "./WeatherInfoSelector";
 import WeatherDateSelector from "./WeatherDateSelector";
 
-function WeatherPanel(props: PanelProperties): JSX.Element {
+function WeatherPanel(): JSX.Element {
 
     return (
 
@@ -14,9 +14,9 @@ function WeatherPanel(props: PanelProperties): JSX.Element {
 
             <Stack>
 
-                <WeatherInfoSelector setSelectedInfo={props.setSelectedInfo}/>
+                <WeatherInfoSelector/>
 
-                <WeatherDateSelector setSelectedDate={props.setSelectedDate} setSelectedInfo={props.setSelectedInfo}/>
+                <WeatherDateSelector/>
 
             </Stack>
 

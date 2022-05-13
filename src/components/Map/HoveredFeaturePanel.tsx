@@ -1,8 +1,10 @@
 import React from 'react';
-import '../styles/MapFeatureInformation.css'
-import {MapFeatureInformationProperties} from "../models/MapFeatureInformationProperties";
+import '../../styles/MapFeatureInformation.css'
+import HoveredFeatureStore from "../../stores/HoveredFeatureStore";
 
-function MapFeatureInformation(props: MapFeatureInformationProperties): JSX.Element {
+function HoveredFeaturePanel(): JSX.Element {
+
+    const featureProperties = HoveredFeatureStore(state => state.featureProperties)
 
     // Classes used by Leaflet to position controls
     const POSITION_CLASSES = {
@@ -17,12 +19,12 @@ function MapFeatureInformation(props: MapFeatureInformationProperties): JSX.Elem
         <div className={POSITION_CLASSES["topright"]}>
             <div className="leaflet-control leaflet-bar MapFeatureInformation">
                 <h4>Weather information</h4>
-                {props.mapFeatureInformation}
+                {featureProperties?.sovereignt}
             </div>
         </div>
     )
 
 }
 
-export default MapFeatureInformation;
+export default HoveredFeaturePanel;
 
