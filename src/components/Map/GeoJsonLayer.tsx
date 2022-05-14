@@ -50,38 +50,51 @@ function GeoJsonLayer(props: GeoJsonLayerProperties): JSX.Element {
         if (!geoJSON) {
 
             (async () => {
+                let fetchedGeoJSON = await fetchGeoJSON();
                 setGeoJSON(await fetchGeoJSON() as GeoJsonObject)
+                if (props.geoJsonLayer.current){
+                    props.geoJsonLayer.current.clearLayers().addData(fetchedGeoJSON);
+                }
             })()
 
         }
 
-    })
-
-    /**
-     * The events associated with each feature
-     */
-    function onEachFeature(feature: Feature<Geometry, FeatureProperties>, layer: Layer, map: LeafletMap | null) {
-
-        layer.on({
-            mouseover: (event) => {
-                console.log("Hovered")
-                highlightFeature(event)
-            },
-            mouseout: (_) => {
-                setFeatureProperties(null);
-            },
-            click: (event) => {
-                zoomToFeature(event, map)
-            },
-        });
-
-    }
+    }, [])
 
     // Zooms to the feature clicked
     function zoomToFeature(event: LeafletMouseEvent, map: LeafletMap | null) {
         if (map !== null) {
             map.fitBounds(event.target.getBounds());
         }
+    }
+
+    /**
+     * Resets the highlight a feature of the map when hovered over.
+     * @param event The event when a feature is hovered over.
+     * @param setMapFeatureInformation The function that sets the state of the panel with the feature's information.
+     */
+    function resetHighlightFeature(event: LeafletMouseEvent) {
+
+        let mapFeatureHoveredEvent = event.target;
+        let mapFeatureHovered = mapFeatureHoveredEvent.feature;
+
+        setFeatureProperties(mapFeatureHovered.properties);
+
+        // For some reason, without sleeping, the map feature is highlighted only from a brief moment.
+        function sleep(ms: number) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        sleep(10).then(_ => {
+            let mapFeatureHoveredStyle: MapFeatureStyle = {
+                weight: 2,
+                dashArray: "3",
+            }
+            mapFeatureHoveredEvent.setStyle(mapFeatureHoveredStyle);
+            mapFeatureHoveredEvent.bringToFront();
+        })
+
+
     }
 
     /**
@@ -113,11 +126,31 @@ function GeoJsonLayer(props: GeoJsonLayerProperties): JSX.Element {
 
     }
 
+    /**
+     * The events associated with each feature
+     */
+    function onEachFeature(feature: Feature<Geometry, FeatureProperties>, layer: Layer, map: LeafletMap | null) {
+
+        layer.on({
+            mouseover: (event) => {
+                highlightFeature(event)
+            },
+            mouseout: (event) => {
+                resetHighlightFeature(event)
+            },
+            click: (event) => {
+                zoomToFeature(event, map)
+            },
+        });
+
+    }
+
     return (
 
         <LayerGroup>
 
             <GeoJSON
+                ref={props.geoJsonLayer}
                 data={geoJSON as GeoJsonObject}
                 onEachFeature={(feature, layer) => onEachFeature(feature, layer, props.mapRef.current)}
                 // @ts-ignore

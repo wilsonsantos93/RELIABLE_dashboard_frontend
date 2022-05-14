@@ -2,14 +2,14 @@ import React, {createRef} from 'react';
 import {MapContainer, TileLayer} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../../styles/Map.css'
-import {Map as LeafletMap} from "leaflet";
+import {GeoJSON, Map as LeafletMap} from "leaflet";
 import HoveredFeaturePanel from "./HoveredFeaturePanel";
 import GeoJsonLayer from "./GeoJsonLayer";
 
 function Map(): JSX.Element {
 
     let mapRef = createRef<LeafletMap>()
-
+    let geoJsonLayer = createRef<GeoJSON>(); //https://github.com/PaulLeCam/react-leaflet/issues/332
     
     return (
 
@@ -33,7 +33,7 @@ function Map(): JSX.Element {
                 />
 
 
-                <GeoJsonLayer mapRef={mapRef}/>
+                <GeoJsonLayer mapRef={mapRef} geoJsonLayer={geoJsonLayer}/>
 
                 <HoveredFeaturePanel/>
 
