@@ -3,15 +3,16 @@ import {WeatherPanelState} from "../models/stores/WeatherPanelState";
 
 const WeatherPanelStore = create<WeatherPanelState>((set) => ({
 
-    selectedDate: undefined,
-    setSelectedDate: (selectedDate) => set(state => ({
-        selectedDate: selectedDate
+    selectedDateDatabaseId: undefined,
+    setSelectedDateDatabaseId: (selectedDateDatabaseId) => set(state => ({
+        selectedDateDatabaseId: selectedDateDatabaseId
     })),
 
     selectedInformation: undefined,
     setSelectedInformation: (selectedInformation) => set(state => ({
         selectedInformation: selectedInformation
     })),
+
 
 }))
 

@@ -10,10 +10,12 @@ import {GeoJsonLayerProperties} from "../../models/components/GeoJsonLayerProper
 import WeatherPanelStore from "../../stores/WeatherPanelStore";
 import {FeatureProperties} from "../../models/FeatureProperties";
 import HoveredFeatureStore from "../../stores/HoveredFeatureStore";
+import {fetchWeatherGeoJSON} from "../../data/fetchWeatherGeoJSON";
 
 function GeoJsonLayer(props: GeoJsonLayerProperties): JSX.Element {
 
-    const selectedInformation = WeatherPanelStore(state => state.selectedInformation)
+    const selectedInformationType = WeatherPanelStore(state => state.selectedInformation)
+    const selectedDateDatabaseId = WeatherPanelStore(state => state.selectedDateDatabaseId)
 
     const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties)
 
@@ -25,7 +27,7 @@ function GeoJsonLayer(props: GeoJsonLayerProperties): JSX.Element {
 
         let featureColor = "#808080";
 
-        if ("weather" in feature && feature.properties.weather && selectedInformation === "Temperature") {
+        if ("weather" in feature && feature.properties.weather && selectedInformationType === "Temperature") {
             featureColor = getTemperatureColor(feature.properties.weather.current.temp_c);
         }
 
@@ -45,21 +47,38 @@ function GeoJsonLayer(props: GeoJsonLayerProperties): JSX.Element {
      * Fetch and update geoJSON
      */
     const [geoJSON, setGeoJSON] = useState<GeoJsonObject | null>(null);
+    // useEffect(() => {
+    //     if (!geoJSON) {
+    //         (async () => {
+    //             let fetchedGeoJSON = await fetchGeoJSON();
+    //             setGeoJSON(fetchedGeoJSON)
+    //             if (props.geoJsonLayer.current) {
+    //                 props.geoJsonLayer.current.clearLayers().addData(fetchedGeoJSON);
+    //             }
+    //         })()
+    //     }
+    // }, [])
+
     useEffect(() => {
-
-        if (!geoJSON) {
-
+        if (selectedInformationType && selectedDateDatabaseId) {
             (async () => {
-                let fetchedGeoJSON = await fetchGeoJSON();
-                setGeoJSON(await fetchGeoJSON() as GeoJsonObject)
-                if (props.geoJsonLayer.current){
+                let fetchedGeoJSON = await fetchWeatherGeoJSON(selectedDateDatabaseId);
+                setGeoJSON(fetchedGeoJSON)
+                if (props.geoJsonLayer.current) {
                     props.geoJsonLayer.current.clearLayers().addData(fetchedGeoJSON);
                 }
             })()
-
         }
-
-    }, [])
+        else {
+            (async () => {
+                let fetchedGeoJSON = await fetchGeoJSON();
+                setGeoJSON(fetchedGeoJSON)
+                if (props.geoJsonLayer.current) {
+                    props.geoJsonLayer.current.clearLayers().addData(fetchedGeoJSON);
+                }
+            })()
+        }
+    }, [selectedInformationType, selectedDateDatabaseId])
 
     // Zooms to the feature clicked
     function zoomToFeature(event: LeafletMouseEvent, map: LeafletMap | null) {

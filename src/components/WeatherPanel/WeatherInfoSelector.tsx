@@ -11,17 +11,15 @@ function WeatherInfoSelector(): JSX.Element {
     const setSelectedInformation = WeatherPanelStore(state => state.setSelectedInformation)
 
     return (
-        <Row style={{margin:0, padding:0}}>
-            <Col style={{margin:0, padding:0}}><Form.Text>Weather information</Form.Text></Col>
-            <Col style={{margin:0, padding:0}}>
+        <Row style={{margin: 0, padding: 0}}>
+            <Col style={{margin: 0, padding: 0}}><Form.Text>Weather information</Form.Text></Col>
+            <Col style={{margin: 0, padding: 0}}>
                 <Form.Select onChange={(event) => {
                     setSelectedInformation(event.target.value as "Temperature" | "WindSpeed" | undefined)
                 }}>
-                    <option value={undefined}>
-                        No weather information selected
-                    </option>
-                    <option value={"Temperature"}>Temperature</option>
-                    <option value={"WindSpeed"}>Wind Speed</option>
+                    <option value="">No weather information selected</option>
+                    <option value="Temperature">Temperature</option>
+                    <option value="WindSpeed">Wind Speed</option>
                 </Form.Select>
             </Col>
         </Row>
