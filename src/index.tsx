@@ -12,13 +12,13 @@ if (container !== null) {
 
     const root = createRoot(container);
     root.render(
-        <React.StrictMode>
+        // <React.StrictMode>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<App/>}/>
                 </Routes>
             </BrowserRouter>
-        </React.StrictMode>,
+        // </React.StrictMode>,
     )
 }
 

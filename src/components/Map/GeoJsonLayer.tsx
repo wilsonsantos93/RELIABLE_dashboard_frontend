@@ -14,10 +14,15 @@ import {fetchWeatherGeoJSON} from "../../data/fetchWeatherGeoJSON";
 
 function GeoJsonLayer(props: GeoJsonLayerProperties): JSX.Element {
 
+
     const selectedInformationType = WeatherPanelStore(state => state.selectedInformation)
     const selectedDateDatabaseId = WeatherPanelStore(state => state.selectedDateDatabaseId)
 
     const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties)
+
+    const [currentlyRenderingGeoJsonWeather, setCurrentlyRenderingGeoJsonWeather] = useState(false)
+    const [lastDateRendered, setLastDateRendered] = useState("")
+
 
     /**
      * Returns the style of a feature in the map.
@@ -27,8 +32,12 @@ function GeoJsonLayer(props: GeoJsonLayerProperties): JSX.Element {
 
         let featureColor = "#808080";
 
-        if ("weather" in feature && feature.properties.weather && selectedInformationType === "Temperature") {
+        if (feature.properties.weather && selectedInformationType === "Temperature") {
             featureColor = getTemperatureColor(feature.properties.weather.current.temp_c);
+        }
+
+        if (feature.properties.weather && selectedInformationType === "WindSpeed") {
+            featureColor = getWindSpeedColor(feature.properties.weather.current.wind_kph);
         }
 
         let mapFeatureNotHoveredStyle: MapFeatureStyle = {
@@ -47,37 +56,40 @@ function GeoJsonLayer(props: GeoJsonLayerProperties): JSX.Element {
      * Fetch and update geoJSON
      */
     const [geoJSON, setGeoJSON] = useState<GeoJsonObject | null>(null);
-    // useEffect(() => {
-    //     if (!geoJSON) {
-    //         (async () => {
-    //             let fetchedGeoJSON = await fetchGeoJSON();
-    //             setGeoJSON(fetchedGeoJSON)
-    //             if (props.geoJsonLayer.current) {
-    //                 props.geoJsonLayer.current.clearLayers().addData(fetchedGeoJSON);
-    //             }
-    //         })()
-    //     }
-    // }, [])
-
     useEffect(() => {
-        if (selectedInformationType && selectedDateDatabaseId) {
-            (async () => {
-                let fetchedGeoJSON = await fetchWeatherGeoJSON(selectedDateDatabaseId);
-                setGeoJSON(fetchedGeoJSON)
-                if (props.geoJsonLayer.current) {
-                    props.geoJsonLayer.current.clearLayers().addData(fetchedGeoJSON);
-                }
-            })()
-        }
-        else {
+        // console.log("Rendered GeoJSON layer")
+        // console.log("selectedInformationType: " + selectedInformationType)
+        // console.log("selectedDateDatabaseId: " + selectedDateDatabaseId)
+
+        // No information type and no date
+        // geoJSON currently empty or currently showing weather from a date
+        if (!selectedDateDatabaseId && (!geoJSON || currentlyRenderingGeoJsonWeather)) {
             (async () => {
                 let fetchedGeoJSON = await fetchGeoJSON();
                 setGeoJSON(fetchedGeoJSON)
                 if (props.geoJsonLayer.current) {
                     props.geoJsonLayer.current.clearLayers().addData(fetchedGeoJSON);
+                    setCurrentlyRenderingGeoJsonWeather(false)
+                    setLastDateRendered("")
                 }
             })()
         }
+
+        // information type and date
+        // date has changed or wasn't currently rendering weather from a date
+        else if (selectedDateDatabaseId && !currentlyRenderingGeoJsonWeather && (selectedDateDatabaseId !== lastDateRendered || !geoJSON)) {
+            (async () => {
+                let fetchedGeoJSON = await fetchWeatherGeoJSON(selectedDateDatabaseId);
+                setGeoJSON(fetchedGeoJSON)
+                if (props.geoJsonLayer.current) {
+                    props.geoJsonLayer.current.clearLayers().addData(fetchedGeoJSON);
+                    setCurrentlyRenderingGeoJsonWeather(true)
+                    setLastDateRendered(selectedDateDatabaseId)
+                    setCurrentlyRenderingGeoJsonWeather(true)
+                }
+            })()
+        }
+
     }, [selectedInformationType, selectedDateDatabaseId])
 
     // Zooms to the feature clicked
@@ -205,6 +217,24 @@ function getTemperatureColor(temperature: number) {
     if (temperature > -30) return "#8c6bb1"
     if (temperature > -30) return "#88419d"
     if (temperature > -35) return "#810f7c"
+    return "#4d004b"
+}
+
+/**
+ * Returns the wind speed of a given color.
+ * @param windSpeed The temperature to return the color of.
+ */
+function getWindSpeedColor(windSpeed: number) {
+
+    if (windSpeed > 40) return "#4d004b"
+    if (windSpeed > 35) return "#810f7c"
+    if (windSpeed > 30) return "#88419d"
+    if (windSpeed > 25) return "#8c6bb1"
+    if (windSpeed > 20) return "#8c96c6"
+    if (windSpeed > 15) return "#9ebcda"
+    if (windSpeed > 10) return "#bfd3e6"
+    if (windSpeed > 5) return "#e0ecf4"
+    if (windSpeed > 0) return "#f7fcfd"
     return "#4d004b"
 }
 

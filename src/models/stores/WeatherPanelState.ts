@@ -5,4 +5,5 @@ export interface WeatherPanelState {
 
     selectedInformation: "Temperature" | "WindSpeed" | undefined
     setSelectedInformation: (selectedInformation: "Temperature" | "WindSpeed" | undefined) => void
+
 }

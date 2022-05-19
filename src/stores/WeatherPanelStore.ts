@@ -13,7 +13,6 @@ const WeatherPanelStore = create<WeatherPanelState>((set) => ({
         selectedInformation: selectedInformation
     })),
 
-
 }))
 
 
