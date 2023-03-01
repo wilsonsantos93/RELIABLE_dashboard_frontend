@@ -1,10 +1,8 @@
-import React from 'react';
 import '../../styles/MapFeatureInformation.css'
 import HoveredFeatureStore from "../../stores/HoveredFeatureStore";
-import JsxParser from 'react-jsx-parser'
+import { FeatureProperties } from '../../models/FeatureProperties';
 
 function HoveredFeaturePanel(): JSX.Element {
-
 
     const featureProperties = HoveredFeatureStore(state => state.featureProperties)
 
@@ -19,7 +17,16 @@ function HoveredFeaturePanel(): JSX.Element {
     let freguesia: JSX.Element = <div/>;
     if (featureProperties?.Freguesia) {
         freguesia = <div style={{fontSize: 20}}>
-            Freguesia: {featureProperties?.Freguesia} <br/>
+            {/* Freguesia: {featureProperties?.Freguesia} <br/> */}
+            Freguesia: { featureProperties.properties.Freguesia } <br/>
+        </div>
+    }
+
+    let concelho: JSX.Element = <div/>;
+    if (featureProperties?.properties) {
+        freguesia = <div style={{fontSize: 20}}>
+            {/* Concelho: {featureProperties?.Concelho} <br/> */}
+            Concelho: { featureProperties.properties.Concelho } <br/>
         </div>
     }
 
@@ -34,7 +41,7 @@ function HoveredFeaturePanel(): JSX.Element {
     if (featureProperties?.weather) {
         temperature = <div style={{fontSize: 20}}>
             {/*@ts-ignore*/}
-            Temperatura (C): {featureProperties?.weather.current.temp_c} <br/>
+            Temperatura (C): {featureProperties?.weather?.current?.temp_c} <br/>
         </div>
     }
 
@@ -44,7 +51,7 @@ function HoveredFeaturePanel(): JSX.Element {
         windSpeed =
             <div style={{fontSize: 20}}>
                 {/*@ts-ignore*/}
-                Velocidade do vento (Kph): {featureProperties?.weather.current.wind_kph} <br/>
+                Velocidade do vento (Kph): {featureProperties?.weather?.current?.wind_kph} <br/>
             </div>
     }
 
@@ -53,6 +60,7 @@ function HoveredFeaturePanel(): JSX.Element {
             <div className="leaflet-control leaflet-bar MapFeatureInformation">
                 <h4>Weather information</h4>
                 {freguesia}
+                {concelho}
                 {pais}
                 {temperature}
                 {windSpeed}

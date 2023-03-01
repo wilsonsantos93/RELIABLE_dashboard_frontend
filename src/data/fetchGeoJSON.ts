@@ -7,7 +7,7 @@ export async function fetchGeoJSON() {
 
     //! Fetch the geoJSON from the backend
     console.log("Started fetching the geoJSON from the backend.");
-    let url = "http://localhost:8000/getRegionBorders/";
+    let url = "http://localhost:8000/api/region";
 
     const geoJSONsResponse = await fetch(url);
 
@@ -15,7 +15,7 @@ export async function fetchGeoJSON() {
 
     // Note that despite the method being named json(),
     // the result is not JSON but is instead the result of taking JSON as input and parsing it to produce a JavaScript object.
-    let geoJSON: GeoJsonObject = await geoJSONsResponse.json() as GeoJsonObject;
+    let geoJSON: any /* GeoJsonObject */ = await geoJSONsResponse.json() //as GeoJsonObject;
 
     return geoJSON;
 }

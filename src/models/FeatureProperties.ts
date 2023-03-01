@@ -31,5 +31,5 @@ export interface FeatureProperties {
     Freguesia?: string
     sovereignt?: string
     weather?: FeatureWeather
-
+    Concelho?: string
 }

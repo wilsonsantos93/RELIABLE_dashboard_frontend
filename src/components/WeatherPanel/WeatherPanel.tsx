@@ -9,19 +9,12 @@ import WeatherDateSelector from "./WeatherDateSelector";
 function WeatherPanel(): JSX.Element {
 
     return (
-
         <div className="WeatherPanel">
-
             <Stack>
-
                 <WeatherInfoSelector/>
-
                 <WeatherDateSelector/>
-
             </Stack>
-
         </div>
-
     );
 
 }

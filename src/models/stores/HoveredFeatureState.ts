@@ -1,9 +1,6 @@
 import {FeatureProperties} from "../FeatureProperties";
 
 export interface HoveredFeatureState {
-
-    featureProperties: FeatureProperties | null
-    setFeatureProperties: (featureProperties: FeatureProperties | null) => void
-
-
+    featureProperties: any; //FeatureProperties | null
+    setFeatureProperties: (obj: any) => void //(featureProperties: FeatureProperties | null) => void
 }

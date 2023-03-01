@@ -8,13 +8,12 @@ import GeoJsonLayer from "./GeoJsonLayer";
 
 function Map(): JSX.Element {
 
-    let mapRef = createRef<LeafletMap>()
+    let mapRef = createRef<LeafletMap>();
     let geoJsonLayer = createRef<GeoJSON>(); //https://github.com/PaulLeCam/react-leaflet/issues/332
     
     return (
 
         <div>
-
             <MapContainer
                 ref={mapRef}
                 preferCanvas={true}
@@ -38,7 +37,6 @@ function Map(): JSX.Element {
                 <HoveredFeaturePanel/>
 
             </MapContainer>
-
         </div>
 
     );

@@ -1,4 +1,3 @@
-import React from 'react';
 import './styles/Index.css';
 import App from './components/App';
 import reportWebVitals from './reportWebVitals';
