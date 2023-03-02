@@ -13,6 +13,16 @@ const WeatherPanelStore = create<WeatherPanelState>((set) => ({
         selectedInformation: selectedInformation
     })),
 
+    loading: true,
+    setLoading: (bool) => set(state => ({
+        loading: bool
+    })),
+
+    data: true,
+    setData: (data) => set(state => ({
+        data: data
+    }))
+
 }))
 
 

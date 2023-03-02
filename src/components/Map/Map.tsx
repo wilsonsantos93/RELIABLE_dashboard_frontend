@@ -1,18 +1,21 @@
-import React, {createRef} from 'react';
+import {createRef, useEffect} from 'react';
 import {MapContainer, TileLayer} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../../styles/Map.css'
 import {GeoJSON, Map as LeafletMap} from "leaflet";
 import HoveredFeaturePanel from "./HoveredFeaturePanel";
 import GeoJsonLayer from "./GeoJsonLayer";
+import Sidebar from '../WeatherPanel/Sidebar';
+import LeafletGeoSearch from './LeafletGeoSearch';
+import "leaflet-fullscreen";
+import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 
-function Map(): JSX.Element {
+function Map() {
 
     let mapRef = createRef<LeafletMap>();
     let geoJsonLayer = createRef<GeoJSON>(); //https://github.com/PaulLeCam/react-leaflet/issues/332
-    
-    return (
 
+    return (
         <div>
             <MapContainer
                 ref={mapRef}
@@ -25,23 +28,23 @@ function Map(): JSX.Element {
                 minZoom={4}
                 maxBounds={[[-90, -180], [90, 180]]}
                 maxBoundsViscosity={0.8}
+                fullscreenControl={true}
             >
-
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+                
+                <GeoJsonLayer mapRef={mapRef} geoJsonLayer={geoJsonLayer}/> 
 
-
-                <GeoJsonLayer mapRef={mapRef} geoJsonLayer={geoJsonLayer}/>
+                <LeafletGeoSearch geoJsonLayer={geoJsonLayer} style={{zIndex:900}} />
 
                 <HoveredFeaturePanel/>
 
+                <Sidebar /> 
+
             </MapContainer>
         </div>
-
     );
-
 }
 
 export default Map;
-

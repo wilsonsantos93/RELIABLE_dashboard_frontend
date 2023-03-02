@@ -5,7 +5,12 @@ import '../../styles/WeatherPanel.css';
 import {Col, Row} from "react-bootstrap";
 import WeatherPanelStore from "../../stores/WeatherPanelStore";
 import {fetchWeatherDates} from "../../data/fetchWeatherDates";
-
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+dayjs.extend(utc);
+dayjs.extend(timezone);
+const tz = "Europe/Lisbon";
 
 function WeatherDateSelector(): JSX.Element {
     type WeatherDate = {
@@ -40,7 +45,10 @@ function WeatherDateSelector(): JSX.Element {
                 <Form.Select value={selectedDateDatabaseId} onChange={onSelectChange}>
                     <option value="">No date selected</option>
                     { 
-                        weatherDates?.map(date => <option key={date._id} value={date._id}>{date.date.toDateString()}</option>)
+                        weatherDates?.map(date => 
+                        <option key={date._id} value={date._id}>
+                            {dayjs(date.date.toISOString()).tz(tz).format("YYYY-MM-DD HH:mm")}
+                        </option>)
                     }
                 </Form.Select>
             </Col>

@@ -56,7 +56,7 @@ function HoveredFeaturePanel(): JSX.Element {
     }
 
     return (
-        <div className={POSITION_CLASSES["topright"]}>
+        <div className={POSITION_CLASSES["bottomleft"]}>
             <div className="leaflet-control leaflet-bar MapFeatureInformation">
                 <h4>Weather information</h4>
                 {freguesia}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState} from 'react';
 import {GeoJSON, LayerGroup, Marker, Popup} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../../styles/Map.css'
@@ -13,12 +13,9 @@ import HoveredFeatureStore from "../../stores/HoveredFeatureStore";
 import {fetchWeatherGeoJSON} from "../../data/fetchWeatherGeoJSON";
 import markerIconPng from "leaflet/dist/images/marker-icon.png"
 import {Icon} from 'leaflet'
-import ClickedFeatureStore from '../../stores/ClickedFeatureStore';
-import { useStableCallback } from '../useStableCallback';
+import "@mapbox/leaflet-pip";
 
-
-
-function GeoJsonLayer(props: GeoJsonLayerProperties) {
+const GeoJsonLayer = (props: any) => {
 
     const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
     const selectedDateId = WeatherPanelStore(state => state.selectedDateDatabaseId);
@@ -29,12 +26,14 @@ function GeoJsonLayer(props: GeoJsonLayerProperties) {
     const [lastDateRendered, setLastDateRendered] = useState("");
 
     const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
-    //const [clickedFeatureId, setClickedFeatureId] = useState<any>(null);
-
     const markerIcon = new Icon({iconUrl: markerIconPng, iconSize: [25, 41], iconAnchor: [12, 41]});
 
-    const setClickedFeatureId = ClickedFeatureStore(state => state.setClickedFeatureId);
-    const clickedFeatureId = ClickedFeatureStore(state => state.clickedFeatureId);
+    let clickedFeatureId: any = null;
+
+    //const [loading, setLoading] = useState<boolean>(true);
+    const setLoading = WeatherPanelStore(state => state.setLoading);
+
+    const setData = WeatherPanelStore(state => state.setData);
 
 
     /**
@@ -59,7 +58,7 @@ function GeoJsonLayer(props: GeoJsonLayerProperties) {
             opacity: 1,
             color: "white",
             dashArray: "3",
-            fillOpacity: 0.7,
+            fillOpacity: 0.5,
         };
 
         return mapFeatureNotHoveredStyle as PathOptions;
@@ -104,8 +103,10 @@ function GeoJsonLayer(props: GeoJsonLayerProperties) {
     useEffect(() => {
         (async () => {
             if (selectedDateId) {
+                setLoading(true);
                 const data = await fetchWeatherGeoJSON(selectedDateId);
                 setGeoJSON(data);
+                setData(data);
                 if (props.geoJsonLayer.current) {
                     props.geoJsonLayer.current.clearLayers().addData(data);
                     setCurrentlyRenderingGeoJsonWeather(true);
@@ -116,11 +117,21 @@ function GeoJsonLayer(props: GeoJsonLayerProperties) {
         })()
     }, [selectedDateId]);
 
+    useEffect(() => {
+        if (geoJSON) setLoading(false);
+     }, [geoJSON])
+
 
     // Zooms to the feature clicked
     const zoomToFeature = (event: LeafletMouseEvent, map: LeafletMap | null) => {
         if (map !== null) {
-            map.fitBounds(event.target.getBounds());
+            //map.fitBounds(event.target.getBounds());
+            const currentZoom = map.getZoom();
+            let zoom = 11;
+            if (currentZoom >= zoom) {
+               zoom = currentZoom;
+            }
+            map.setView(event.latlng, zoom);
         }
     }
 
@@ -139,7 +150,6 @@ function GeoJsonLayer(props: GeoJsonLayerProperties) {
         const mapFeatureHovered = mapFeatureHoveredEvent.feature;
 
         if (mapFeatureHovered._id === clickedFeatureId) {
-            console.log("out of clicked region");
             return;
         }
 
@@ -183,16 +193,16 @@ function GeoJsonLayer(props: GeoJsonLayerProperties) {
 
     const addMarker = (event: LeafletMouseEvent) => {
         setMarkerPosition(event.latlng);
-        setClickedFeatureId(event.target.feature._id);
+        clickedFeatureId = event.target.feature._id;
     }
 
     /**
      * The events associated with each feature
      */
     const onEachFeature = (feature: Feature<Geometry, FeatureProperties>, layer: Layer, map: LeafletMap | null) => {
+        layer.bindPopup(`<a href="#">Guardar localização </a>`);
         layer.on({
             mouseover: (event) => {
-                console.log(clickedFeatureId)
                 highlightFeature(event);
             },
             mouseout: (event) => {
@@ -200,7 +210,8 @@ function GeoJsonLayer(props: GeoJsonLayerProperties) {
             },
             click: (event) => {
                 addMarker(event);
-                //zoomToFeature(event, map)
+                highlightFeature(event);
+                zoomToFeature(event, map);
             },
         });
     }
@@ -213,12 +224,13 @@ function GeoJsonLayer(props: GeoJsonLayerProperties) {
                 onEachFeature={(feature, layer) => onEachFeature(feature, layer, props.mapRef.current)}
                 // @ts-ignore
                 style={getStyle}
-            />
-            { markerPosition && 
+            /> 
+
+            {/* { markerPosition && 
                 <Marker icon={markerIcon} position={markerPosition}> 
                     <Popup><a href="#">Guardar localização </a></Popup>
                 </Marker>
-            }
+            } */}
         </LayerGroup>
     );
 
