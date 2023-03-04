@@ -21,6 +21,26 @@ const WeatherPanelStore = create<WeatherPanelState>((set) => ({
     data: true,
     setData: (data) => set(state => ({
         data: data
+    })),
+
+    weatherFields: [],
+    setWeatherFields: (fields) => set(state => ({
+        weatherFields: fields
+    })),
+
+    clickedFeature: null,
+    setClickedFeature: (feature) => set(state => ({
+        clickedFeature: feature
+    })),
+
+    comparedFeatures: [],
+    setComparedFeatures: (data: any[]) => set(state => ({
+        comparedFeatures: data
+    })),
+
+    comparisonMode: false,
+    setComparisonMode: () => set(state => ({
+        comparisonMode: !state.comparisonMode
     }))
 
 }))

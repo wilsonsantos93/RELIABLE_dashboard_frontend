@@ -2,7 +2,6 @@
  * Fetches and returns the geoJSON with the weather dates informatio .
  */
 export async function fetchWeatherDates() {
-
     console.log("Started fetching the weather dates from the backend.");
     let url = "http://localhost:8000/api/weather/dates";
 

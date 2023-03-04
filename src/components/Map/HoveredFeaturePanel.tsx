@@ -1,10 +1,12 @@
 import '../../styles/MapFeatureInformation.css'
 import HoveredFeatureStore from "../../stores/HoveredFeatureStore";
 import { FeatureProperties } from '../../models/FeatureProperties';
+import WeatherPanelStore from '../../stores/WeatherPanelStore';
 
 function HoveredFeaturePanel(): JSX.Element {
 
-    const featureProperties = HoveredFeatureStore(state => state.featureProperties)
+    const featureProperties = HoveredFeatureStore(state => state.featureProperties);
+    const weatherFields = WeatherPanelStore(state => state.weatherFields);
 
     // Classes used by Leaflet to position controls
     const POSITION_CLASSES = {
@@ -37,10 +39,9 @@ function HoveredFeaturePanel(): JSX.Element {
         </div>
     }
 
-    let temperature: JSX.Element = <div/>;
+/*     let temperature: JSX.Element = <div/>;
     if (featureProperties?.weather) {
         temperature = <div style={{fontSize: 20}}>
-            {/*@ts-ignore*/}
             Temperatura (C): {featureProperties?.weather?.current?.temp_c} <br/>
         </div>
     }
@@ -50,10 +51,11 @@ function HoveredFeaturePanel(): JSX.Element {
         // @ts-ignore
         windSpeed =
             <div style={{fontSize: 20}}>
-                {/*@ts-ignore*/}
                 Velocidade do vento (Kph): {featureProperties?.weather?.current?.wind_kph} <br/>
             </div>
-    }
+    } */
+
+
 
     return (
         <div className={POSITION_CLASSES["bottomleft"]}>
@@ -62,8 +64,8 @@ function HoveredFeaturePanel(): JSX.Element {
                 {freguesia}
                 {concelho}
                 {pais}
-                {temperature}
-                {windSpeed}
+                {/* {temperature}
+                {windSpeed} */}
             </div>
         </div>
     )

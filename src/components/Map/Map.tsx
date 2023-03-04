@@ -29,6 +29,7 @@ function Map() {
                 maxBounds={[[-90, -180], [90, 180]]}
                 maxBoundsViscosity={0.8}
                 fullscreenControl={true}
+                doubleClickZoom={false}
             >
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

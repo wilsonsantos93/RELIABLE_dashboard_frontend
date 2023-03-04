@@ -8,6 +8,7 @@ import WeatherPanelStore from '../stores/WeatherPanelStore';
 
 function App(): JSX.Element {
     const loading = WeatherPanelStore(state => state.loading);
+    const comparisonMode = WeatherPanelStore(state => state.comparisonMode);
 
     return (
         <div>
@@ -24,6 +25,9 @@ function App(): JSX.Element {
             <ToastContainer style={{zIndex:999}} position="bottom-center">
                 <Toast show={loading} animation={true}>
                     <Toast.Body><Spinner size="sm" animation="border" role="status" /> A carregar...</Toast.Body>
+                </Toast> 
+                <Toast show={comparisonMode} animation={true}>
+                    <Toast.Body>Clique nas localidades para adicionar à lista</Toast.Body>
                 </Toast> 
             </ToastContainer>
         </div>
