@@ -124,6 +124,8 @@ const GeoJsonLayer = (props: any) => {
 
         button.onclick = function() {
             console.log("Adicionar à comparação", event.target.feature.properties.Concelho)
+            const comparedFeaturesFiltered = comparedFeatures.find((f:any) => f._id == event.target.feature._id)
+            if (comparedFeaturesFiltered) return
             setComparedFeatures([...comparedFeatures, event.target.feature])
         }
 
@@ -203,10 +205,6 @@ const GeoJsonLayer = (props: any) => {
             mapFeatureHoveredEvent.setStyle(mapFeatureHoveredStyle);
             mapFeatureHoveredEvent.bringToFront();
         })
-    }
-
-    const addToComparison = () => {
-        console.log("add to comparison");
     }
 
 

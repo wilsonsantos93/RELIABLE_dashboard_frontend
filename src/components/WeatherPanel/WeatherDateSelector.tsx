@@ -43,7 +43,7 @@ function WeatherDateSelector(): JSX.Element {
             <Col style={{margin: 0, padding: 0}}><Form.Text>Selecionar data</Form.Text></Col>
             <Col style={{margin: 0, padding: 0}}>
                 <Form.Select value={selectedDateDatabaseId} onChange={onSelectChange}>
-                    <option value="">Sem data selecionada</option>
+                    <option key="none_opt_date" value="">Sem data selecionada</option>
                     { 
                         weatherDates?.map(date => 
                         <option key={date._id} value={date._id}>

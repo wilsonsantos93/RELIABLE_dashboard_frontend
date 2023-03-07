@@ -9,6 +9,7 @@ import WeatherInfoSelector from "./WeatherInfoSelector";
 import WeatherPanelStore from "../../stores/WeatherPanelStore";
 import { Table } from "react-bootstrap";
 import { useTable, useSortBy } from "react-table";
+import ParallelCoordinatesChart from "./parallel-coordinates-chart/paralell-coordinates-chart.component.";
 
 const Sidebar = () => {
     const clickedFeature = WeatherPanelStore(state => state.clickedFeature);
@@ -92,8 +93,9 @@ const Sidebar = () => {
         <div id="sidebar" className="leaflet-sidebar collapsed">
             <div className="leaflet-sidebar-tabs">
                 <ul role="tablist" style={{paddingLeft: "0px"}}> 
-                    <li><a href="#tab1" role="tab">t1</a></li>
-                    <li><a href="#tab2" role="tab">t2</a></li>
+                    <li key="tab1"><a href="#tab1" role="tab">t1</a></li>
+                    <li key="tab2"><a href="#tab2" role="tab">t2</a></li>
+                    <li key="tab3"><a href="#tab3" role="tab">t3</a></li>
                 </ul>
             </div>
     
@@ -106,7 +108,7 @@ const Sidebar = () => {
                     <Table responsive striped bordered hover>
                         <thead>
                             <tr>
-                                <th>Concelho</th>
+                                <th key="Concelho_th">Concelho</th>
                                 { 
                                     weatherFields.map(field => 
                                         <th key={field._id+"_th"}>{field.displayName}</th>
@@ -128,11 +130,11 @@ const Sidebar = () => {
                             </tr> */}
                             {
                                comparedFeatures.map((feature:any) => 
-                                <tr>
-                                    <td>{feature?.properties?.Concelho}</td>
+                                <tr key={"Concelho_tr_"+feature._id}>
+                                    <td key="Concelho_td">{feature?.properties?.Concelho}</td>
                                     {
                                         weatherFields.map(field => {
-                                            if (!feature?.weather) return <td></td>
+                                            if (!feature?.weather) return <td key="none_td_key"></td>
                                             return <td style={{backgroundColor: getColor(feature?.weather[field.name], field.name)}} key={field._id+"_td"}>
                                                 {feature?.weather[field.name]}
                                             </td>
@@ -146,6 +148,13 @@ const Sidebar = () => {
                     <a href="#" onClick={setComparisonMode}>
                         { comparisonMode ? "Cancelar comparação" : "Adicionar mais localidades para comparar" }
                     </a>
+                </div>
+
+                <div className="leaflet-sidebar-pane" id="tab3">
+                    <h1 className="leaflet-sidebar-header">Gráfico
+                        <div className="leaflet-sidebar-close">X</div>
+                    </h1>
+                    <ParallelCoordinatesChart/>
                 </div>
     
                 <div className="leaflet-sidebar-pane" id="tab2">

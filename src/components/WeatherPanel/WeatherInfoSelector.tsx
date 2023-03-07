@@ -34,7 +34,7 @@ function WeatherInfoSelector(): JSX.Element {
             <Col style={{margin: 0, padding: 0}}><Form.Text>Weather information</Form.Text></Col>
             <Col style={{margin: 0, padding: 0}}>
                 <Form.Select value={selectedWeatherField?.name} onChange={onSelectChange}>
-                    <option value="">Sem informação selecionada</option>
+                    <option key="none_opt_weather" value="">Sem informação selecionada</option>
                     {
                         weatherFields.map((field: any) => 
                             <option key={field._id} value={field.name}>{field.displayName || field.name }</option>
