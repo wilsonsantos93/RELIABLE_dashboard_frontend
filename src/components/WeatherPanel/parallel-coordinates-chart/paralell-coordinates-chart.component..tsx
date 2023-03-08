@@ -26,35 +26,6 @@ const ParallelCoordinatesChart = () => {
           categories: [] as string[],
           offset: 10
         },
-        /* yAxis: [{
-          type: 'datetime',
-          tooltipValueFormat: '{value:%Y-%m-%d}'
-        }, {
-            min: 0,
-            tooltipValueFormat: '{value} mile(s)'
-        }, {
-            type: 'datetime',
-            min: 0,
-            labels: {
-                format: '{value:%H:%M}'
-            }
-        }, {
-            categories: [
-                'Other',
-                'Adidas',
-                'Mizuno',
-                'Asics',
-                'Brooks',
-                'New Balance',
-                'Izumi'
-            ]
-        }, {
-            type: 'datetime'
-        }, {
-            categories: ['&gt; 5miles', '&lt; 5miles']
-        }, {
-            categories: ['Before', 'After']
-        }], */
         series: [] as any[],
         tooltip: {
           pointFormat: '<span style="color:{point.color}">\u25CF</span>' +
@@ -87,19 +58,7 @@ const ParallelCoordinatesChart = () => {
     });
 
     useEffect( () => {
-        console.log("Data has changed, updating series");
-        /* setChartOptions({ 
-          ...chartOptions,
-          series: comparedFeatures.map((set:any, i: any) => {
-            const data = weatherFields.map(field => set.weather[field.name])
-            console.log({name: 'region_'+i, data, shadow:false})
-            return {
-                name: 'region_'+i,
-                data: data,
-                shadow: false
-            };
-          })
-        }) */
+        //console.log("Data has changed, updating series");
         const series = comparedFeatures.map((set:any, i: any) => {
             const data = weatherFields.map(field => set.weather[field.name])
             return {
@@ -114,12 +73,12 @@ const ParallelCoordinatesChart = () => {
             series: series
         })
 
-        console.log("SET DATA", chartOptions.series)
+        //console.log("SET DATA", chartOptions.series)
     }, [comparedFeatures]);
 
 
     useEffect( () => {
-        console.log("weather fields has changed, updating series");
+        //console.log("weather fields has changed, updating series");
         const categories =  weatherFields.map(field => field.displayName);
        
         setChartOptions({ 
@@ -130,7 +89,7 @@ const ParallelCoordinatesChart = () => {
           }
         })
 
-        console.log("SET CATEGORIES", chartOptions.xAxis.categories)
+        //console.log("SET CATEGORIES", chartOptions.xAxis.categories)
 
     }, [weatherFields]);
 

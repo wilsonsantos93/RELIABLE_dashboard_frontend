@@ -1,5 +1,5 @@
 import create from 'zustand'
-import {HoveredFeatureState} from "../models/stores/HoveredFeatureState";
+import {HoveredFeatureState} from "../types/stores/HoveredFeatureState";
 
 const HoveredFeatureStore = create<HoveredFeatureState>((set) => ({
 

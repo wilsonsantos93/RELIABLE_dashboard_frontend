@@ -1,9 +1,8 @@
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import 'leaflet-geosearch/dist/geosearch.css';
 import L from 'leaflet';
-import WeatherPanelStore from '../../stores/WeatherPanelStore';
 declare function require(name:string):any;
 var leafletPip = require('@mapbox/leaflet-pip');
 //import "@mapbox/leaflet-pip/leaflet-pip.js";

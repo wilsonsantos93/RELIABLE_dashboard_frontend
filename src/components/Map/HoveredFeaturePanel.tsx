@@ -1,6 +1,6 @@
 import '../../styles/MapFeatureInformation.css'
 import HoveredFeatureStore from "../../stores/HoveredFeatureStore";
-import { FeatureProperties } from '../../models/FeatureProperties';
+import { FeatureProperties } from '../../types/FeatureProperties';
 import WeatherPanelStore from '../../stores/WeatherPanelStore';
 
 function HoveredFeaturePanel(): JSX.Element {

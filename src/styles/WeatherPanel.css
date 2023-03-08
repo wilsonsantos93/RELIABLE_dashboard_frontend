@@ -9,7 +9,7 @@
     background: #333
 }
 
-.WeatherInfoSelector {
+/* .WeatherInfoSelector {
     position: relative;
     display: flex;
     justify-content: center;
@@ -17,12 +17,12 @@
     min-width: 100px;
     height: 10%;
     min-height: 100px;
-}
+} */
 
-.WeatherInfoLabel {
+/* .WeatherInfoLabel {
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
     margin: auto;
-}
+} */

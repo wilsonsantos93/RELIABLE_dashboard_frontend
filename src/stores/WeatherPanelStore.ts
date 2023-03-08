@@ -1,5 +1,5 @@
 import create from 'zustand'
-import {WeatherPanelState} from "../models/stores/WeatherPanelState";
+import {WeatherPanelState} from "../types/stores/WeatherPanelState";
 
 const WeatherPanelStore = create<WeatherPanelState>((set) => ({
 
