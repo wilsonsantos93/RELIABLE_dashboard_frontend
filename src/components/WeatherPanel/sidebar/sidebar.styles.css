@@ -1,0 +1,43 @@
+tbody tr.comparisonTblRow:hover {
+    border: 3px solid black!important;
+}
+
+.leaflet-sidebar-header {
+    background-color: black!important;
+}
+
+.leaflet-sidebar-tabs > ul > li.active {
+    background-color: black!important;
+}
+
+@media (min-width: 1200px) {
+    .leaflet-sidebar {
+        width: 40vw;
+        max-width: 40vw;
+    }
+}
+
+html, 
+body, 
+.leaflet-sidebar-content,
+.leaflet-sidebar-pane,
+.container-table, 
+.inline-row, 
+.inline-row > div {
+    height: 100%!important;
+}
+
+/* We do the trick here with Table, table row and table-cell */
+.container-table {
+    display: table!important;
+    width: 100%!important; /* Width is important for display:table */
+}
+
+.inline-row { 
+    display: table-row!important; 
+}
+.inline-row > div { display: table-cell!important; }
+
+/* This will set our heights as we need them */
+.inline-row > div > .row { height: 100%!important; }
+.inline-row > div .row > div { height: 50%!important; overflow-y:auto!important; }
