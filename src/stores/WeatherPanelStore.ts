@@ -1,3 +1,4 @@
+import React, { createRef, MutableRefObject } from 'react';
 import create from 'zustand'
 import {WeatherPanelState} from "../types/stores/WeatherPanelState";
 
@@ -42,7 +43,6 @@ const WeatherPanelStore = create<WeatherPanelState>((set) => ({
     setComparisonMode: () => set(state => ({
         comparisonMode: !state.comparisonMode
     }))
-
 }))
 
 

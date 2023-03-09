@@ -19,8 +19,8 @@ const LeafletGeoSearch = (props: any) => {
     // @ts-ignore
     const searchControl = new GeoSearchControl({
         provider: provider,
-        style: 'bar', // button or bar
-        keepResult: true,
+        style: 'button', // button or bar
+        keepResult: false,
         showMarker: false,
         searchLabel: "Pesquise uma morada...",
         autoClose: true,
@@ -39,7 +39,7 @@ const LeafletGeoSearch = (props: any) => {
                 });
             });
         });
-    },[props.geoJsonLayer])
+    }, [props.geoJsonLayer])
 
     useEffect(() => {
         (() => {

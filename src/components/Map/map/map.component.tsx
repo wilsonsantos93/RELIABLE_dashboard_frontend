@@ -39,7 +39,7 @@ function Map() {
 
                 <LeafletGeoSearch geoJsonLayer={geoJsonLayer} style={{zIndex:900}} />
 
-                <HoveredFeaturePanel/>
+                {/* <HoveredFeaturePanel/> */}
 
                 <Sidebar /> 
 

@@ -13,7 +13,6 @@ import "./sidebar.styles.css";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 
 const Sidebar = () => {
-    //const clickedFeature = WeatherPanelStore(state => state.clickedFeature);
     const [isOpen, setIsOpen] = useState(false);
     const [sidebar, setSidebar] = useState<L.Control.Sidebar|null>(null);
     const weatherFields = WeatherPanelStore(state => state.weatherFields);
@@ -41,11 +40,21 @@ const Sidebar = () => {
         setComparedFeatures([]);
     }
 
+    const setComparison = () => {
+        map.closePopup(); 
+        setComparisonMode();
+       // if (!comparisonMode) setComparedFeatures([comparedFeatures[0]]);
+    }
+
+    useEffect(() => {
+        if (!comparisonMode && comparedFeatures.length) setComparedFeatures([comparedFeatures[0]]);
+    }, [comparisonMode])
+
     const map = useMap();
     useEffect(() => {
         (() => { 
             const sidebar = L.control.sidebar({
-                autopan: false,       // whether to maintain the centered map point when opening the sidebar
+                autopan: true,       // whether to maintain the centered map point when opening the sidebar
                 closeButton: true,    // whether t add a close button to the panes
                 container: 'sidebar', // the DOM container or #ID of a predefined sidebar container that should be used
                 position: 'right',     // left or right
@@ -64,19 +73,17 @@ const Sidebar = () => {
         })()
     }, [])
 
-
-    /* useEffect(() => {
-        if (clickedFeature && !isOpen) sidebar?.open("tab1");
-        else if (!clickedFeature) sidebar?.close();
-    }, [clickedFeature]) */
-
+    const removeFeature = (featureId: string) => {
+        const filteredFeatures = comparedFeatures.filter((f:any) => f._id != featureId);
+        setComparedFeatures(filteredFeatures);
+    }
 
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);
 
-    const hoverFeature = (featureId: any) => {
+    const hoverFeature = (featureId: string) => {
         const feature = comparedFeatures.find((f:any) => f._id == featureId);
-        setFeatureProperties({_id: feature._id, properties: feature.properties, weater: feature.weather});
+        setFeatureProperties({_id: feature._id, properties: feature.properties, weather: feature.weather, rowHover: true});
     }
 
     useEffect(() => {
@@ -109,6 +116,10 @@ const Sidebar = () => {
                                     <Table size="sm" responsive striped bordered hover>
                                         <thead>
                                             <tr>
+                                                {/* { 
+                                                    comparisonMode &&
+                                                    <th key="remove_th"></th>
+                                                } */}
                                                 <th key="Concelho_th">Concelho</th>
                                                 { 
                                                     weatherFields.map(field => 
@@ -120,7 +131,21 @@ const Sidebar = () => {
                                         <tbody>
                                         {
                                             comparedFeatures.map((feature:any) => 
-                                            <tr id={"row_"+feature._id} style={hoveredFeature._id == feature._id ? { border: '3px solid black' } : { border: '1px solid black'}} onMouseOver={() => hoverFeature(feature._id)} className="comparisonTblRow" key={"Concelho_tr_"+feature._id}>
+                                            <tr 
+                                                id={"row_"+feature._id} 
+                                                style={ comparedFeatures.length > 1 && hoveredFeature._id == feature._id ? { border: '3px solid red' } : { border: '1px solid black' }} 
+                                                onClick={() => hoverFeature(feature._id)}
+                                                className="comparisonTblRow" 
+                                                key={"Concelho_tr_"+feature._id}
+                                                
+                                            >
+                                                {/* { 
+                                                comparisonMode &&
+                                                <td key="remove_td">
+                                                    <button onClick={() => removeFeature(feature._id)} className="btn btn-sm btn-danger">X</button>
+                                                </td>
+                                                } */}
+
                                                 <td key="Concelho_td">{feature?.properties?.Concelho}</td>
                                                 {
                                                     weatherFields.map(field => {
@@ -135,20 +160,20 @@ const Sidebar = () => {
                                         </tbody>
                                     </Table>
 
-                                    <div>
-                                        <a href="#" onClick={setComparisonMode}>
-                                            { comparisonMode ? "Cancelar comparação" : "Adicionar mais localidades para comparar" }
+                                    <div className="row" style={{display:'unset', textAlign: 'center'}}>
+                                        <a href="#" onClick={setComparison}>
+                                            { comparisonMode ? "Sair do modo comparação" : "Entrar no modo comparação" }
                                         </a>
 
-                                        <a className="text-right" href="#" onClick={clearAll}>
+                                        <a href="#" onClick={clearAll}>
                                             Limpar tudo
                                         </a>
                                     </div>
                                 </Col>
                                 
                                 <Col xs={12}>
-                                    <div>
-                                        <h5>Dicas</h5>
+                                    <div className="text-left">
+                                        <h5>Recomendações</h5>
                                         Um doce pacote de belgas foi calmamente saboreado por uma águia que só deixou de perseguir a sua presa ao quinto golo. Não foi sequer uma grande entrada em ação, mas a superioridade dos encarnados era natural e as ocasiões começaram a suceder-se, Florentino e João Mário perderam ocasiões incríveis para marcar.
                                     </div>
                                 </Col>

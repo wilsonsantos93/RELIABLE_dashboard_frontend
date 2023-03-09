@@ -3,6 +3,6 @@ export interface MapFeatureStyle {
     weight: number,
     opacity?: number,
     color?: string,
-    dashArray: string,
+    dashArray?: string,
     fillOpacity?: number,
 }

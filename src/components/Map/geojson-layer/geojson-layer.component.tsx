@@ -15,7 +15,18 @@ import {Icon} from 'leaflet'
 import "@mapbox/leaflet-pip";
 import { useStableCallback } from '../../../hooks/UseStableCallback';
 
-let clickedFeatureId: any = null;
+
+const layerHighlightedStyle: MapFeatureStyle = {
+    color: "black",
+    weight: 3
+}
+
+const layerNormalStyle: MapFeatureStyle = {
+    color: "#a2a2a2",
+    weight: 1
+}
+
+let clickedFeatureId: string | null = null;
 
 const GeoJsonLayer = (props: any) => {
 
@@ -27,13 +38,15 @@ const GeoJsonLayer = (props: any) => {
     const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);
     const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
 
+
+
     /* const setClickedFeature = WeatherPanelStore(state => state.setClickedFeature);
     const clickedFeature = WeatherPanelStore(state => state.clickedFeature) */
 
 /*     const [currentlyRenderingGeoJsonWeather, setCurrentlyRenderingGeoJsonWeather] = useState(false);
     const [lastDateRendered, setLastDateRendered] = useState(""); */
 
-    const [previousLayer, setPreviousLayer] = useState<any>(null);
+    //const [previousLayer, setPreviousLayer] = useState<any>(null);
 
     /* const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
     const markerIcon = new Icon({iconUrl: markerIconPng, iconSize: [25, 41], iconAnchor: [12, 41]}); */
@@ -48,7 +61,9 @@ const GeoJsonLayer = (props: any) => {
         const field = weatherFields.find(field => field.name === selectedWeatherField.name);
         if (field) {
             for (let r of field.colours) {
-                if (r.min <= value && value < r.max) return r.colour
+                const min = r.min != null ? r.min : -Infinity; 
+                const max = r.max != null ? r.max : Infinity;
+                if (min <= value && value < max) return r.colour
             }
         }
         return "#808080";
@@ -65,14 +80,22 @@ const GeoJsonLayer = (props: any) => {
             featureColor = getColor(feature.weather[selectedWeatherField.name]);
         }
 
-        const mapFeatureNotHoveredStyle: MapFeatureStyle = {
+        let mapFeatureNotHoveredStyle: MapFeatureStyle = {
             fillColor: featureColor,
-            weight: 2,
+            //weight: 2,
             opacity: 1,
-            color: "black",
-            dashArray: "3",
-            fillOpacity: 0.5,
+            //color: "black",
+            //dashArray: "3",
+            fillOpacity: 0.8,
+            ...layerNormalStyle
         };
+
+        if (comparedFeatures.find((f:any) => f._id == feature._id)) {
+            mapFeatureNotHoveredStyle = { 
+                ...mapFeatureNotHoveredStyle, 
+                ...layerHighlightedStyle 
+            };
+        }
 
         return mapFeatureNotHoveredStyle as PathOptions;
     }
@@ -115,11 +138,13 @@ const GeoJsonLayer = (props: any) => {
         for (const key of keys) {
             if (props.geoJsonLayer.current._layers[key].feature._id != hoveredFeature._id) continue;
             const layer = props.geoJsonLayer.current._layers[key];
-            setLayerStyle(layer, {
-                weight: 6,
-                color: "black",
-                dashArray: "",
-            });
+            const isOnComparisonList = comparedFeatures.find((f:any) => f._id == hoveredFeature._id);
+            if (comparedFeatures.length > 1 && (hoveredFeature.rowHover || isOnComparisonList)) {
+                setLayerStyle(layer, {...layerHighlightedStyle, color: 'red' });
+            } 
+            else setLayerStyle(layer, layerHighlightedStyle);
+            //layer.setPopupContent(createPopupContent(hoveredFeature));
+            //layer.openPopup();
             break;
         }
     }, [hoveredFeature])
@@ -148,13 +173,14 @@ const GeoJsonLayer = (props: any) => {
             <br/>
         `;
 
+        const button = document.createElement("a");
+        button.href = "#";
+
         if (comparisonMode) {
-            const comparedFeaturesFiltered = comparedFeatures.find((f:any) => f._id == event.target.feature._id);
-            const button = document.createElement("a");
-            button.href = "#";
-            if (!comparedFeaturesFiltered) {
+            const featureInComparison = comparedFeatures.find((f:any) => f._id == event.target.feature._id);
+
+            if (!featureInComparison) {
                 button.innerHTML = "Adicionar à comparação";
-                //button.className = "btn btn-sm btn-primary";
                 button.onclick = function() {
                     setComparedFeatures([...comparedFeatures, event.target.feature]);
                     event.target.closePopup();
@@ -163,18 +189,15 @@ const GeoJsonLayer = (props: any) => {
             }
             else {
                 const filteredFeatures = comparedFeatures.filter((f:any) => f._id != event.target.feature._id);
-                //if (filteredFeatures.length) {
-                    button.innerHTML = "Remover da comparação";
-                    //button.className = "btn btn-sm btn-danger";
-                    button.onclick = function() {
-                        setComparedFeatures(filteredFeatures);
-                        event.target.closePopup();
-                        resetHighlightFeature(event);
-                    }
-                //}
+                button.innerHTML = "Remover da comparação";
+                button.onclick = function() {
+                    setComparedFeatures(filteredFeatures);
+                    event.target.closePopup();
+                }
             }
-            div.appendChild(button);
         }
+
+        div.appendChild(button);
        
         return div;
     }
@@ -207,30 +230,26 @@ const GeoJsonLayer = (props: any) => {
         const mapFeatureHoveredEvent = event.target;
         const mapFeatureHovered = mapFeatureHoveredEvent.feature;
 
-        setFeatureProperties({});
+        //setFeatureProperties({});
 
-        /* console.log("hover", mapFeatureHovered._id, "clicked", clickedFeatureId)
         if (mapFeatureHovered._id === clickedFeatureId) {
-            console.log("Not reset style")
             return;
-        } */
+        }
 
-        const exists = comparedFeatures.find((feature: any) => feature._id == mapFeatureHovered._id)
+        const exists = comparedFeatures.find((feature: any) => feature._id == mapFeatureHovered._id);
         if (exists) {
-            console.log("Already exists, keeping style") 
             return;
         }
 
         // For some reason, without sleeping, the map feature is highlighted only from a brief moment.
         sleep(10).then(_ => {
-            const mapFeatureHoveredStyle: MapFeatureStyle = {
-                weight: 2,
-                color: 'black',
-                dashArray: "3",
-            }
-            mapFeatureHoveredEvent.setStyle(mapFeatureHoveredStyle);
+            /* const mapFeatureHoveredStyle: MapFeatureStyle = {
+                weight: 1,
+                color: "#a2a2a2",
+                //dashArray: "3",
+            } */
+            mapFeatureHoveredEvent.setStyle(layerNormalStyle);
             mapFeatureHoveredEvent.bringToFront();
-            console.log("Resetting style", mapFeatureHovered.properties.Concelho)
             return;
         });
     }
@@ -251,7 +270,7 @@ const GeoJsonLayer = (props: any) => {
         }); */
 
         // For some reason, without sleeping, the map feature is highlighted only from a brief moment.
-        sleep(10).then(_ => {
+        /* sleep(10).then(_ => {
             const mapFeatureHoveredStyle: MapFeatureStyle = {
                 weight: 6,
                 color: "black",
@@ -261,23 +280,22 @@ const GeoJsonLayer = (props: any) => {
             mapFeatureHoveredEvent.bringToFront();
             console.log("higlight feature!", mapFeatureHovered.properties.Concelho);
             return;
-        })
+        }) */
+
+        /* if (comparedFeatures.find((f:any) => f._id == mapFeatureHovered._id)){
+            console.log("Compared feature. Highlight red");
+            setLayerStyle(mapFeatureHoveredEvent, { ...layerHighlightedStyle, color: 'red' });
+        }
+        else */ setLayerStyle(mapFeatureHoveredEvent, layerHighlightedStyle);
     }
 
 
-    const addMarker = (event: LeafletMouseEvent, layer: Layer) => {
-        //setMarkerPosition(event.latlng);
-        /* layer.setPopupContent(`
-            <strong>${event.target.feature.properties.Concelho}</strong><br/>
-            <span>${selectedWeatherField?.displayName}</span>
-            <span>${selectedWeatherField && event.target.feature.weather ? event.target.feature.weather[selectedWeatherField.name] : ''} ${selectedWeatherField.unit}</span>
-        `) */
-
+    const addMarker = (event:any, layer: Layer) => {
         layer.setPopupContent(createPopupContent(event))
     }
 
     const setClickedFeatureId = (event: LeafletMouseEvent) => {
-        //if (!event.target) return;
+        if (!event.target) return;
         //setPreviousLayer(event.target);
         clickedFeatureId = event.target.feature._id;
         const feature = { 
@@ -285,15 +303,15 @@ const GeoJsonLayer = (props: any) => {
             properties: event.target.feature.properties,
             weather: event.target.feature.weather 
         };
-        setFeatureProperties(feature);
+        setFeatureProperties({_id: feature._id, weather: feature.weather, properties: feature.properties, mapHover: true });
         //setClickedFeature(feature);
-        if (!comparisonMode) setComparedFeatures([feature]);
+        if (!comparisonMode && comparedFeatures.length <= 1) setComparedFeatures([feature]);
     }
 
     const newAddMarker = useStableCallback(addMarker);
     const newSetClickedFeatureId = useStableCallback(setClickedFeatureId);
     const newResetHighlightFeature = useStableCallback(resetHighlightFeature);
-
+    const newHighlightFeature = useStableCallback(highlightFeature);
 
     /* const openPopup = (event: any, layer: Layer) => {
         //event.latlng 
@@ -308,9 +326,8 @@ const GeoJsonLayer = (props: any) => {
         layer.bindPopup(`<strong>${feature.properties.Concelho}</strong><br/>`);
         layer.on({
             mouseover: (event) => {
-                highlightFeature(event);
-                //newAddMarker(event, layer);
-                //openPopup(event, layer);
+                //highlightFeature(event);
+                newHighlightFeature(event);
             },
             mouseout: (event) => {
                 newResetHighlightFeature(event);
@@ -318,10 +335,11 @@ const GeoJsonLayer = (props: any) => {
             click: (event) => {
                 newSetClickedFeatureId(event);
                 newAddMarker(event, layer);
-                highlightFeature(event);
+                //highlightFeature(event);
+                newHighlightFeature(event);
                 //zoomToFeature(event, map);
-                /* var elem = document.getElementById("row_"+feature._id);  
-                if (elem) elem.scrollIntoView(true);  */
+                const row = document.getElementById("row_"+event.target.feature._id);  
+                if (row) row.scrollIntoView(true); 
             },
         });
     }
