@@ -116,10 +116,10 @@ const Sidebar = () => {
                                     <Table size="sm" responsive striped bordered hover>
                                         <thead>
                                             <tr>
-                                                {/* { 
-                                                    comparisonMode &&
+                                                { 
+                                                    (comparisonMode && comparedFeatures.length > 1) &&
                                                     <th key="remove_th"></th>
-                                                } */}
+                                                }
                                                 <th key="Concelho_th">Concelho</th>
                                                 { 
                                                     weatherFields.map(field => 
@@ -130,7 +130,7 @@ const Sidebar = () => {
                                         </thead>
                                         <tbody>
                                         {
-                                            comparedFeatures.map((feature:any) => 
+                                            comparedFeatures.map((feature:any, i:number) => 
                                             <tr 
                                                 id={"row_"+feature._id} 
                                                 style={ comparedFeatures.length > 1 && hoveredFeature._id == feature._id ? { border: '3px solid red' } : { border: '1px solid black' }} 
@@ -139,12 +139,13 @@ const Sidebar = () => {
                                                 key={"Concelho_tr_"+feature._id}
                                                 
                                             >
-                                                {/* { 
-                                                comparisonMode &&
+                                               { comparisonMode && 
                                                 <td key="remove_td">
+                                                    { i > 0  &&
                                                     <button onClick={() => removeFeature(feature._id)} className="btn btn-sm btn-danger">X</button>
+                                                    }
                                                 </td>
-                                                } */}
+                                                }
 
                                                 <td key="Concelho_td">{feature?.properties?.Concelho}</td>
                                                 {
