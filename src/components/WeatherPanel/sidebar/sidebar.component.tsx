@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import WeatherDateSelector from "../weather-date-selector/weather-date-selector.component";
 import WeatherInfoSelector from "../weather-info-selector/weather-info-selector.component";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
-import { Col, Container, Row, Stack, Table } from "react-bootstrap";
+import { Col, Container, Row, Table } from "react-bootstrap";
 import ParallelCoordinatesChart from "../parallel-coordinates-chart/paralell-coordinates-chart.component.";
 import "./sidebar.styles.css";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
@@ -43,7 +43,6 @@ const Sidebar = () => {
     const setComparison = () => {
         map.closePopup(); 
         setComparisonMode();
-       // if (!comparisonMode) setComparedFeatures([comparedFeatures[0]]);
     }
 
     useEffect(() => {
@@ -73,7 +72,9 @@ const Sidebar = () => {
         })()
     }, [])
 
-    const removeFeature = (featureId: string) => {
+    const removeFeature = (e: any, featureId: string) => {
+        e.stopPropagation();
+        e.preventDefault();
         const filteredFeatures = comparedFeatures.filter((f:any) => f._id != featureId);
         setComparedFeatures(filteredFeatures);
     }
@@ -84,7 +85,12 @@ const Sidebar = () => {
     const hoverFeature = (featureId: string) => {
         const feature = comparedFeatures.find((f:any) => f._id == featureId);
         setFeatureProperties({_id: feature._id, properties: feature.properties, weather: feature.weather, rowHover: true});
+        console.log("Clicked row", feature.properties.Concelho);
     }
+
+    useEffect(() => {
+        if (!hoveredFeature) return;
+    }, [hoveredFeature])
 
     useEffect(() => {
         if (comparedFeatures.length && !isOpen) sidebar?.open("tab1");
@@ -137,12 +143,11 @@ const Sidebar = () => {
                                                 onClick={() => hoverFeature(feature._id)}
                                                 className="comparisonTblRow" 
                                                 key={"Concelho_tr_"+feature._id}
-                                                
                                             >
-                                               { comparisonMode && 
+                                               { (comparisonMode && comparedFeatures > 1) &&
                                                 <td key="remove_td">
                                                     { i > 0  &&
-                                                    <button onClick={() => removeFeature(feature._id)} className="btn btn-sm btn-danger">X</button>
+                                                    <button onClick={(e) => removeFeature(e, feature._id)} className="btn btn-sm btn-danger">X</button>
                                                     }
                                                 </td>
                                                 }

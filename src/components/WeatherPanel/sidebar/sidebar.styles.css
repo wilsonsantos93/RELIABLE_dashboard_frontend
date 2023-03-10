@@ -47,3 +47,35 @@ body,
 /* This will set our heights as we need them */
 .inline-row > div > .row { height: 100%!important; }
 .inline-row > div .row > div { height: 50%!important; overflow-y:auto!important; }
+
+
+/* Fixed table header */
+/* table {
+    width: 100%;
+}
+
+thead, tbody, tr, td, th { display: block; }
+
+tr:after {
+    content: ' ';
+    display: block;
+    visibility: hidden;
+    clear: both;
+}
+
+thead th {
+    height: 30px;
+}
+
+tbody {
+    height: 120px;
+    overflow-y: auto;
+}
+
+thead {
+}
+
+tbody td, thead th {
+    width: 19.2%;
+    float: left;
+} */
