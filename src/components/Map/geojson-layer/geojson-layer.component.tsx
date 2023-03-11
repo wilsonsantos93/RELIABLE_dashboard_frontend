@@ -133,10 +133,10 @@ const GeoJsonLayer = (props: any) => {
 
         //if (previousLayer && previousLayer.feature._id != hoveredFeature._id) previousLayer.closePopup();
         const layer = getLayer(hoveredFeature._id);
-        const isOnComparisonList = existsInComparedFeatures(hoveredFeature._id);
+        //const isOnComparisonList = existsInComparedFeatures(hoveredFeature._id);
     
         //if (comparedFeatures.length > 1 && (hoveredFeature.rowHover || isOnComparisonList)) {
-        if (isOnComparisonList) {
+        /* if (isOnComparisonList) {
             map.fitBounds(layer.getBounds(), {
                 maxZoom: map.getZoom()
             });
@@ -146,7 +146,8 @@ const GeoJsonLayer = (props: any) => {
         else {
             console.log("useEffect hoveredFeature - Setting BLACK color");
             setLayerStyle(layer, layerHighlightedStyle);
-        } 
+        }  */
+        highlightFeature(layer);
         setPreviousLayer(layer);
     }, [hoveredFeature])
 
@@ -248,6 +249,13 @@ const GeoJsonLayer = (props: any) => {
         if (isComparedFeature && comparisonMode){
             console.log("highlightFeature - Setting RED color");
             setLayerStyle(layer, layerRedHighlightedStyle);
+            /* map.fitBounds(layer.getBounds(), {
+                maxZoom: map.getZoom()
+            }); */
+            /* var targetPoint = map.project(layer.getBounds(), map.getZoom()).subtract([20 / 2, 0]),
+            targetLatLng = map.unproject(targetPoint, map.getZoom());
+
+            map.setView(targetLatLng, map.getZoom()); */
         }
         else {
             console.log("highlightFeature - Setting BLACK color");
