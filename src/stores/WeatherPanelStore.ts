@@ -4,6 +4,11 @@ import {WeatherPanelState} from "../types/stores/WeatherPanelState";
 
 const WeatherPanelStore = create<WeatherPanelState>((set) => ({
 
+    geoJsonLayerRef: undefined,
+    setGeoJsonLayerRef: (ref: any) => set(state => ({
+        geoJsonLayerRef: ref
+    })),
+
     selectedDateDatabaseId: undefined,
     setSelectedDateDatabaseId: (selectedDateDatabaseId) => set(state => ({
         selectedDateDatabaseId: selectedDateDatabaseId

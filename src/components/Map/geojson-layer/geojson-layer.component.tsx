@@ -34,6 +34,11 @@ const layerNormalStyle: MapFeatureStyle = {
 
 let clickedFeatureId: string | null = null;
 
+// Sleep function 
+const sleep = (ms: number) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const GeoJsonLayer = (props: any) => {
     const [geoJSON, setGeoJSON] = useState<GeoJsonObject | null>(null);
 
@@ -121,20 +126,27 @@ const GeoJsonLayer = (props: any) => {
 
 
     useEffect(() => {
-        if (!hoveredFeature) return
-        if (previousLayer && previousLayer.feature._id != hoveredFeature._id) previousLayer.closePopup();
+        resetHighlightFeature(previousLayer);
+        if (!hoveredFeature) {
+            return;
+        }
+
+        //if (previousLayer && previousLayer.feature._id != hoveredFeature._id) previousLayer.closePopup();
         const layer = getLayer(hoveredFeature._id);
         const isOnComparisonList = existsInComparedFeatures(hoveredFeature._id);
-        if (comparedFeatures.length > 1 && (hoveredFeature.rowHover || isOnComparisonList)) {
-            setLayerStyle(layer, layerRedHighlightedStyle);
-            //layer.setPopupContent(updatePopupContent(layer));
-            //layer.openPopup();
+    
+        //if (comparedFeatures.length > 1 && (hoveredFeature.rowHover || isOnComparisonList)) {
+        if (isOnComparisonList) {
             map.fitBounds(layer.getBounds(), {
                 maxZoom: map.getZoom()
             });
-
+            console.log("useEffect hoveredFeature - Setting RED color");
+            setLayerStyle(layer, layerRedHighlightedStyle);
         } 
-        else setLayerStyle(layer, layerHighlightedStyle);
+        else {
+            console.log("useEffect hoveredFeature - Setting BLACK color");
+            setLayerStyle(layer, layerHighlightedStyle);
+        } 
         setPreviousLayer(layer);
     }, [hoveredFeature])
 
@@ -191,16 +203,18 @@ const GeoJsonLayer = (props: any) => {
                 button.onclick = function() {
                     setComparedFeatures([...comparedFeatures, layer.feature]);
                     layer.closePopup();
-                    highlightFeature(layer);
-                    //event.target.setStyle(layerHighlightedStyle);
+                    newHighlightFeature(layer);
+                    const tbl = document.querySelector(".featuresTable");
+                    if (tbl) tbl.scrollIntoView({block: "end", inline: "end"});
                 }
             }
             else {
                 button.innerHTML = "Remover da comparação";
                 button.onclick = function() {
-                    const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.target.feature._id);
+                    const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
                     setComparedFeatures(filteredFeatures);
                     layer.closePopup();
+                    console.log("Remove button - Setting NORMAL color");
                     setLayerStyle(layer, layerNormalStyle)
                 }
             }
@@ -210,38 +224,43 @@ const GeoJsonLayer = (props: any) => {
         return div;
     }
 
-    // Sleep function 
-    const sleep = (ms: number) => {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
 
-    // Resets the highlight a feature of the map when hovered over.
+    // Resets the highlight a feature of the map when hovered out.
     const resetHighlightFeature = (layer: any) => {
-        if (layer.feature._id === clickedFeatureId) {
+        if (!layer || (layer.feature._id === clickedFeatureId)) {
             return;
         }
 
-        const exists = comparedFeatures.find((feature: any) => feature._id == layer.feature._id);
+        const exists = existsInComparedFeatures(layer.feature._id);
         if (exists) {
+            console.log("resetHighlight - Setting BLACK color");
             setLayerStyle(layer, layerHighlightedStyle)
             return;
         }
 
+        console.log("resetHighlight - Setting NORMAL color");
         setLayerStyle(layer, layerNormalStyle);
     }
 
     // Highlights a feature of the map when hovered over.
     const highlightFeature = (layer: any) => {
-        const isComparedFeature = comparedFeatures.find((f:any) => f._id == layer.feature._id);
+        const isComparedFeature = existsInComparedFeatures(layer.feature._id);
         if (isComparedFeature && comparisonMode){
+            console.log("highlightFeature - Setting RED color");
             setLayerStyle(layer, layerRedHighlightedStyle);
         }
-        else setLayerStyle(layer, layerHighlightedStyle);
+        else {
+            console.log("highlightFeature - Setting BLACK color");
+            setLayerStyle(layer, layerHighlightedStyle);
+        }
     }
 
+    // Set clicked feature id
     const setClickedFeatureId = (event: LeafletMouseEvent) => {
-        if (!event.target) return;
-        //setPreviousLayer(event.target);
+        if (!event.target) {
+            console.log("event not found")
+            return;
+        }
         clickedFeatureId = event.target.feature._id;
         const feature = { 
             _id: event.target.feature._id, 
@@ -249,19 +268,25 @@ const GeoJsonLayer = (props: any) => {
             weather: event.target.feature.weather 
         };
         setFeatureProperties({_id: feature._id, weather: feature.weather, properties: feature.properties, mapHover: true });
-        //setClickedFeature(feature);
         if (!comparisonMode && comparedFeatures.length <= 1) setComparedFeatures([feature]);
     }
 
+    // Clear the layer
     const clearFeature = (layer: CustomLayer) => {
+        setFeatureProperties(null);
         clickedFeatureId = null;
-        if (comparisonMode) {
+        /* if (comparisonMode) {
             const exists = existsInComparedFeatures(layer.feature._id);
             if (!exists) {
+                console.log("clearFeature - Setting NORMAL style.");
                 setLayerStyle(layer, layerNormalStyle);
-            } 
-            setFeatureProperties({});
-        }
+                setFeatureProperties({});
+                clickedFeatureId = null;
+            } else {
+                console.log("clearFeature - exists");
+                setLayerStyle(layer, layerHighlightedStyle);
+            }
+        } */
     }
 
     const newSetClickedFeatureId = useStableCallback(setClickedFeatureId);
@@ -274,7 +299,6 @@ const GeoJsonLayer = (props: any) => {
     /**
      * The events associated with each feature
      */
-
     const onEachFeature = (feature: any, layer: CustomLayer, map: LeafletMap | null) => {
         layer.bindPopup(`<strong>${feature.properties.Concelho}</strong><br/>`);
         layer.getPopup()?.on('remove', () => {
@@ -291,10 +315,10 @@ const GeoJsonLayer = (props: any) => {
             click: (event) => {
                 newSetClickedFeatureId(event);
                 layer.setPopupContent(newUpdatePopupContent(layer));
-                newHighlightFeature(layer);
+                //newHighlightFeature(layer);
                 //zoomToFeature(event, map);
-                const row = document.getElementById("row_"+event.target.feature._id);  
-                if (row) row.scrollIntoView(true); 
+                /* const row = document.getElementById("row_"+event.target.feature._id);  
+                if (row) row.scrollIntoView(true);  */
             },
         });
 

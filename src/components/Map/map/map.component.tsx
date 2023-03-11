@@ -1,19 +1,26 @@
-import {createRef } from 'react';
+import {createRef, useEffect } from 'react';
 import {MapContainer, TileLayer} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './map.styles.css'
 import {GeoJSON, Map as LeafletMap} from "leaflet";
-import HoveredFeaturePanel from "../HoveredFeaturePanel";
+/* import HoveredFeaturePanel from "../HoveredFeaturePanel"; */
 import GeoJsonLayer from "../geojson-layer/geojson-layer.component";
 import Sidebar from '../../WeatherPanel/sidebar/sidebar.component';
 import LeafletGeoSearch from '../LeafletGeoSearch';
 import "leaflet-fullscreen";
 import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
+/* import WeatherPanelStore from '../../../stores/WeatherPanelStore'; */
 
 function Map() {
 
     let mapRef = createRef<LeafletMap>();
     let geoJsonLayer = createRef<GeoJSON>();
+
+    /* const setGeoJsonLayerRef = WeatherPanelStore(state => state.setGeoJsonLayerRef);
+
+    useEffect(() => {
+        setGeoJsonLayerRef(geoJsonLayer);
+    }, [geoJsonLayer]) */
 
     return (
         <div>
@@ -41,7 +48,7 @@ function Map() {
 
                 {/* <HoveredFeaturePanel/> */}
 
-                <Sidebar /> 
+                <Sidebar geoJsonLayer={geoJsonLayer} /> 
 
             </MapContainer>
         </div>

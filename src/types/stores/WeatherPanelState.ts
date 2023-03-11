@@ -1,5 +1,8 @@
 export interface WeatherPanelState {
 
+    geoJsonLayerRef: any,
+    setGeoJsonLayerRef: (ref: any) => void
+
     selectedDateDatabaseId: string | undefined
     setSelectedDateDatabaseId: (selectedDateDatabaseId: string | undefined) => void
 
