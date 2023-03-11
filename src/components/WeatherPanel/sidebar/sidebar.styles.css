@@ -22,7 +22,24 @@ tbody tr.comparisonTblRow {
     }
 }
 
-html, 
+.containerDiv {
+    display: flex;
+    flex-direction: column
+}
+
+.featuresTable{
+    flex: 1;
+    max-height: 400px;
+    overflow: auto;
+}
+
+.recommendations{
+    flex: 1;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* html, 
 body, 
 .leaflet-sidebar-content,
 .leaflet-sidebar-pane,
@@ -30,13 +47,13 @@ body,
 .inline-row, 
 .inline-row > div {
     height: 100%!important;
+    overflow: hidden;
 }
 
-/* We do the trick here with Table, table row and table-cell */
 .container-table {
     table-layout: fixed;
     display: table!important;
-    width: 100%!important; /* Width is important for display:table */
+    width: 100%!important;
 }
 
 .inline-row { 
@@ -44,9 +61,8 @@ body,
 }
 .inline-row > div { display: table-cell!important; }
 
-/* This will set our heights as we need them */
 .inline-row > div > .row { height: 100%!important; }
-.inline-row > div .row > div { height: 50%!important; overflow-y:auto!important; }
+.inline-row > div .row > div { height: 50%!important; overflow-y:auto!important; } */
 
 
 /* Fixed table header */

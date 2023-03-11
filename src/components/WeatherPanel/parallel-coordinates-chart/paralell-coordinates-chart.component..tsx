@@ -7,9 +7,40 @@ import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 HighchartsParallelCoordinates(Highcharts);
 
 
-const ParallelCoordinatesChart = () => {
+const ParallelCoordinatesChart = ({ onClickSeries, geoJsonLayerRef }: any) => {
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const weatherFields = WeatherPanelStore(state => state.weatherFields);
+
+    //const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
+
+    useEffect( () => {
+        setChartOptions({
+            ...chartOptions,
+            plotOptions: {
+                ...chartOptions.plotOptions,
+                series: {
+                    ...chartOptions.plotOptions.series,
+                    events: {
+                        ...chartOptions.plotOptions.series.events,
+                        click:  function(event) {
+                            /* const featureId = event.target.options.featureId;
+                            const layer = geoJsonLayerRef.current.getLayer(featureId);
+                            layer.fireEvent("click"); */
+                            const featureId = event.point.series.options.featureId;
+                            const layer = geoJsonLayerRef.current.getLayer(featureId);
+                            layer.fireEvent("click");
+                        }
+                    }
+                }
+            }
+        })
+    }, [geoJsonLayerRef])
+
+    /* const clickSeries = (event: any) => {
+        const featureId = event.point.series.options.featureId;
+        onClickSeries(featureId);
+    } */
+
 
     const [chartOptions, setChartOptions] = useState({
         chart: {
@@ -20,7 +51,13 @@ const ParallelCoordinatesChart = () => {
           }
         },
         title: {
-          text: 'Comparação'
+          text: undefined
+        },
+        credits: {
+            enabled: false
+        },
+        legend: {
+            enabled: true
         },
         xAxis: {
           categories: [] as string[],
@@ -34,35 +71,40 @@ const ParallelCoordinatesChart = () => {
         //colors: ['rgba(11, 200, 200, 0.1)'],
         plotOptions: {
           series: {
-              accessibility: {
-                  enabled: false
-              },
-              animation: false,
-              marker: {
-                  enabled: false,
-                  states: {
-                      hover: {
-                          enabled: false
-                      }
-                  }
-              },
-              states: {
-                  hover: {
-                      halo: {
-                          size: 0
-                      }
-                  }
-              },
+            lineWidth: 2,
+            cursor: 'pointer',
+            accessibility: {
+                enabled: false
+            },
+            animation: false,
+            marker: {
+                enabled: false,
+                states: {
+                    hover: {
+                        enabled: false
+                    }
+                }
+            },
+            events: {
+                click: (event: any) => {}
+            },
+            states: {
+                hover: {
+                    halo: {
+                        size: 2
+                    }
+                }
+            },
           }
       },
     });
 
     useEffect( () => {
-        //console.log("Data has changed, updating series");
-        const series = comparedFeatures.map((set:any, i: any) => {
-            const data = weatherFields.map(field => set.weather[field.name])
+        const series = comparedFeatures.map((feature:any, i: any) => {
+            const data = weatherFields.map(field => feature.weather[field.name])
             return {
-                name: set.properties.Concelho,
+                featureId: feature._id,
+                name: feature.properties.Concelho,
                 data: data,
                 shadow: false
             };
@@ -72,13 +114,10 @@ const ParallelCoordinatesChart = () => {
             ...chartOptions,
             series: series
         })
-
-        //console.log("SET DATA", chartOptions.series)
     }, [comparedFeatures]);
 
 
     useEffect( () => {
-        //console.log("weather fields has changed, updating series");
         const categories =  weatherFields.map(field => field.displayName);
        
         setChartOptions({ 
@@ -88,9 +127,6 @@ const ParallelCoordinatesChart = () => {
             categories: categories
           }
         })
-
-        //console.log("SET CATEGORIES", chartOptions.xAxis.categories)
-
     }, [weatherFields]);
 
 
