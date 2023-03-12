@@ -1,17 +1,46 @@
 import "./parallel-coordinates-chart.styles.css";
 import { useState, useEffect, useRef } from 'react';
 import HighchartsReact from 'highcharts-react-official';
-import Highcharts from 'highcharts';
+import Highcharts, { Chart, Series } from 'highcharts';
 import HighchartsParallelCoordinates from 'highcharts/modules/parallel-coordinates';
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
+import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 HighchartsParallelCoordinates(Highcharts);
 
+type CustomSeries = Series & {userOptions: { featureId: string }};
 
-const ParallelCoordinatesChart = ({ onClickSeries, geoJsonLayerRef }: any) => {
+const ParallelCoordinatesChart = ({ geoJsonLayerRef }: any) => {
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const weatherFields = WeatherPanelStore(state => state.weatherFields);
+    const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
 
-    //const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
+    //let previousSeries: any = null;
+    const [previousSeries, setPreviousSeries] = useState<CustomSeries | undefined>();
+
+    const chartRef = useRef<any>();
+
+
+    useEffect(() => {
+        if (previousSeries) {
+            const prevSeries = chartRef.current.chart.series.find((s:CustomSeries) => s.userOptions.featureId == previousSeries.userOptions.featureId);
+            if (prevSeries) {
+                chartRef.current.chart.series[prevSeries.index].update({ color: previousSeries.color, lineWidth: 2 });
+            }
+        }
+
+        if (!hoveredFeature) return;
+        updateColor(hoveredFeature._id);
+    }, [hoveredFeature])
+
+    const updateColor = (featureId: string) => {
+        if (!featureId) return;
+        const series: any = chartRef.current.chart.series.find((s:CustomSeries) => s.userOptions.featureId == featureId);
+        if (!series) return;
+        //previousSeries = { ...series };
+        setPreviousSeries({ ...series });
+        const options = { color: "red", lineWidth: 6 }
+        series.update(options);
+    }
 
     useEffect( () => {
         setChartOptions({
@@ -23,9 +52,6 @@ const ParallelCoordinatesChart = ({ onClickSeries, geoJsonLayerRef }: any) => {
                     events: {
                         ...chartOptions.plotOptions.series.events,
                         click:  function(event) {
-                            /* const featureId = event.target.options.featureId;
-                            const layer = geoJsonLayerRef.current.getLayer(featureId);
-                            layer.fireEvent("click"); */
                             const featureId = event.point.series.options.featureId;
                             const layer = geoJsonLayerRef.current.getLayer(featureId);
                             layer.fireEvent("click");
@@ -35,11 +61,6 @@ const ParallelCoordinatesChart = ({ onClickSeries, geoJsonLayerRef }: any) => {
             }
         })
     }, [geoJsonLayerRef])
-
-    /* const clickSeries = (event: any) => {
-        const featureId = event.point.series.options.featureId;
-        onClickSeries(featureId);
-    } */
 
 
     const [chartOptions, setChartOptions] = useState({
@@ -65,8 +86,8 @@ const ParallelCoordinatesChart = ({ onClickSeries, geoJsonLayerRef }: any) => {
         },
         series: [] as any[],
         tooltip: {
-          pointFormat: '<span style="color:{point.color}">\u25CF</span>' +
-              '{series.name}: <b>{point.formattedValue}</b><br/>'
+            shared: false,
+            pointFormat: '<span style="color:{point.color}">\u25CF</span>' + '{series.name}: <b>{point.formattedValue}</b><br/>'
         },
         //colors: ['rgba(11, 200, 200, 0.1)'],
         plotOptions: {
@@ -90,9 +111,16 @@ const ParallelCoordinatesChart = ({ onClickSeries, geoJsonLayerRef }: any) => {
             },
             states: {
                 hover: {
+                    enabled: false,
                     halo: {
                         size: 2
                     }
+                },
+                select: {
+                    lineColor: 'rgba(100,100,200, 0.25)',
+                    fillColor: null,
+                    lineWidth: 10,
+                    radius: 6,
                 }
             },
           }
@@ -132,6 +160,7 @@ const ParallelCoordinatesChart = ({ onClickSeries, geoJsonLayerRef }: any) => {
 
     return (
         <HighchartsReact
+            ref={chartRef}
             immutable={true}
             highcharts={Highcharts}
             options={chartOptions}

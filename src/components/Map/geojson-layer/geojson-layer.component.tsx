@@ -215,7 +215,7 @@ const GeoJsonLayer = (props: any) => {
                     const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
                     setComparedFeatures(filteredFeatures);
                     layer.closePopup();
-                    console.log("Remove button - Setting NORMAL color");
+                    //console.log("Remove button - Setting NORMAL color");
                     setLayerStyle(layer, layerNormalStyle)
                 }
             }
@@ -234,12 +234,12 @@ const GeoJsonLayer = (props: any) => {
 
         const exists = existsInComparedFeatures(layer.feature._id);
         if (exists) {
-            console.log("resetHighlight - Setting BLACK color");
+            //console.log("resetHighlight - Setting BLACK color");
             setLayerStyle(layer, layerHighlightedStyle)
             return;
         }
 
-        console.log("resetHighlight - Setting NORMAL color");
+        //console.log("resetHighlight - Setting NORMAL color");
         setLayerStyle(layer, layerNormalStyle);
     }
 
@@ -247,7 +247,7 @@ const GeoJsonLayer = (props: any) => {
     const highlightFeature = (layer: any) => {
         const isComparedFeature = existsInComparedFeatures(layer.feature._id);
         if (isComparedFeature && comparisonMode){
-            console.log("highlightFeature - Setting RED color");
+            //console.log("highlightFeature - Setting RED color");
             setLayerStyle(layer, layerRedHighlightedStyle);
             /* map.fitBounds(layer.getBounds(), {
                 maxZoom: map.getZoom()
@@ -258,7 +258,7 @@ const GeoJsonLayer = (props: any) => {
             map.setView(targetLatLng, map.getZoom()); */
         }
         else {
-            console.log("highlightFeature - Setting BLACK color");
+            //console.log("highlightFeature - Setting BLACK color");
             setLayerStyle(layer, layerHighlightedStyle);
         }
     }
@@ -266,7 +266,7 @@ const GeoJsonLayer = (props: any) => {
     // Set clicked feature id
     const setClickedFeatureId = (event: LeafletMouseEvent) => {
         if (!event.target) {
-            console.log("event not found")
+            //console.log("event not found")
             return;
         }
         clickedFeatureId = event.target.feature._id;

@@ -42,6 +42,6 @@
 }
 
 .highcharts-series-hover path {
-    stroke: rgb(255 66 66);
-    stroke-width: 5px;
+    /* stroke: rgb(255 66 66); */
+    stroke-width: 6px;
 }
