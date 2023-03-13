@@ -1,0 +1,32 @@
+.MapFeatureInformation {
+    padding: 6px 8px;
+    opacity: 0.7;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    color: #fff;
+    background: #333;
+  }
+
+.legend-list-item {
+/*     min-height: 20px;
+    max-height: 30px; */
+    height: 100%;
+    width: 100%;
+    display: table;
+    margin-top: 2px;
+    text-align: center;
+}
+
+.legend-color {
+    width: 0.9rem;
+    /* height: 0.9rem; */
+    display: table-cell;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.legend-text {
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 15px;
+}
