@@ -9,6 +9,8 @@ export interface WeatherPanelState {
     selectedInformation: any | undefined
     setSelectedInformation: (selectedInformation: object | undefined) => void
 
+    selectedWeatherMetadata: () => any
+
     loading: boolean
     setLoading: (bool: boolean) => void
 

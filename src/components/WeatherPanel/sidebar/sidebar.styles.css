@@ -39,6 +39,10 @@ tbody tr.comparisonTblRow {
     overflow-y: auto;
 }
 
+.configuration {
+    margin-top: 20px;
+}
+
 /* html, 
 body, 
 .leaflet-sidebar-content,

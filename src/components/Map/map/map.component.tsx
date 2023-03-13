@@ -9,6 +9,7 @@ import Sidebar from '../../WeatherPanel/sidebar/sidebar.component';
 import LeafletGeoSearch from '../LeafletGeoSearch';
 import "leaflet-fullscreen";
 import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
+import MapLegend from '../map-legend/map-legend.component';
 /* import WeatherPanelStore from '../../../stores/WeatherPanelStore'; */
 
 function Map() {
@@ -47,6 +48,8 @@ function Map() {
                 <LeafletGeoSearch geoJsonLayer={geoJsonLayer} style={{zIndex:900}} />
 
                 {/* <HoveredFeaturePanel/> */}
+                
+                <MapLegend />
 
                 <Sidebar geoJsonLayer={geoJsonLayer} /> 
 

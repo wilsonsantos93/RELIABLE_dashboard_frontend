@@ -1,8 +1,7 @@
-import React, { createRef, MutableRefObject } from 'react';
 import create from 'zustand'
 import {WeatherPanelState} from "../types/stores/WeatherPanelState";
 
-const WeatherPanelStore = create<WeatherPanelState>((set) => ({
+const WeatherPanelStore = create<WeatherPanelState>((set, get) => ({
 
     geoJsonLayerRef: undefined,
     setGeoJsonLayerRef: (ref: any) => set(state => ({
@@ -18,6 +17,13 @@ const WeatherPanelStore = create<WeatherPanelState>((set) => ({
     setSelectedInformation: (selectedInformation) => set(state => ({
         selectedInformation: selectedInformation
     })),
+
+    selectedWeatherMetadata: () => {
+        const weatherFields = get().weatherFields;
+        const selectedWeatherField = get().selectedInformation;
+        const field = weatherFields.find(w => w.name === selectedWeatherField);
+        return field;
+    },
 
     loading: true,
     setLoading: (bool) => set(state => ({

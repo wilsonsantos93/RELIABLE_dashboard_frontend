@@ -30,19 +30,21 @@ function WeatherInfoSelector(): JSX.Element {
 
 
     return (
-        <Row style={{margin: 0, padding: 0}}>
-            <Col style={{margin: 0, padding: 0}}><Form.Text>Weather information</Form.Text></Col>
-            <Col style={{margin: 0, padding: 0}}>
-                <Form.Select value={selectedWeatherField?.name} onChange={onSelectChange}>
-                    <option key="none_opt_weather" value="">Sem informação selecionada</option>
-                    {
-                        weatherFields.map((field: any) => 
-                            <option key={field._id} value={field.name}>{field.displayName || field.name }</option>
-                        )
-                    }
-                </Form.Select>
+        <Form.Group as={Row} className="mb-3">
+            <Form.Label column sm={4}>
+                Selecionar informação:
+            </Form.Label>
+            <Col sm={8}>
+            <Form.Select style={{fontSize: "unset"}} value={selectedWeatherField?.name} onChange={onSelectChange}>
+                <option key="none_opt_weather" value="">Sem informação selecionada</option>
+                {
+                    weatherFields.map((field: any) => 
+                        <option key={field._id} value={field.name}>{field.displayName || field.name }</option>
+                    )
+                }
+            </Form.Select>
             </Col>
-        </Row>
+        </Form.Group>
     )
 }
 

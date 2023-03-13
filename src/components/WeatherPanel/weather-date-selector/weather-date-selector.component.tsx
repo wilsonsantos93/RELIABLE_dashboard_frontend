@@ -39,20 +39,22 @@ function WeatherDateSelector(): JSX.Element {
     }
 
     return (
-        <Row style={{margin: 0, padding: 0}}>
-            <Col style={{margin: 0, padding: 0}}><Form.Text>Selecionar data</Form.Text></Col>
-            <Col style={{margin: 0, padding: 0}}>
-                <Form.Select value={selectedDateDatabaseId} onChange={onSelectChange}>
-                    <option key="none_opt_date" value="">Sem data selecionada</option>
-                    { 
-                        weatherDates?.map(date => 
-                        <option key={date._id} value={date._id}>
-                            {dayjs(date.date.toISOString()).tz(tz).format("YYYY-MM-DD HH:mm")}
-                        </option>)
-                    }
-                </Form.Select>
+        <Form.Group as={Row} className="mb-3">
+            <Form.Label column sm={4}>
+                Selecionar data:
+            </Form.Label>
+            <Col sm={8}>
+            <Form.Select style={{fontSize: "unset"}} value={selectedDateDatabaseId} onChange={onSelectChange}>
+                <option key="none_opt_date" value="">Sem data selecionada</option>
+                { 
+                    weatherDates?.map(date => 
+                    <option key={date._id} value={date._id}>
+                        {dayjs(date.date.toISOString()).tz(tz).format("YYYY-MM-DD HH:mm")}
+                    </option>)
+                }
+            </Form.Select>
             </Col>
-        </Row>
+        </Form.Group>
     )
 }
 

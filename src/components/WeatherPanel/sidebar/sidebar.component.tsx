@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import WeatherDateSelector from "../weather-date-selector/weather-date-selector.component";
 import WeatherInfoSelector from "../weather-info-selector/weather-info-selector.component";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
-import { Col, Container, Row, Table } from "react-bootstrap";
+import { Col, Container, Form, Row, Table } from "react-bootstrap";
 import ParallelCoordinatesChart from "../parallel-coordinates-chart/paralell-coordinates-chart.component.";
 import "./sidebar.styles.css";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
@@ -103,11 +103,6 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
     const onClickSeries = (featureId: string) => {
         hoverFeature(featureId);
     }
-
-    /* useEffect(() => {
-        console.log("SIDEBAR ref changed to", geoJsonLayer);
-        onClickSeries = hoverFeature;
-    }, [geoJsonLayer]) */
 
     return (
         <div id="sidebar" className="leaflet-sidebar collapsed">
@@ -213,8 +208,10 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
                     <h1 className="leaflet-sidebar-header">Configurar
                         <div className="leaflet-sidebar-close"><FontAwesomeIcon icon={faWindowClose} /></div>
                     </h1>
-                    <WeatherDateSelector/>
-                    <WeatherInfoSelector/>
+                    <Form className="configuration">
+                        <WeatherDateSelector/>
+                        <WeatherInfoSelector/>
+                    </Form>
                 </div>
             </div>
         </div>

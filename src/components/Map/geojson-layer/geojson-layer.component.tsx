@@ -188,7 +188,7 @@ const GeoJsonLayer = (props: any) => {
         const div = document.createElement("div");
         div.innerHTML = `
             <strong>${layer.feature.properties.Concelho}</strong><br>
-            <span>${selectedWeatherField?.displayName}</span>
+            <span>${selectedWeatherField?.displayName}:</span>
             <span>${selectedWeatherField && layer.feature.weather ? layer.feature.weather[selectedWeatherField.name] : ''} ${selectedWeatherField.unit}</span>
             <br/>
         `;
