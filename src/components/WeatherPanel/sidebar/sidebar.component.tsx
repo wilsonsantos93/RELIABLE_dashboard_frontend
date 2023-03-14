@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import WeatherDateSelector from "../weather-date-selector/weather-date-selector.component";
 import WeatherInfoSelector from "../weather-info-selector/weather-info-selector.component";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
-import { Col, Container, Form, Row, Table } from "react-bootstrap";
+import { Col, Container, Dropdown, Form, Row, Table } from "react-bootstrap";
 import ParallelCoordinatesChart from "../parallel-coordinates-chart/paralell-coordinates-chart.component.";
 import "./sidebar.styles.css";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
@@ -104,6 +104,16 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
         hoverFeature(featureId);
     }
 
+    //const setSelectAreaMode = WeatherPanelStore(state => state.setSelectAreaMode);
+
+   /*  const selectArea = () => {
+        setSelectAreaMode(true);
+    }
+ */
+    const selectMode = WeatherPanelStore(state => state.selectMode);
+    const setSelectMode = WeatherPanelStore(state => state.setSelectMode);
+
+
     return (
         <div id="sidebar" className="leaflet-sidebar collapsed">
             <div className="leaflet-sidebar-tabs">
@@ -116,7 +126,7 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
     
             <div className="leaflet-sidebar-content">
                 <div className="leaflet-sidebar-pane" id="tab1">
-                    <h1 className="leaflet-sidebar-header">Dados
+                    <h1 className="leaflet-sidebar-header">Tabela
                         <div className="leaflet-sidebar-close"><FontAwesomeIcon icon={faWindowClose} /></div>
                     </h1>
 
@@ -124,8 +134,24 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
                     <Row className="inline-row">
                         <Col xs={12}>
                             <Row className="containerDiv">
+                                <div style={{display:"flex", flexDirection: "row", alignItems:"center", margin: '5px 5px'}}>
+                                <Dropdown>
+                                    <Dropdown.Toggle variant="success" id="dropdown-basic">
+                                        Adicionar à lista
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item onClick={() => setSelectMode('individual')} active={selectMode == 'individual'} href="#">Selecionar individualmente</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => setSelectMode('area')}  active={selectMode == 'area'} href="#">Selecionar área</Dropdown.Item>
+                                        { selectMode && <Dropdown.Divider /> }
+                                        { selectMode && <Dropdown.Item onClick={() => setSelectMode(null)}  active={!selectMode} href="#">Terminar seleção</Dropdown.Item> }   
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                                    <span style={{ flex: 2 }}>{comparedFeatures.length} localidades selecionadas.</span>
+                                    <a style={{ flex: 1 }} href="#" onClick={clearAll}>Limpar tudo</a>
+                                </div>
+                                    
                                 <Col xs={12} className="featuresTable">
-                                    {comparedFeatures.length} localidades selecionadas.
                                     <Table size="sm" responsive striped bordered hover>
                                         <thead>
                                             <tr>
@@ -178,9 +204,7 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
                                             { comparisonMode ? "Sair do modo comparação" : "Entrar no modo comparação" }
                                         </a>
 
-                                        <a href="#" onClick={clearAll}>
-                                            Limpar tudo
-                                        </a>
+                                      
                                     </div>
                                 </Col>
                                 

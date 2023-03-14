@@ -32,6 +32,11 @@ const layerNormalStyle: MapFeatureStyle = {
     weight: 1
 }
 
+const layerNormalHoverStyle: MapFeatureStyle = {
+    color: "#a2a2a2",
+    weight: 3
+}
+
 let clickedFeatureId: string | null = null;
 
 // Sleep function 
@@ -200,7 +205,7 @@ const GeoJsonLayer = (props: any) => {
             const featureInComparison = existsInComparedFeatures(layer.feature._id);
 
             if (!featureInComparison) {
-                button.innerHTML = "Adicionar à comparação";
+                button.innerHTML = "Adicionar à lista";
                 button.onclick = function() {
                     setComparedFeatures([...comparedFeatures, layer.feature]);
                     layer.closePopup();
@@ -210,7 +215,7 @@ const GeoJsonLayer = (props: any) => {
                 }
             }
             else {
-                button.innerHTML = "Remover da comparação";
+                button.innerHTML = "Remover da lista";
                 button.onclick = function() {
                     const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
                     setComparedFeatures(filteredFeatures);

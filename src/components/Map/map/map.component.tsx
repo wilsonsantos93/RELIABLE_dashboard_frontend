@@ -11,6 +11,8 @@ import "leaflet-fullscreen";
 import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 import MapLegend from '../map-legend/map-legend.component';
 /* import WeatherPanelStore from '../../../stores/WeatherPanelStore'; */
+import "leaflet-area-select";
+import AreaSelect from "../AreaSelect";
 
 function Map() {
 
@@ -44,6 +46,8 @@ function Map() {
                 />
                 
                 <GeoJsonLayer mapRef={mapRef} geoJsonLayer={geoJsonLayer}/> 
+
+                <AreaSelect geoJsonLayer={geoJsonLayer} />
 
                 <LeafletGeoSearch geoJsonLayer={geoJsonLayer} style={{zIndex:900}} />
 

@@ -1,6 +1,12 @@
 export interface WeatherPanelState {
 
-    geoJsonLayerRef: any,
+    selectMode: string | null
+    setSelectMode: (mode: string | null ) => void
+
+    /* selectAreaMode: boolean
+    setSelectAreaMode: (bool?: boolean ) => void */
+
+    geoJsonLayerRef: any
     setGeoJsonLayerRef: (ref: any) => void
 
     selectedDateDatabaseId: string | undefined
@@ -27,5 +33,5 @@ export interface WeatherPanelState {
     setComparedFeatures: (data: any) => void
 
     comparisonMode: boolean
-    setComparisonMode: () => void
+    setComparisonMode: (bool?: boolean) => void
 }
