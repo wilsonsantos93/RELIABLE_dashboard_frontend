@@ -12,7 +12,7 @@ import ParallelCoordinatesChart from "../parallel-coordinates-chart/paralell-coo
 import "./sidebar.styles.css";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTable, faChartLine, faCog, faWindowClose } from '@fortawesome/free-solid-svg-icons'
+import { faTable, faChartLine, faCog, faWindowClose, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 
 const Sidebar = ({ geoJsonLayer }: any ) => {
@@ -41,13 +41,14 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
     const clearAll = () => {
         map.closePopup(); 
         setComparedFeatures([]);
-        setComparisonMode();
+        setComparisonMode(false);
+        setSelectMode(null);
     }
 
-    const setComparison = () => {
+    /* const setComparison = () => {
         map.closePopup(); 
         setComparisonMode();
-    }
+    } */
 
     useEffect(() => {
         if (!comparisonMode && comparedFeatures.length) setComparedFeatures([comparedFeatures[0]]);
@@ -113,6 +114,12 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
     const selectMode = WeatherPanelStore(state => state.selectMode);
     const setSelectMode = WeatherPanelStore(state => state.setSelectMode);
 
+    const onSelectMode = (mode: string) => {
+        setSelectMode(mode);
+        if (mode) setComparisonMode(true);
+        else setComparisonMode(false);
+    }
+
 
     return (
         <div id="sidebar" className="leaflet-sidebar collapsed">
@@ -135,20 +142,22 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
                         <Col xs={12}>
                             <Row className="containerDiv">
                                 <div style={{display:"flex", flexDirection: "row", alignItems:"center", margin: '5px 5px'}}>
-                                <Dropdown>
+                                {/* <Dropdown>
                                     <Dropdown.Toggle variant="success" id="dropdown-basic">
                                         Adicionar à lista
                                     </Dropdown.Toggle>
 
                                     <Dropdown.Menu>
-                                        <Dropdown.Item onClick={() => setSelectMode('individual')} active={selectMode == 'individual'} href="#">Selecionar individualmente</Dropdown.Item>
-                                        <Dropdown.Item onClick={() => setSelectMode('area')}  active={selectMode == 'area'} href="#">Selecionar área</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => onSelectMode('individual')} active={selectMode == 'individual'} href="#">Selecionar individualmente</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => onSelectMode('area')}  active={selectMode == 'area'} href="#">Selecionar área</Dropdown.Item>
                                         { selectMode && <Dropdown.Divider /> }
                                         { selectMode && <Dropdown.Item onClick={() => setSelectMode(null)}  active={!selectMode} href="#">Terminar seleção</Dropdown.Item> }   
                                     </Dropdown.Menu>
-                                </Dropdown>
-                                    <span style={{ flex: 2 }}>{comparedFeatures.length} localidades selecionadas.</span>
-                                    <a style={{ flex: 1 }} href="#" onClick={clearAll}>Limpar tudo</a>
+                                </Dropdown> */}
+                                    <span style={{ flex: 1, textAlign:'left' }}>{comparedFeatures.length} localidades selecionadas.</span>
+                                    <a style={{ flex: 1, textAlign:'right' }} href="#" onClick={clearAll}>
+                                       <FontAwesomeIcon icon={faTrash} /> Limpar tudo
+                                    </a>
                                 </div>
                                     
                                 <Col xs={12} className="featuresTable">
@@ -199,13 +208,11 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
                                         </tbody>
                                     </Table>
 
-                                    <div className="row" style={{display:'unset', textAlign: 'center'}}>
+                                   {/*  <div className="row" style={{display:'unset', textAlign: 'center'}}>
                                         <a href="#" onClick={setComparison}>
                                             { comparisonMode ? "Sair do modo comparação" : "Entrar no modo comparação" }
                                         </a>
-
-                                      
-                                    </div>
+                                    </div> */}
                                 </Col>
                                 
                                 <Col xs={12} className="recommendations">

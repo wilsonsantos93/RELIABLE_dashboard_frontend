@@ -28,7 +28,7 @@ function App(): JSX.Element {
                 {/* <Toast bg="dark" show={comparisonMode} animation={true}>
                     <Toast.Body className='text-white'>Clique nas localidades para adicionar à lista</Toast.Body>
                 </Toast>  */}
-                <Toast bg="dark" show={selectMode ? true : false} animation={true}>
+                <Toast bg="dark" show={(selectMode && !loading) ? true : false} animation={true}>
                     <Toast.Body className='text-white'> 
                     {
                         selectMode === 'area' && 
@@ -37,8 +37,7 @@ function App(): JSX.Element {
                     {
                         selectMode === 'individual' && 
                         <span>
-                            <FontAwesomeIcon icon={faHandPointer} />
-                            Clique numa localidade para adicionar/remover
+                            <FontAwesomeIcon icon={faHandPointer} />  Clique numa localidade para adicionar/remover
                         </span>
                     }  
                     </Toast.Body>

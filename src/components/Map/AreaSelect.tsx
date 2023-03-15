@@ -6,6 +6,7 @@ import WeatherPanelStore from "../../stores/WeatherPanelStore";
 const AreaSelect = ({ geoJsonLayer }: any) => {
 
     const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
+    const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     
     const map: any = useMap();
 
@@ -17,18 +18,21 @@ const AreaSelect = ({ geoJsonLayer }: any) => {
                 const bound = layer.getBounds();
                 if (bound.getCenter) {
                     if (area.contains(bound.getCenter())) {
-                        features.push({ 
-                            _id: layer.feature._id, 
-                            properties: layer.feature.properties, 
-                            weather: layer.feature.weather 
-                        });
+                        if (!comparedFeatures.length || !comparedFeatures.find((f:any) => f._id == layer.feature._id)) {
+                            features.push({
+                                _id: layer.feature._id, 
+                                properties: layer.feature.properties, 
+                                weather: layer.feature.weather 
+                            });
+                        }
                     }  
                 }
                 
             }
             
         });
-        setComparedFeatures(features)
+        console.log(features)
+        setComparedFeatures([...comparedFeatures, ...features])
     }
 
     //const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
