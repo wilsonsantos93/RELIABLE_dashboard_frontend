@@ -3,11 +3,13 @@ import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import 'leaflet-geosearch/dist/geosearch.css';
 import L from 'leaflet';
+import WeatherPanelStore from '../../stores/WeatherPanelStore';
 declare function require(name:string):any;
-var leafletPip = require('@mapbox/leaflet-pip');
-//import "@mapbox/leaflet-pip/leaflet-pip.js";
+const leafletPip = require('@mapbox/leaflet-pip');
 
 const LeafletGeoSearch = (props: any) => {
+    const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
+
     const provider = new OpenStreetMapProvider({
         params: {
             'accept-language': 'pt', // render results in portuguese
@@ -32,20 +34,20 @@ const LeafletGeoSearch = (props: any) => {
         map.removeEventListener('geosearch/showlocation');
         map.on('geosearch/showlocation', (result: any) => {
             const latlngPoint = new L.LatLng(result.location.y, result.location.x);
-            const results = leafletPip.pointInLayer(latlngPoint, props.geoJsonLayer.current, true);
+            const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef.current, true);
             results.forEach(function(layer: any) {
                 layer.fire('click', {
                   latlng: latlngPoint
                 });
             });
         });
-    }, [props.geoJsonLayer])
+
+        return () => { map.removeEventListener('geosearch/showlocation') }
+    }, [geoJsonLayerRef])
 
     useEffect(() => {
-        (() => {
-            map.addControl(searchControl);
-            return () => map.removeControl(searchControl);
-        })()
+        map.addControl(searchControl);
+        return () => { map.removeControl(searchControl) };
     }, []);
 
     return (<></>);

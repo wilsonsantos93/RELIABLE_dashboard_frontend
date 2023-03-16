@@ -3,15 +3,20 @@ import {WeatherPanelState} from "../types/stores/WeatherPanelState";
 
 const WeatherPanelStore = create<WeatherPanelState>((set, get) => ({
 
-    selectMode: null,
+    selectMode: "individual",
     setSelectMode: (mode) => set(state => ({
         selectMode: mode
     })),
 
-    /* selectAreaMode: false,
-    setSelectAreaMode: (bool) => set(state => ({
+    isTabOpen: false,
+    setIsTabOpen: (bool) => set(state => ({
+        isTabOpen: bool
+    })),
+
+    selectAreaMode: false,
+    setSelectAreaMode: (bool?) => set(state => ({
         selectAreaMode: bool == undefined ? !state.selectAreaMode : bool
-    })), */
+    })),
 
     geoJsonLayerRef: undefined,
     setGeoJsonLayerRef: (ref: any) => set(state => ({

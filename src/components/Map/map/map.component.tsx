@@ -1,4 +1,4 @@
-import {createRef } from 'react';
+import {createRef, useEffect } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './map.styles.css'
@@ -20,29 +20,30 @@ import { faHandPointer, faObjectGroup } from '@fortawesome/free-solid-svg-icons'
 function Map() {
 
     let mapRef = createRef<LeafletMap>();
-    let geoJsonLayer = createRef<GeoJSON>();
-
-    /* const setGeoJsonLayerRef = WeatherPanelStore(state => state.setGeoJsonLayerRef);
-
-    useEffect(() => {
-        setGeoJsonLayerRef(geoJsonLayer);
-    }, [geoJsonLayer]) */
 
     const setSelectMode = WeatherPanelStore(state => state.setSelectMode);
     const selectMode = WeatherPanelStore(state => state.selectMode);
 
     const setComparisonMode = WeatherPanelStore(state => state.setComparisonMode);
 
-    const onSetMode = (mode: string) => {
+    const setSelectAreaMode = WeatherPanelStore(state => state.setSelectAreaMode);
+    const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
+
+    /* const onSetMode = (mode: string) => {
+        setComparisonMode(true);
         if (selectMode === mode) {
-            setSelectMode(null);
-            setComparisonMode(false);
+            setSelectMode("individual");
         }
         else {
             setSelectMode(mode);
-            setComparisonMode(true);
         }
+    } */
+
+    const onSelectAreaMode = (mode?: boolean) => {
+        setSelectAreaMode();
     }
+
+
 
     return (
         <div>
@@ -66,23 +67,23 @@ function Map() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
-                <GeoJsonLayer mapRef={mapRef} geoJsonLayer={geoJsonLayer}/> 
+                <GeoJsonLayer mapRef={mapRef} /* geoJsonLayer={geoJsonLayerRef} *//> 
 
-                <AreaSelect geoJsonLayer={geoJsonLayer} />
+                <AreaSelect /* geoJsonLayer={geoJsonLayerRef} */ />
 
-                <LeafletGeoSearch geoJsonLayer={geoJsonLayer} style={{zIndex:900}} />
+                <LeafletGeoSearch style={{zIndex:900}} />
 
-                <Control position='topleft'>
+                {/* <Control position='topleft'>
                     <div style={{cursor: 'pointer'}} className="leaflet-bar">
                         <a style={{backgroundColor: selectMode === 'individual' ? '#0d6efd' : ''}} title="Selecionar individualmente" onClick={() => onSetMode('individual')}>
                             <FontAwesomeIcon icon={faHandPointer} />
                         </a>
                     </div>
-                </Control>
+                </Control> */}
 
                 <Control position='topleft'>
                     <div style={{cursor: 'pointer'}} className="leaflet-bar">
-                        <a style={{backgroundColor: selectMode === 'area' ? '#0d6efd' : ''}} title="Selecionar área" onClick={() => onSetMode('area')}>
+                        <a style={{backgroundColor: selectAreaMode ? '#0d6efd' : ''}} title="Selecionar área" onClick={() => onSelectAreaMode()}>
                             <FontAwesomeIcon icon={faObjectGroup} />
                         </a>
                     </div>
@@ -93,7 +94,7 @@ function Map() {
                 
                 <MapLegend />
 
-                <Sidebar geoJsonLayer={geoJsonLayer} /> 
+                <Sidebar /* geoJsonLayer={geoJsonLayerRef} */ /> 
 
             </MapContainer>
         </div>

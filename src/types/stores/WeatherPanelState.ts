@@ -3,8 +3,11 @@ export interface WeatherPanelState {
     selectMode: string | null
     setSelectMode: (mode: string | null ) => void
 
-    /* selectAreaMode: boolean
-    setSelectAreaMode: (bool?: boolean ) => void */
+    isTabOpen: boolean
+    setIsTabOpen: (bool: boolean) => void
+
+    selectAreaMode: boolean
+    setSelectAreaMode: (bool?: boolean ) => void
 
     geoJsonLayerRef: any
     setGeoJsonLayerRef: (ref: any) => void

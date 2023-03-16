@@ -5,71 +5,20 @@ import Highcharts, { Chart, Series } from 'highcharts';
 import HighchartsParallelCoordinates from 'highcharts/modules/parallel-coordinates';
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
+import HC_exporting from 'highcharts/modules/exporting'
 HighchartsParallelCoordinates(Highcharts);
+HC_exporting(Highcharts);
 
 type CustomSeries = Series & {userOptions: { featureId: string }};
 
-const ParallelCoordinatesChart = ({ geoJsonLayerRef }: any) => {
-    const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
-    const weatherFields = WeatherPanelStore(state => state.weatherFields);
-    const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
-
-    //let previousSeries: any = null;
-    const [previousSeries, setPreviousSeries] = useState<CustomSeries | undefined>();
-
-    const chartRef = useRef<any>();
-
-
-    useEffect(() => {
-        if (previousSeries) {
-            const prevSeries = chartRef.current.chart.series.find((s:CustomSeries) => s.userOptions.featureId == previousSeries.userOptions.featureId);
-            if (prevSeries) {
-                chartRef.current.chart.series[prevSeries.index].update({ color: previousSeries.color, lineWidth: 2 });
-            }
-        }
-
-        if (!hoveredFeature) return;
-        updateColor(hoveredFeature._id);
-    }, [hoveredFeature])
-
-    const updateColor = (featureId: string) => {
-        if (!featureId) return;
-        const series: any = chartRef.current.chart.series.find((s:CustomSeries) => s.userOptions.featureId == featureId);
-        if (!series) return;
-        //previousSeries = { ...series };
-        setPreviousSeries({ ...series });
-        const options = { color: "red", lineWidth: 6 }
-        series.update(options);
-    }
-
-    useEffect( () => {
-        setChartOptions({
-            ...chartOptions,
-            plotOptions: {
-                ...chartOptions.plotOptions,
-                series: {
-                    ...chartOptions.plotOptions.series,
-                    events: {
-                        ...chartOptions.plotOptions.series.events,
-                        click:  function(event) {
-                            const featureId = event.point.series.options.featureId;
-                            const layer = geoJsonLayerRef.current.getLayer(featureId);
-                            layer.fireEvent("click");
-                        }
-                    }
-                }
-            }
-        })
-    }, [geoJsonLayerRef])
-
-
-    const [chartOptions, setChartOptions] = useState({
+const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
+    const chartConfig: any = {
         chart: {
           type: 'spline',
           parallelCoordinates: true,
           parallelAxes: {
               lineWidth: 2
-          }
+          },
         },
         title: {
           text: undefined
@@ -107,7 +56,7 @@ const ParallelCoordinatesChart = ({ geoJsonLayerRef }: any) => {
                 }
             },
             events: {
-                click: (event: any) => {}
+                //click: (event: any) => {}
             },
             states: {
                 hover: {
@@ -125,9 +74,77 @@ const ParallelCoordinatesChart = ({ geoJsonLayerRef }: any) => {
             },
           }
       },
-    });
+    };
+    
+    const [chartOptions, setChartOptions] = useState<any>(chartConfig);
+
+    const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
+    const weatherFields = WeatherPanelStore(state => state.weatherFields);
+    const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
+    const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
+    const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
+
+
+    const [previousSeries, setPreviousSeries] = useState<CustomSeries | undefined>();
+
+    const chartRef = useRef<any>();
+
+    useEffect(() => {
+        onHoveredFeatureChanged();
+    }, [hoveredFeature])
+
+    const onHoveredFeatureChanged = () => {
+        if (previousSeries) {
+            const prevSeries = chartRef.current.chart.series.find((s:CustomSeries) => s.userOptions.featureId == previousSeries.userOptions.featureId);
+            if (prevSeries) {
+                chartRef.current.chart.series[prevSeries.index].update({ color: previousSeries.color, lineWidth: 2 });
+            }
+        }
+
+        if (!hoveredFeature) return;
+        updateColor(hoveredFeature._id);
+    }
+
+    const updateColor = (featureId: string) => {
+        if (!featureId) return;
+        const series: any = chartRef.current.chart.series.find((s:CustomSeries) => s.userOptions.featureId == featureId);
+        if (!series) return;
+        setPreviousSeries({ ...series });
+        const options = { color: "red", lineWidth: 6 };
+        series.update(options);
+    }
+
 
     useEffect( () => {
+        if (!geoJsonLayerRef || !geoJsonLayerRef.current) return;
+
+        setChartOptions((oldChartOptions:any) =>  { 
+            return {
+                ...oldChartOptions,
+                plotOptions: {
+                    ...oldChartOptions.plotOptions,
+                    series: {
+                        ...oldChartOptions.plotOptions.series,
+                        events: {
+                            ...oldChartOptions.plotOptions.series.events,
+                            click: function(event: any) {
+                                const featureId = event.point.series.options.featureId;
+                                const layer = geoJsonLayerRef.current.getLayer(featureId);
+                                layer.fireEvent("click");
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }, [geoJsonLayerRef])
+
+    useEffect(() => {
+        onHoveredFeatureChanged();
+    }, [chartOptions])
+
+
+    useEffect(() => {
         const series = comparedFeatures.map((feature:any, i: any) => {
             const data = weatherFields.map(field => feature.weather[field.name])
             return {
@@ -138,27 +155,40 @@ const ParallelCoordinatesChart = ({ geoJsonLayerRef }: any) => {
             };
         })
 
-        setChartOptions({ 
-            ...chartOptions,
-            series: series
-        })
+        setChartOptions((oldChartOptions: any) => { return { ...oldChartOptions, series }});
     }, [comparedFeatures]);
 
 
-    useEffect( () => {
+    useEffect(() => {
         const categories =  weatherFields.map(field => field.displayName);
        
-        setChartOptions({ 
-          ...chartOptions,
-          xAxis: {
-            ...chartOptions.xAxis,
-            categories: categories
-          }
+        setChartOptions((oldChartOptions: any) => {
+            return { 
+                ...oldChartOptions,
+                xAxis: {
+                    ...oldChartOptions.xAxis,
+                    categories: categories
+                }
+            }
         })
     }, [weatherFields]);
 
+    useEffect(() => {
+        const el: any = document.querySelector("#sidebar");
+        el?.removeEventListener('transitionend', null);
+        el?.addEventListener("transitionend", () => {
+            if (isTabOpen) { 
+                return 
+            }
+            else {
+                chartRef.current.chart.reflow();
+            }
+        })
+        return () => el?.removeEventListener('transitionend', null);
+    }, [isTabOpen]);
 
-    return (
+
+    return ( 
         <HighchartsReact
             ref={chartRef}
             immutable={true}
@@ -166,7 +196,6 @@ const ParallelCoordinatesChart = ({ geoJsonLayerRef }: any) => {
             options={chartOptions}
         />
     )
-
 }
 
 export default ParallelCoordinatesChart;

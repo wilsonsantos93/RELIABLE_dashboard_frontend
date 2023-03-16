@@ -15,10 +15,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTable, faChartLine, faCog, faWindowClose, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 
-const Sidebar = ({ geoJsonLayer }: any ) => {
-    const [isOpen, setIsOpen] = useState(false);
+const Sidebar = (/* { geoJsonLayer }: any  */) => {
+    /* const [isOpen, setIsOpen] = useState(false); */
+    const setIsTabOpen = WeatherPanelStore(state => state.setIsTabOpen);
+    const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
     const [sidebar, setSidebar] = useState<L.Control.Sidebar|null>(null);
     const weatherFields = WeatherPanelStore(state => state.weatherFields);
+    const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
 
     // Get color for depending on value
     const getColor = (value: number, fieldName:string) => {
@@ -32,7 +35,7 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
     }
 
     const setComparisonMode = WeatherPanelStore(state => state.setComparisonMode);
-    const comparisonMode = WeatherPanelStore(state => state.comparisonMode);
+    //const comparisonMode = WeatherPanelStore(state => state.comparisonMode);
 
     const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
 
@@ -42,7 +45,7 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
         map.closePopup(); 
         setComparedFeatures([]);
         setComparisonMode(false);
-        setSelectMode(null);
+        //setSelectMode(null);
     }
 
     /* const setComparison = () => {
@@ -50,9 +53,9 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
         setComparisonMode();
     } */
 
-    useEffect(() => {
+    /* useEffect(() => {
         if (!comparisonMode && comparedFeatures.length) setComparedFeatures([comparedFeatures[0]]);
-    }, [comparisonMode])
+    }, [comparisonMode]) */
 
     const map = useMap();
     useEffect(() => {
@@ -63,13 +66,16 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
                 container: 'sidebar', // the DOM container or #ID of a predefined sidebar container that should be used
                 position: 'right',     // left or right
             });
+
             sidebar.on("opening", () => {
-                setIsOpen(true);
-            })
+                //setIsOpen(true);
+                setIsTabOpen(true);
+            });
 
             sidebar.on("closing", () => {
-                setIsOpen(false);
-            })
+                //setIsOpen(false);
+                setIsTabOpen(false);
+            });
 
             map.addControl(sidebar);
             setSidebar(sidebar);
@@ -82,7 +88,7 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
         e.preventDefault();
         const filteredFeatures = comparedFeatures.filter((f:any) => f._id != featureId);
         setComparedFeatures(filteredFeatures);
-        const layer = geoJsonLayer.current.getLayer(featureId);
+        const layer = geoJsonLayerRef.current.getLayer(featureId);
         layer.closePopup();
     }
 
@@ -92,18 +98,18 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
     const hoverFeature = (featureId: string) => {
         const feature = comparedFeatures.find((f:any) => f._id == featureId);
         setFeatureProperties({_id: feature._id, properties: feature.properties, weather: feature.weather, rowHover: true});
-        const layer = geoJsonLayer.current.getLayer(feature._id);
+        const layer = geoJsonLayerRef.current.getLayer(feature._id);
         layer.fireEvent("click");
     }
 
     useEffect(() => {
-        if (comparedFeatures.length && !isOpen) sidebar?.open("tab1");
+        if (comparedFeatures.length && !isTabOpen) sidebar?.open("tab1");
         else if (!comparedFeatures.length) sidebar?.close();
     }, [comparedFeatures])
 
-    const onClickSeries = (featureId: string) => {
+    /* const onClickSeries = (featureId: string) => {
         hoverFeature(featureId);
-    }
+    } */
 
     //const setSelectAreaMode = WeatherPanelStore(state => state.setSelectAreaMode);
 
@@ -111,14 +117,14 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
         setSelectAreaMode(true);
     }
  */
-    const selectMode = WeatherPanelStore(state => state.selectMode);
+   /*  const selectMode = WeatherPanelStore(state => state.selectMode);
     const setSelectMode = WeatherPanelStore(state => state.setSelectMode);
-
-    const onSelectMode = (mode: string) => {
+ */
+   /*  const onSelectMode = (mode: string) => {
         setSelectMode(mode);
         if (mode) setComparisonMode(true);
         else setComparisonMode(false);
-    }
+    } */
 
 
     return (
@@ -142,18 +148,6 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
                         <Col xs={12}>
                             <Row className="containerDiv">
                                 <div style={{display:"flex", flexDirection: "row", alignItems:"center", margin: '5px 5px'}}>
-                                {/* <Dropdown>
-                                    <Dropdown.Toggle variant="success" id="dropdown-basic">
-                                        Adicionar à lista
-                                    </Dropdown.Toggle>
-
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item onClick={() => onSelectMode('individual')} active={selectMode == 'individual'} href="#">Selecionar individualmente</Dropdown.Item>
-                                        <Dropdown.Item onClick={() => onSelectMode('area')}  active={selectMode == 'area'} href="#">Selecionar área</Dropdown.Item>
-                                        { selectMode && <Dropdown.Divider /> }
-                                        { selectMode && <Dropdown.Item onClick={() => setSelectMode(null)}  active={!selectMode} href="#">Terminar seleção</Dropdown.Item> }   
-                                    </Dropdown.Menu>
-                                </Dropdown> */}
                                     <span style={{ flex: 1, textAlign:'left' }}>{comparedFeatures.length} localidades selecionadas.</span>
                                     <a style={{ flex: 1, textAlign:'right' }} href="#" onClick={clearAll}>
                                        <FontAwesomeIcon icon={faTrash} /> Limpar tudo
@@ -165,10 +159,10 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
                                         <thead>
                                             <tr>
                                                 { 
-                                                    (comparisonMode && comparedFeatures.length > 1) &&
+                                                   /*  (comparisonMode && comparedFeatures.length > 1) && */
                                                     <th key="remove_th"></th>
                                                 }
-                                                <th key="local_th">Local</th>
+                                                    <th key="local_th">Local</th>
                                                 { 
                                                     weatherFields.map(field => 
                                                         <th key={field._id+"_th"}>{field.displayName}</th>
@@ -181,15 +175,17 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
                                             comparedFeatures.map((feature:any, i:number) => 
                                             <tr 
                                                 id={"row_"+feature._id} 
-                                                style={ comparedFeatures.length > 1 && hoveredFeature && hoveredFeature._id == feature._id ? { border: '3px solid red' } : { border: '1px solid black' }} 
+                                                style={ comparedFeatures.length > 1 && hoveredFeature && hoveredFeature._id == feature._id ? { fontWeight: 'bold', border: '3px solid red' } : { fontWeight: 'normal', border: '1px solid black' }} 
                                                 onClick={() => hoverFeature(feature._id)}
                                                 className="comparisonTblRow" 
                                                 key={"local_tr_"+feature._id}
                                             >
-                                               { (comparisonMode) &&
+                                               { /* (comparisonMode) && */
                                                 <td key="remove_td">
                                                     { 
-                                                    <button onClick={(e) => removeFeature(e, feature._id)} className="btn btn-sm btn-danger">X</button>
+                                                    <button onClick={(e) => removeFeature(e, feature._id)} className="btn btn-sm btn-danger">
+                                                    <FontAwesomeIcon icon={faTrash} />
+                                                    </button>
                                                     }
                                                 </td>
                                                 }
@@ -232,7 +228,7 @@ const Sidebar = ({ geoJsonLayer }: any ) => {
                     <h1 className="leaflet-sidebar-header">Gráfico
                         <div className="leaflet-sidebar-close"><FontAwesomeIcon icon={faWindowClose} /></div>
                     </h1>
-                    <ParallelCoordinatesChart geoJsonLayerRef={geoJsonLayer} onClickSeries={onClickSeries} />
+                    <ParallelCoordinatesChart />
                 </div>
     
                 <div className="leaflet-sidebar-pane" id="tab3">

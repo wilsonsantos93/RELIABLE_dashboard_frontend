@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState} from 'react';
+import { createRef, useCallback, useEffect, useRef, useState} from 'react';
 import {GeoJSON, LayerGroup, Marker, Popup, useMap} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import {Feature, GeoJsonObject, Geometry} from "geojson";
 import {fetchGeoJSON} from "../../../data/fetchGeoJSON";
-import {LatLng, Layer, LayerEvent, LeafletMouseEvent, Map as LeafletMap, PathOptions, PopupOptions} from "leaflet";
+import { GeoJSON as GJSON, LatLng, Layer, LayerEvent, LeafletMouseEvent, Map as LeafletMap, PathOptions, PopupOptions} from "leaflet";
 import {MapFeatureStyle} from "../../../types/MapFeatureStyle";
 import {GeoJsonLayerProperties} from "../../../types/components/GeoJsonLayerProperties";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
@@ -64,6 +64,16 @@ const GeoJsonLayer = (props: any) => {
 
     const setLoading = WeatherPanelStore(state => state.setLoading);
 
+    const selectMode = WeatherPanelStore(state => state.selectMode);
+
+    const geoJsonLayerRef = useRef<GJSON>();
+
+    const setGeoJsonLayerRef = WeatherPanelStore(state => state.setGeoJsonLayerRef);
+
+    useEffect(() => {
+        setGeoJsonLayerRef(geoJsonLayerRef);
+    }, [geoJsonLayerRef])
+
     const map = useMap();
 
     /* const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
@@ -98,10 +108,18 @@ const GeoJsonLayer = (props: any) => {
         };
 
         if (comparedFeatures.find((f:any) => f._id == feature._id)) {
-            mapFeatureNotHoveredStyle = { 
-                ...mapFeatureNotHoveredStyle, 
-                ...layerHighlightedStyle 
-            };
+
+            if (hoveredFeature && hoveredFeature._id == feature._id) {
+                mapFeatureNotHoveredStyle = { 
+                    ...mapFeatureNotHoveredStyle, 
+                    ...layerRedHighlightedStyle 
+                };
+            } else {
+                mapFeatureNotHoveredStyle = { 
+                    ...mapFeatureNotHoveredStyle, 
+                    ...layerHighlightedStyle 
+                };
+            }
         }
 
         return mapFeatureNotHoveredStyle as PathOptions;
@@ -114,8 +132,8 @@ const GeoJsonLayer = (props: any) => {
                 setLoading(true);
                 const data = await fetchWeatherGeoJSON(selectedDateId);
                 setGeoJSON(data);
-                if (props.geoJsonLayer.current) {
-                    props.geoJsonLayer.current.clearLayers().addData(data);
+                if (geoJsonLayerRef.current) {
+                    geoJsonLayerRef.current.clearLayers().addData(data);
                 }
             }
         })()
@@ -158,8 +176,8 @@ const GeoJsonLayer = (props: any) => {
 
 
     // Get layer by id
-    const getLayer = (id: string) => {
-        return props.geoJsonLayer.current.getLayer(id);
+    const getLayer = (id: any) => {
+        return geoJsonLayerRef?.current?.getLayer(id);
     }
 
     // Set layer style
@@ -173,7 +191,7 @@ const GeoJsonLayer = (props: any) => {
     }
 
     // Zooms to the feature clicked
-    const zoomToFeature = (event: LeafletMouseEvent) => {
+    /* const zoomToFeature = (event: LeafletMouseEvent) => {
         if (map !== null) {
             //map.fitBounds(event.target.getBounds());
             const currentZoom = map.getZoom();
@@ -183,10 +201,15 @@ const GeoJsonLayer = (props: any) => {
             }
             map.setView(event.latlng, zoom);
         }
-    }
+    } */
 
     const existsInComparedFeatures = (featureId: string) => {
         return comparedFeatures.find((feature: any) => feature._id === featureId);
+    }
+
+    const removeFeatureFromList = (layer: CustomLayer) => {
+        const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
+        setComparedFeatures(filteredFeatures);
     }
 
     const updatePopupContent = (layer: any) => {
@@ -201,7 +224,17 @@ const GeoJsonLayer = (props: any) => {
         const button = document.createElement("a");
         button.href = "#";
 
-        if (comparisonMode) {
+        //const featureInComparison = existsInComparedFeatures(layer.feature._id);
+        //if (featureInComparison) {
+            button.innerHTML = "Remover da lista";
+            button.onclick = function() {
+                newRemoveFeatureFromList(layer);
+                layer.closePopup();
+                setLayerStyle(layer, layerNormalStyle)
+            }
+       // }
+
+        /* if (comparisonMode) {
             const featureInComparison = existsInComparedFeatures(layer.feature._id);
 
             if (!featureInComparison) {
@@ -220,11 +253,10 @@ const GeoJsonLayer = (props: any) => {
                     const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
                     setComparedFeatures(filteredFeatures);
                     layer.closePopup();
-                    //console.log("Remove button - Setting NORMAL color");
                     setLayerStyle(layer, layerNormalStyle)
                 }
             }
-        }
+        }  */
 
         div.appendChild(button);
         return div;
@@ -239,31 +271,19 @@ const GeoJsonLayer = (props: any) => {
 
         const exists = existsInComparedFeatures(layer.feature._id);
         if (exists) {
-            //console.log("resetHighlight - Setting BLACK color");
             setLayerStyle(layer, layerHighlightedStyle)
-            return;
         }
 
-        //console.log("resetHighlight - Setting NORMAL color");
-        setLayerStyle(layer, layerNormalStyle);
+        else setLayerStyle(layer, layerNormalStyle);
     }
 
     // Highlights a feature of the map when hovered over.
     const highlightFeature = (layer: any) => {
         const isComparedFeature = existsInComparedFeatures(layer.feature._id);
-        if (isComparedFeature && comparisonMode){
-            //console.log("highlightFeature - Setting RED color");
+        if (isComparedFeature/*  && comparisonMode */){
             setLayerStyle(layer, layerRedHighlightedStyle);
-            /* map.fitBounds(layer.getBounds(), {
-                maxZoom: map.getZoom()
-            }); */
-            /* var targetPoint = map.project(layer.getBounds(), map.getZoom()).subtract([20 / 2, 0]),
-            targetLatLng = map.unproject(targetPoint, map.getZoom());
-
-            map.setView(targetLatLng, map.getZoom()); */
         }
         else {
-            //console.log("highlightFeature - Setting BLACK color");
             setLayerStyle(layer, layerHighlightedStyle);
         }
     }
@@ -271,7 +291,6 @@ const GeoJsonLayer = (props: any) => {
     // Set clicked feature id
     const setClickedFeatureId = (event: LeafletMouseEvent) => {
         if (!event.target) {
-            //console.log("event not found")
             return;
         }
         clickedFeatureId = event.target.feature._id;
@@ -280,8 +299,12 @@ const GeoJsonLayer = (props: any) => {
             properties: event.target.feature.properties,
             weather: event.target.feature.weather 
         };
-        setFeatureProperties({_id: feature._id, weather: feature.weather, properties: feature.properties, mapHover: true });
-        if (!comparisonMode && comparedFeatures.length <= 1) setComparedFeatures([feature]);
+        const { _id, weather, properties } = feature;
+        setFeatureProperties({ _id, weather, properties, mapHover: true });
+        event.target.addedToList = true;
+    
+        if (!existsInComparedFeatures(_id)) setComparedFeatures([feature, ...comparedFeatures])
+        //if (!comparisonMode && comparedFeatures.length <= 1) setComparedFeatures([feature]);
     }
 
     // Clear the layer
@@ -307,6 +330,7 @@ const GeoJsonLayer = (props: any) => {
     const newHighlightFeature = useStableCallback(highlightFeature);
     const newClearFeature = useStableCallback(clearFeature);
     const newUpdatePopupContent = useStableCallback(updatePopupContent);
+    const newRemoveFeatureFromList = useStableCallback(removeFeatureFromList);
 
 
     /**
@@ -328,7 +352,7 @@ const GeoJsonLayer = (props: any) => {
             click: (event) => {
                 newSetClickedFeatureId(event);
                 layer.setPopupContent(newUpdatePopupContent(layer));
-                //newHighlightFeature(layer);
+                setLayerStyle(layer, layerRedHighlightedStyle);
                 //zoomToFeature(event, map);
                 /* const row = document.getElementById("row_"+event.target.feature._id);  
                 if (row) row.scrollIntoView(true);  */
@@ -341,7 +365,8 @@ const GeoJsonLayer = (props: any) => {
     return (
         <LayerGroup>
             <GeoJSON
-                ref={props.geoJsonLayer}
+                /* ref={props.geoJsonLayer} */
+                ref={geoJsonLayerRef}
                 data={geoJSON as GeoJsonObject}
                 onEachFeature={(feature, layer:CustomLayer) => onEachFeature(feature, layer, props.mapRef.current)}
                 // @ts-ignore

@@ -9,6 +9,7 @@ function App(): JSX.Element {
     const loading = WeatherPanelStore(state => state.loading);
     const comparisonMode = WeatherPanelStore(state => state.comparisonMode);
     const selectMode = WeatherPanelStore(state => state.selectMode);
+    const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
 
     return (
         <div>
@@ -31,13 +32,15 @@ function App(): JSX.Element {
                 <Toast bg="dark" show={(selectMode && !loading) ? true : false} animation={true}>
                     <Toast.Body className='text-white'> 
                     {
-                        selectMode === 'area' && 
+                        //selectMode === 'area' && 
+                        selectAreaMode &&
                         <span><FontAwesomeIcon icon={faObjectGroup} />  Clique e arraste para selecionar uma área</span>
                     } 
                     {
-                        selectMode === 'individual' && 
+                        //selectMode === 'individual' && 
+                        !selectAreaMode &&
                         <span>
-                            <FontAwesomeIcon icon={faHandPointer} />  Clique numa localidade para adicionar/remover
+                            <FontAwesomeIcon icon={faHandPointer} />  Clique nas localidades para adicionar à lista
                         </span>
                     }  
                     </Toast.Body>

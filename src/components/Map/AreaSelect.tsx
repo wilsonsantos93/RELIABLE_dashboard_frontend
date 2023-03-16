@@ -3,17 +3,19 @@ import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import WeatherPanelStore from "../../stores/WeatherPanelStore";
 
-const AreaSelect = ({ geoJsonLayer }: any) => {
-
+const AreaSelect = () => {
     const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
+    const geoJsonLayerRef  = WeatherPanelStore(state => state.geoJsonLayerRef);
+    const setSelectAreaMode = WeatherPanelStore(state => state.setSelectAreaMode);
+    const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
     
     const map: any = useMap();
 
     const getFeaturesInView = (area: any) => {
         var features: any = [];
-        if (!geoJsonLayer.current) return;
-        geoJsonLayer.current.eachLayer((layer: any) => {
+        if (!geoJsonLayerRef || !geoJsonLayerRef.current) return;
+        geoJsonLayerRef.current.eachLayer((layer: any) => {
             if (layer.getBounds) {
                 const bound = layer.getBounds();
                 if (bound.getCenter) {
@@ -31,23 +33,20 @@ const AreaSelect = ({ geoJsonLayer }: any) => {
             }
             
         });
-        console.log(features)
         setComparedFeatures([...comparedFeatures, ...features])
     }
 
-    //const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
     const selectMode = WeatherPanelStore(state => state.selectMode);
     const setSelectMode = WeatherPanelStore(state => state.setSelectMode);
-    const setComparisonMode = WeatherPanelStore(state => state.setComparisonMode);
 
     useEffect( () => {
-        console.log("selectMode", selectMode);
-        if (selectMode == 'area') {
+        //if (selectMode == 'area') {
+        if (selectAreaMode){
             map.selectArea?.setControlKey(false); 
             map.selectArea.enable();
         }
         else map.selectArea.disable();
-    }, [selectMode])
+    }, [selectAreaMode])
 
   
     useEffect(() => {
@@ -58,8 +57,9 @@ const AreaSelect = ({ geoJsonLayer }: any) => {
         //L.rectangle(e.bounds, { color: "blue", weight: 1 }).addTo(map);
         getFeaturesInView(e.bounds);
         map.selectArea.disable();
-        setSelectMode(null);
-        setComparisonMode(true);
+        setSelectAreaMode(false);
+        //setSelectMode("individual");
+        //setComparisonMode(true);
       });
   
       // You can restrict selection area like this:
@@ -73,7 +73,9 @@ const AreaSelect = ({ geoJsonLayer }: any) => {
       // now switch it off
       map.selectArea.setValidate();
 
-    }, [map, geoJsonLayer]);
+      return () => { map.removeEventListener("areaselected") }
+
+    }, [map, geoJsonLayerRef]);
   
     return null;
 }
