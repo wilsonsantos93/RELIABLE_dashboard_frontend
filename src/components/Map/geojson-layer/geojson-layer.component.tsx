@@ -15,9 +15,6 @@ import { Icon } from 'leaflet';
 import "@mapbox/leaflet-pip";
 import { useStableCallback } from '../../../hooks/UseStableCallback';
 
-
-//delete L.Icon.Default.prototype._getIconUrl;
-
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
     iconUrl: require('leaflet/dist/images/marker-icon.png'),
@@ -96,7 +93,13 @@ const GeoJsonLayer = (props: any) => {
 
     const map = useMap();
 
-    const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
+    const [userMarkers, setUserMarkers] = useState([
+        {
+            name: "Local 1",
+            lat: 38.724425,
+            lon: -9.125481
+        }
+    ]);
 
     // Get color for depending on value
     const getColor = (value: number) => {
@@ -372,7 +375,7 @@ const GeoJsonLayer = (props: any) => {
                 newSetClickedFeatureId(event);
                 layer.setPopupContent(newUpdatePopupContent(layer));
                 setLayerStyle(layer, layerRedHighlightedStyle);
-                setMarkerPosition(event.latlng);
+                //setMarkerPosition(event.latlng);
                 //zoomToFeature(event, map);
                 /* const row = document.getElementById("row_"+event.target.feature._id);  
                 if (row) row.scrollIntoView(true);  */
@@ -390,10 +393,10 @@ const GeoJsonLayer = (props: any) => {
                 onEachFeature={(feature, layer:CustomLayer) => onEachFeature(feature, layer, props.mapRef.current)}
                 // @ts-ignore
                 style={getStyle}
-            /> 
+            />
 
-            { markerPosition && 
-                <Marker icon={markerIcon} draggable={true} position={markerPosition}> 
+            {   userMarkers && userMarkers.map(marker =>
+                <Marker icon={markerIcon} draggable={true} position={[marker.lat, marker.lon]}> 
                     <Popup>
                         <span>Boas a todos</span>
                     </Popup>
@@ -401,7 +404,6 @@ const GeoJsonLayer = (props: any) => {
             }
         </LayerGroup>
     );
-
 }
 
 export default GeoJsonLayer;
