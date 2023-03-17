@@ -1,19 +1,39 @@
-import { createRef, useCallback, useEffect, useRef, useState} from 'react';
-import {GeoJSON, LayerGroup, Marker, Popup, useMap} from 'react-leaflet';
+import { useEffect, useRef, useState} from 'react';
+import { GeoJSON, LayerGroup, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import {Feature, GeoJsonObject, Geometry} from "geojson";
-import {fetchGeoJSON} from "../../../data/fetchGeoJSON";
-import { GeoJSON as GJSON, LatLng, Layer, LayerEvent, LeafletMouseEvent, Map as LeafletMap, PathOptions, PopupOptions} from "leaflet";
+import L from 'leaflet';
+import { GeoJsonObject} from "geojson";
+import { GeoJSON as GJSON, LatLng, Layer, LeafletMouseEvent, Map as LeafletMap, PathOptions } from "leaflet";
 import {MapFeatureStyle} from "../../../types/MapFeatureStyle";
-import {GeoJsonLayerProperties} from "../../../types/components/GeoJsonLayerProperties";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
-import {FeatureProperties} from "../../../types/FeatureProperties";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 import {fetchWeatherGeoJSON} from "../../../data/fetchWeatherGeoJSON";
-import markerIconPng from "leaflet/dist/images/marker-icon.png"
-import {Icon} from 'leaflet'
+import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
+import iconUrl from "leaflet/dist/images/marker-icon.png";
+import shadowUrl from "leaflet/dist/images/marker-shadow.png";
+import { Icon } from 'leaflet';
 import "@mapbox/leaflet-pip";
 import { useStableCallback } from '../../../hooks/UseStableCallback';
+
+
+//delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+    iconUrl: require('leaflet/dist/images/marker-icon.png'),
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+});
+
+const markerIcon = new Icon({
+    iconRetinaUrl,
+    iconUrl,
+    shadowUrl,
+    iconSize: [25, 41], 
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41]
+});
 
 type CustomLayer = { feature: any, _leaflet_id: string } & Layer;
 
@@ -76,8 +96,7 @@ const GeoJsonLayer = (props: any) => {
 
     const map = useMap();
 
-    /* const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
-    const markerIcon = new Icon({iconUrl: markerIconPng, iconSize: [25, 41], iconAnchor: [12, 41]}); */
+    const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
 
     // Get color for depending on value
     const getColor = (value: number) => {
@@ -353,6 +372,7 @@ const GeoJsonLayer = (props: any) => {
                 newSetClickedFeatureId(event);
                 layer.setPopupContent(newUpdatePopupContent(layer));
                 setLayerStyle(layer, layerRedHighlightedStyle);
+                setMarkerPosition(event.latlng);
                 //zoomToFeature(event, map);
                 /* const row = document.getElementById("row_"+event.target.feature._id);  
                 if (row) row.scrollIntoView(true);  */
@@ -365,7 +385,6 @@ const GeoJsonLayer = (props: any) => {
     return (
         <LayerGroup>
             <GeoJSON
-                /* ref={props.geoJsonLayer} */
                 ref={geoJsonLayerRef}
                 data={geoJSON as GeoJsonObject}
                 onEachFeature={(feature, layer:CustomLayer) => onEachFeature(feature, layer, props.mapRef.current)}
@@ -373,19 +392,13 @@ const GeoJsonLayer = (props: any) => {
                 style={getStyle}
             /> 
 
-            {/* { markerPosition && 
-                <Marker icon={markerIcon} position={markerPosition}> 
+            { markerPosition && 
+                <Marker icon={markerIcon} draggable={true} position={markerPosition}> 
                     <Popup>
-                        { 
-                            selectedWeatherField ?
-                            <>
-                            <span>{selectedWeatherField}: {featureProperties.weather[selectedWeatherField]}</span>
-                            <a href="#">Guardar localização</a> 
-                            </> : null
-                        }
+                        <span>Boas a todos</span>
                     </Popup>
                 </Marker>
-            } */}
+            }
         </LayerGroup>
     );
 
