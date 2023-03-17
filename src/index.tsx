@@ -8,8 +8,6 @@ declare global {
     interface Window { mobileCheck: any; opera: any }
 }
 
-//window.mobileCheck = window.mobileCheck || {};
-
 
 const container = document.getElementById('root');
 

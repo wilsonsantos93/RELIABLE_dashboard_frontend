@@ -1,7 +1,3 @@
-/* tbody tr.comparisonTblRow:hover {
-    border: 3px solid red!important;
-}
- */
 tbody tr.comparisonTblRow {
     border: 1px solid black;
     cursor: pointer;
@@ -27,13 +23,13 @@ tbody tr.comparisonTblRow {
     flex-direction: column;
 }
 
-.featuresTable{
+.featuresTable, .featuresChart {
     flex: 1;
-    max-height: 400px;
+    max-height: 350px;
     overflow: auto;
 }
 
-.recommendations{
+.recommendations {
     flex: 1;
     max-height: 200px;
     overflow-y: auto;
@@ -43,59 +39,6 @@ tbody tr.comparisonTblRow {
     margin-top: 20px;
 }
 
-/* html, 
-body, 
-.leaflet-sidebar-content,
-.leaflet-sidebar-pane,
-.container-table, 
-.inline-row, 
-.inline-row > div {
-    height: 100%!important;
-    overflow: hidden;
+.tablist {
+    padding-left: 0px;
 }
-
-.container-table {
-    table-layout: fixed;
-    display: table!important;
-    width: 100%!important;
-}
-
-.inline-row { 
-    display: table-row!important; 
-}
-.inline-row > div { display: table-cell!important; }
-
-.inline-row > div > .row { height: 100%!important; }
-.inline-row > div .row > div { height: 50%!important; overflow-y:auto!important; } */
-
-
-/* Fixed table header */
-/* table {
-    width: 100%;
-}
-
-thead, tbody, tr, td, th { display: block; }
-
-tr:after {
-    content: ' ';
-    display: block;
-    visibility: hidden;
-    clear: both;
-}
-
-thead th {
-    height: 30px;
-}
-
-tbody {
-    height: 120px;
-    overflow-y: auto;
-}
-
-thead {
-}
-
-tbody td, thead th {
-    width: 19.2%;
-    float: left;
-} */

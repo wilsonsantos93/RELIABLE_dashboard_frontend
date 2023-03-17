@@ -21,29 +21,13 @@ function Map() {
 
     let mapRef = createRef<LeafletMap>();
 
-    const setSelectMode = WeatherPanelStore(state => state.setSelectMode);
-    const selectMode = WeatherPanelStore(state => state.selectMode);
-
-    const setComparisonMode = WeatherPanelStore(state => state.setComparisonMode);
-
     const setSelectAreaMode = WeatherPanelStore(state => state.setSelectAreaMode);
     const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
 
-    /* const onSetMode = (mode: string) => {
-        setComparisonMode(true);
-        if (selectMode === mode) {
-            setSelectMode("individual");
-        }
-        else {
-            setSelectMode(mode);
-        }
-    } */
 
     const onSelectAreaMode = (mode?: boolean) => {
         setSelectAreaMode();
     }
-
-
 
     return (
         <div>
@@ -67,11 +51,11 @@ function Map() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
-                <GeoJsonLayer mapRef={mapRef} /* geoJsonLayer={geoJsonLayerRef} *//> 
+                <GeoJsonLayer mapRef={mapRef} /> 
 
-                <AreaSelect /* geoJsonLayer={geoJsonLayerRef} */ />
+                <AreaSelect/>
 
-                <LeafletGeoSearch style={{zIndex:900}} />
+                <LeafletGeoSearch />
 
                 {/* <Control position='topleft'>
                     <div style={{cursor: 'pointer'}} className="leaflet-bar">
@@ -94,7 +78,7 @@ function Map() {
                 
                 <MapLegend />
 
-                <Sidebar /* geoJsonLayer={geoJsonLayerRef} */ /> 
+                <Sidebar /> 
 
             </MapContainer>
         </div>
