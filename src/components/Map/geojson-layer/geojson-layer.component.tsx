@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState} from 'react';
+import { useEffect, useMemo, useRef, useState} from 'react';
 import { GeoJSON, LayerGroup, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -8,29 +8,21 @@ import {MapFeatureStyle} from "../../../types/MapFeatureStyle";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 import {fetchWeatherGeoJSON} from "../../../data/fetchWeatherGeoJSON";
-import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
+/* import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
-import { Icon } from 'leaflet';
+import { Icon } from 'leaflet'; */
 import "@mapbox/leaflet-pip";
 import { useStableCallback } from '../../../hooks/UseStableCallback';
+import UserMarker from '../user-marker/user-marker.component';
+import UserMarkerStore from '../../../stores/UserMarkerStore';
 
-L.Icon.Default.mergeOptions({
+/* L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
     iconUrl: require('leaflet/dist/images/marker-icon.png'),
     shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
-
-const markerIcon = new Icon({
-    iconRetinaUrl,
-    iconUrl,
-    shadowUrl,
-    iconSize: [25, 41], 
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    tooltipAnchor: [16, -28],
-    shadowSize: [41, 41]
-});
+ */
 
 type CustomLayer = { feature: any, _leaflet_id: string } & Layer;
 
@@ -87,19 +79,23 @@ const GeoJsonLayer = (props: any) => {
 
     const setGeoJsonLayerRef = WeatherPanelStore(state => state.setGeoJsonLayerRef);
 
+    const userMarkers = UserMarkerStore(state => state.userMarkers);
+
     useEffect(() => {
         setGeoJsonLayerRef(geoJsonLayerRef);
     }, [geoJsonLayerRef])
 
     const map = useMap();
 
-    const [userMarkers, setUserMarkers] = useState([
+   /*  const [userMarkers, setUserMarkers] = useState([
         {
+            _id: 'efg01xasdasd',
             name: "Local 1",
             lat: 38.724425,
-            lon: -9.125481
+            lon: -9.125481,
+            draggable: false
         }
-    ]);
+    ]); */
 
     // Get color for depending on value
     const getColor = (value: number) => {
@@ -385,6 +381,22 @@ const GeoJsonLayer = (props: any) => {
         layer._leaflet_id = feature._id;
     }
 
+    /* const setMoveMarker = (id: string) => {
+        setUserMarkers((oldUserMarkers: any) => {
+            const markerIndex = oldUserMarkers.findIndex((marker: any) => marker._id == id);
+            oldUserMarkers[markerIndex].draggable = !oldUserMarkers[markerIndex].draggable
+            return [...oldUserMarkers];
+        })
+    } */
+
+    /* const onRemove = (id: string) => {
+        console.log("remove", id);
+        setUserMarkers((oldUserMarkers: any) => {
+            const userMarkers = oldUserMarkers.filter((marker: any) => marker._id != id);
+            return userMarkers;
+        })
+    } */
+
     return (
         <LayerGroup>
             <GeoJSON
@@ -395,12 +407,9 @@ const GeoJsonLayer = (props: any) => {
                 style={getStyle}
             />
 
-            {   userMarkers && userMarkers.map(marker =>
-                <Marker icon={markerIcon} draggable={true} position={[marker.lat, marker.lon]}> 
-                    <Popup>
-                        <span>Boas a todos</span>
-                    </Popup>
-                </Marker>
+            {   userMarkers && userMarkers.map((marker) =>
+                    <UserMarker data={marker} />
+                )
             }
         </LayerGroup>
     );
