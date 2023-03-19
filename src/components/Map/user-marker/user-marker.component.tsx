@@ -8,6 +8,7 @@ import UserMarkerStore from "../../../stores/UserMarkerStore";
 import "./user-marker.styles.css";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import L from "leaflet";
+import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -26,6 +27,7 @@ const UserMarker = (props: any) => {
     const [draggable, setDraggable] = useState(false);
     const [editable, setEditable] = useState(false);
     //const [position, setPosition] = useState(null);
+    const [layer, setLayer] = useState<any>(null);
     const markerRef = useRef(null);
 
     /* const setUserMarkers = UserMarkerStore(state => state.setUserMarkers);
@@ -33,8 +35,11 @@ const UserMarker = (props: any) => {
 
     const removeUserMarker = UserMarkerStore(state => state.removeUserMarker);
     const upsertUserMarker = UserMarkerStore(state => state.upsertUserMarker);
-
     const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
+    const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
+    const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
+    const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
+    const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);
 
     const eventHandlers = useMemo(
         () => ({
@@ -51,19 +56,25 @@ const UserMarker = (props: any) => {
                 const latlngPoint = new L.LatLng(props.data.lat, props.data.lng);
                 const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef.current, true);
                 results.forEach(function(layer: any) {
-                    layer.fire('click');/* , {
-                        latlng: latlngPoint
-                    }); */
+                    setLayer(layer);
+                    layer.fire('click', {
+                        markerClicked: true,
+                        markerName: props.data.name
+                    });
                 });
             },
-
-            mouseover() {
-                const marker: any = markerRef.current;
-                marker?.openPopup();
-            }
         }),
         [geoJsonLayerRef],
     );
+
+    const updatePopupContent = (layer: any) => {
+        if (!selectedWeatherField || !layer) return null;
+        return <div>
+            <span>{selectedWeatherField?.displayName}: </span>
+            <span>{selectedWeatherField && layer.feature.weather ? layer.feature.weather[selectedWeatherField.name] : ''} {selectedWeatherField.unit}</span>
+            <br/>
+        </div>
+    }
 
     const toggleDraggable = useCallback(() => {
         setDraggable((d) => !d)
@@ -83,6 +94,18 @@ const UserMarker = (props: any) => {
 
     const onRemove = () => {
         removeUserMarker(props.data._id);
+        onRemoveFeature();
+    }
+
+    const onRemoveFeature = () => {
+        if (!layer) return;
+        const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
+        setComparedFeatures(filteredFeatures);
+        const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
+        l.closePopup();
+        const marker: any = markerRef.current;
+        marker.closePopup();
+        setFeatureProperties(null);
     }
   
     return (
@@ -95,19 +118,24 @@ const UserMarker = (props: any) => {
             >
             <Popup minWidth={90}>
                 { editable ? 
-                <input type="text" placeholder="Casa, Trabalho..." onKeyDown={handleKeyDown} defaultValue={props.data.name}/> : 
-                <strong>{props.data.name}</strong> }
+                    <input type="text" placeholder="Casa, Trabalho..." onKeyDown={handleKeyDown} defaultValue={props.data.name}/> : 
+                    <strong>{props.data.name}</strong> 
+                }
                 <br/>
                 {
                     draggable ? 
                     <span>Arraste para outra localização</span> : 
                     editable ?
                     <span>Alterar nome</span> :
+                    <>
+                    { updatePopupContent(layer) }
                     <div style={{display: "flex", justifyContent: "space-around"}}>
-                        <a className="marker-popup-link" onClick={toggleEditable} href="#">Editar</a> 
+                        <a onClick={toggleEditable} className="marker-popup-link"  href="#">Editar</a> 
                         <a onClick={toggleDraggable} className="marker-popup-link" href="#">Mover</a>
                         <a onClick={() => onRemove()} className="marker-popup-link" href="#">Remover</a>
                     </div>
+                    <a onClick={() => onRemoveFeature()} href="#">Remover da lista</a>
+                    </>
                 }
             </Popup>
         </Marker>

@@ -17,7 +17,7 @@ const FeaturesTable = () => {
         const feature = comparedFeatures.find((f:any) => f._id == featureId);
         setFeatureProperties({_id: feature._id, properties: feature.properties, weather: feature.weather, rowHover: true});
         const layer = geoJsonLayerRef.current.getLayer(feature._id);
-        layer.fireEvent("click");
+        layer.fireEvent("click")
     }
 
     const removeFeature = (e: any, featureId: string) => {
@@ -75,7 +75,9 @@ const FeaturesTable = () => {
                         }
                         </td>
 
-                        <td key="local_td">{feature?.properties?.Concelho}</td>
+                        <td key="local_td">{
+                            !feature?.markerName ? feature?.properties?.Concelho : `${feature?.markerName} (${feature?.properties.Concelho})`
+                        }</td>
                         {
                             weatherFields.map(field => {
                                 if (!feature?.weather) return <td key="none_td_key"></td>

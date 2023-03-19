@@ -169,6 +169,7 @@ const GeoJsonLayer = (props: any) => {
     useEffect(() => {
         resetHighlightFeature(previousLayer);
         if (!hoveredFeature) {
+            clickedFeatureId = null;
             return;
         }
 
@@ -307,28 +308,40 @@ const GeoJsonLayer = (props: any) => {
     }
 
     // Set clicked feature id
-    const setClickedFeatureId = (event: LeafletMouseEvent) => {
+    const setClickedFeatureId = (event: LeafletMouseEvent & {markerClicked: boolean, markerName: string}) => {
         if (!event.target) {
             return;
         }
-        clickedFeatureId = event.target.feature._id;
-        const feature = { 
-            _id: event.target.feature._id, 
-            properties: event.target.feature.properties,
-            weather: event.target.feature.weather 
-        };
+
+        let feature = { ...event.target.feature };
         const { _id, weather, properties } = feature;
-        setFeatureProperties({ _id, weather, properties, mapHover: true });
-        event.target.addedToList = true;
-    
-        if (!existsInComparedFeatures(_id)) setComparedFeatures([feature, ...comparedFeatures])
+        clickedFeatureId = _id;
+
+        if (event.markerClicked) {
+            feature = { ...feature, markerName: event.markerName };
+        } 
+
+        setFeatureProperties({ _id, weather, properties, markerName: event.markerName });
+
+        // Change specific index of comparedFeatures
+        if (existsInComparedFeatures(_id)) {
+            const compFeatures = [...comparedFeatures];
+            const ix = compFeatures.findIndex((f:any) => f._id == feature._id); 
+            compFeatures[ix] = feature;
+            setComparedFeatures(compFeatures);
+        } else {
+            setComparedFeatures([feature, ...comparedFeatures]);
+        }
+
+        //if (!existsInComparedFeatures(_id)) setComparedFeatures([newFeature, ...comparedFeatures])
         //if (!comparisonMode && comparedFeatures.length <= 1) setComparedFeatures([feature]);
     }
 
     // Clear the layer
-    const clearFeature = (layer: CustomLayer) => {
+    const clearFeature = () => {
         setFeatureProperties(null);
-        clickedFeatureId = null;
+        //clickedFeatureId = null;
+
         /* if (comparisonMode) {
             const exists = existsInComparedFeatures(layer.feature._id);
             if (!exists) {
@@ -357,8 +370,10 @@ const GeoJsonLayer = (props: any) => {
     const onEachFeature = (feature: any, layer: CustomLayer, map: LeafletMap | null) => {
         layer.bindPopup(`<strong>${feature.properties.Concelho}</strong><br/>`);
         layer.getPopup()?.on('remove', () => {
-            newClearFeature(layer);
+            newClearFeature();
         })
+
+        layer.off('click');
 
         layer.on({
             mouseover: () => {
@@ -368,9 +383,11 @@ const GeoJsonLayer = (props: any) => {
                 newResetHighlightFeature(layer);
             },
             click: (event) => {
-                newSetClickedFeatureId(event);
+                newSetClickedFeatureId(event as LeafletMouseEvent & { markerClicked: boolean; markerName: string; });
                 layer.setPopupContent(newUpdatePopupContent(layer));
                 setLayerStyle(layer, layerRedHighlightedStyle);
+                if (!event.hasOwnProperty("markerClicked")) layer.openPopup(event.latlng);
+                
                 //setMarkerPosition(event.latlng);
                 //zoomToFeature(event, map);
                 /* const row = document.getElementById("row_"+event.target.feature._id);  
@@ -381,22 +398,7 @@ const GeoJsonLayer = (props: any) => {
         layer._leaflet_id = feature._id;
     }
 
-    /* const setMoveMarker = (id: string) => {
-        setUserMarkers((oldUserMarkers: any) => {
-            const markerIndex = oldUserMarkers.findIndex((marker: any) => marker._id == id);
-            oldUserMarkers[markerIndex].draggable = !oldUserMarkers[markerIndex].draggable
-            return [...oldUserMarkers];
-        })
-    } */
-
-    /* const onRemove = (id: string) => {
-        console.log("remove", id);
-        setUserMarkers((oldUserMarkers: any) => {
-            const userMarkers = oldUserMarkers.filter((marker: any) => marker._id != id);
-            return userMarkers;
-        })
-    } */
-
+    console.log("rerender")
     return (
         <LayerGroup>
             <GeoJSON

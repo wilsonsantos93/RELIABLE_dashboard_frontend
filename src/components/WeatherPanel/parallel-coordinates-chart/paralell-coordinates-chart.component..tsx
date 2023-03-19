@@ -95,9 +95,9 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
 
     const onHoveredFeatureChanged = () => {
         if (previousSeries) {
-            const prevSeries = chartRef.current.chart.series.find((s:CustomSeries) => s.userOptions.featureId == previousSeries.userOptions.featureId);
+            const prevSeries = chartRef?.current?.chart.series.find((s:CustomSeries) => s.userOptions.featureId == previousSeries.userOptions.featureId);
             if (prevSeries) {
-                chartRef.current.chart.series[prevSeries.index].update({ color: previousSeries.color, lineWidth: 2 });
+                chartRef?.current?.chart.series[prevSeries.index].update({ color: previousSeries.color, lineWidth: 2 });
             }
         }
 
@@ -107,7 +107,7 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
 
     const updateColor = (featureId: string) => {
         if (!featureId) return;
-        const series: any = chartRef.current.chart.series.find((s:CustomSeries) => s.userOptions.featureId == featureId);
+        const series: any = chartRef?.current?.chart.series.find((s:CustomSeries) => s.userOptions.featureId == featureId);
         if (!series) return;
         setPreviousSeries({ ...series });
         const options = { color: "red", lineWidth: 6 };
@@ -149,7 +149,7 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
             const data = weatherFields.map(field => feature.weather[field.name])
             return {
                 featureId: feature._id,
-                name: feature.properties.Concelho,
+                name: !feature.markerName ? feature.properties.Concelho : `${feature.markerName} (${feature?.properties.Concelho})`,
                 data: data,
                 shadow: false
             };
@@ -181,7 +181,7 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
                 return 
             }
             else {
-                chartRef.current.chart.reflow();
+                chartRef?.current?.chart.reflow();
             }
         })
         return () => el?.removeEventListener('transitionend', null);
@@ -189,12 +189,14 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
 
 
     return ( 
+        comparedFeatures.length ? 
         <HighchartsReact
             ref={chartRef}
             immutable={true}
             highcharts={Highcharts}
             options={chartOptions}
-        />
+        /> :
+        <span>Sem localidades na lista.</span>
     )
 }
 
