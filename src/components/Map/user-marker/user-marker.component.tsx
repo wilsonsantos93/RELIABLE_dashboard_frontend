@@ -1,5 +1,5 @@
 import { Marker, Popup } from "react-leaflet";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "leaflet";
 import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
@@ -46,8 +46,7 @@ const UserMarker = (props: any) => {
             async dragend() {
                 const marker: any = markerRef.current;
                 if (marker != null) {
-                    await upsertUserMarker(props.data._id, undefined, marker.getLatLng);
-                    //setPosition(marker.getLatLng());
+                    await upsertUserMarker(props.data._id, undefined, marker.getLatLng());
                     toggleDraggable();
                 }
             },
@@ -58,14 +57,51 @@ const UserMarker = (props: any) => {
                 results.forEach(function(layer: any) {
                     setLayer(layer);
                     layer.fire('click', {
-                        markerClicked: true,
-                        markerName: props.data.name
+                        marker: props.data || { _id: null },
+                        markerRef: markerRef.current || null
                     });
+                    //const feature = { _id: props.data._id, properties: layer.feature.properties, weather: layer.feature.weather };
+                    //setFeatureProperties(layer.feature)
+                    
+                    const feature = { 
+                        _id: layer.feature._id, 
+                        properties: layer.feature.properties, 
+                        weather: layer.feature.weather,
+                        markers: layer.markers,
+                        marker: props.data || { _id: null }, 
+                        markerRef: markerRef.current
+                    }
+                    setFeatureProperties(feature)
                 });
             },
         }),
-        [geoJsonLayerRef],
+        [geoJsonLayerRef, comparedFeatures],
     );
+
+    /* useEffect(() => {
+        if (!geoJsonLayerRef) return;
+        const latlngPoint = new L.LatLng(props.data.lat, props.data.lng);
+        const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef.current, true);
+        results.forEach((layer: any) => {
+            setLayer(layer);
+            const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
+            console.log("Found layer for marker");
+            l.markers.push(markerRef.current);
+        });
+    }, [geoJsonLayerRef]) */
+    
+    useEffect(() => {
+        const marker: any = markerRef.current;
+        marker.feature = { 
+            type: 'Point', 
+            properties: { ...props.data }, 
+            geometry: undefined 
+        };
+        marker._leaflet_id = props.data._id;
+        marker.getPopup().on('remove', function() {
+            setEditable(false);
+        });
+    }, [])
 
     const updatePopupContent = (layer: any) => {
         if (!selectedWeatherField || !layer) return null;
@@ -93,8 +129,18 @@ const UserMarker = (props: any) => {
     }
 
     const onRemove = () => {
+        const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
+        l.markers = l.markers.filter((m:any) => m._id != props.data._id)
         removeUserMarker(props.data._id);
-        onRemoveFeature();
+        //onRemoveFeature();
+
+/*         // update comparedFeatures list
+        console.log("UPDATED MARKERS", l.markers);
+        const compFeatures = [...comparedFeatures];
+        const ix = compFeatures.findIndex((f:any) => f._id == layer.feature._id)
+        compFeatures[ix].markers = l.markers;
+        console.log(compFeatures[ix]);
+        setComparedFeatures(compFeatures); */
     }
 
     const onRemoveFeature = () => {

@@ -146,10 +146,14 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
 
     useEffect(() => {
         const series = comparedFeatures.map((feature:any, i: any) => {
-            const data = weatherFields.map(field => feature.weather[field.name])
+            const data = weatherFields.map(field => feature.weather[field.name]);
+            const name = feature.markers?.length ? 
+            `${feature.properties.Concelho} (${feature.markers.map((m:any) => m.name).join()})` :
+            feature.properties.Concelho;
+
             return {
                 featureId: feature._id,
-                name: !feature.markerName ? feature.properties.Concelho : `${feature.markerName} (${feature?.properties.Concelho})`,
+                name: name,
                 data: data,
                 shadow: false
             };

@@ -1,4 +1,5 @@
 import {GeoJsonObject} from "geojson";
+const base_url = process.env.REACT_APP_API_URI;
 
 /**
  * Fetches and returns the geoJSON with only the border information.
@@ -7,7 +8,7 @@ export async function fetchGeoJSON() {
 
     //! Fetch the geoJSON from the backend
     console.log("Started fetching the geoJSON from the backend.");
-    let url = "http://localhost:8000/api/region";
+    let url = `http://${base_url}/api/region`;
 
     const geoJSONsResponse = await fetch(url);
 

@@ -23,8 +23,9 @@ const AreaSelect = () => {
                         if (!comparedFeatures.length || !comparedFeatures.find((f:any) => f._id == layer.feature._id)) {
                             features.push({
                                 _id: layer.feature._id, 
-                                properties: layer.feature.properties, 
-                                weather: layer.feature.weather 
+                                properties: layer.feature.properties,
+                                weather: layer.feature.weather,
+                                markers: layer.markers,
                             });
                         }
                     }  

@@ -5,9 +5,15 @@ const UserMarkerStore = create<UserMarkerState>((set, get) => ({
     userMarkers: [
         {
             _id: 'efg01xasdasd',
-            name: "Local 1",
+            name: "Casa",
             lat: 38.724425,
             lng: -9.125481,
+        },
+        {
+            _id: 'aaa111ddd',
+            name: "Trabalho",
+            lat: 38.724425,
+            lng: -9.105481,
         }
     ],
 
@@ -17,9 +23,12 @@ const UserMarkerStore = create<UserMarkerState>((set, get) => ({
 
     removeUserMarker: async (id: string) => {
         try {
-            await fetch(`http://localhost:8000/api/user/location/${id}/delete`, {
+            const response = await fetch(`http://localhost:8000/api/user/location/${id}/delete`, {
                 method: 'POST',
             });
+            
+            //if (!response?.ok) throw "Error in request";
+
             const userMarkers = get().userMarkers;
             const filteredMarkers = userMarkers.filter((marker: any) => marker._id != id);
             get().setUserMarkers(filteredMarkers);
@@ -28,13 +37,13 @@ const UserMarkerStore = create<UserMarkerState>((set, get) => ({
         }
     },
 
-    upsertUserMarker: async (id: string, name?: string, position?: number[]) => {
+    upsertUserMarker: async (id: string, name?: string, position?: any) => {
         try {
             const body: any = {};
             if (name) body.name = name;
             if (position) {
-                body.lat = position[0];
-                body.lng = position[1];
+                body.lat = position.lat;
+                body.lng = position.lng;
             };
 
             const response = await fetch(`http://localhost:8000/api/user/location/${id}/update`, {
@@ -46,7 +55,7 @@ const UserMarkerStore = create<UserMarkerState>((set, get) => ({
                 body: JSON.stringify(body)
             });
 
-            if (!response?.ok) throw "Error in request";
+            //if (!response?.ok) throw "Error in request";
 
             const userMarkers = [...get().userMarkers];
             const index = userMarkers.findIndex(marker => marker._id == id);

@@ -8,23 +8,15 @@ import {MapFeatureStyle} from "../../../types/MapFeatureStyle";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 import {fetchWeatherGeoJSON} from "../../../data/fetchWeatherGeoJSON";
-/* import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
-import iconUrl from "leaflet/dist/images/marker-icon.png";
-import shadowUrl from "leaflet/dist/images/marker-shadow.png";
-import { Icon } from 'leaflet'; */
 import "@mapbox/leaflet-pip";
 import { useStableCallback } from '../../../hooks/UseStableCallback';
 import UserMarker from '../user-marker/user-marker.component';
 import UserMarkerStore from '../../../stores/UserMarkerStore';
+declare function require(name:string):any;
+const leafletPip = require('@mapbox/leaflet-pip');
 
-/* L.Icon.Default.mergeOptions({
-    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-    iconUrl: require('leaflet/dist/images/marker-icon.png'),
-    shadowUrl: require('leaflet/dist/images/marker-shadow.png')
-});
- */
 
-type CustomLayer = { feature: any, _leaflet_id: string } & Layer;
+type CustomLayer = { addedToList: boolean, feature: any, _leaflet_id: string, markers: any[] } & Layer;
 
 const layerHighlightedStyle: MapFeatureStyle = {
     color: "black",
@@ -87,15 +79,42 @@ const GeoJsonLayer = (props: any) => {
 
     const map = useMap();
 
-   /*  const [userMarkers, setUserMarkers] = useState([
-        {
-            _id: 'efg01xasdasd',
-            name: "Local 1",
-            lat: 38.724425,
-            lon: -9.125481,
-            draggable: false
+    useEffect(() => {
+        if (!geoJsonLayerRef || !geoJsonLayerRef.current) return;
+
+        const compFeatures = [...comparedFeatures];
+        if (!userMarkers.length) {
+            map.eachLayer((layer: any) => {
+                layer.markers = [];
+                const ix = compFeatures.findIndex((f:any) => f._id == layer._leaflet_id);
+                if (ix >= 0) compFeatures[ix].markers = layer.markers;
+            });
+            setComparedFeatures(compFeatures);
+            return;
         }
-    ]); */
+
+        const data: any = {};
+        userMarkers.forEach(marker => {
+            const latlngPoint = new L.LatLng(marker.lat, marker.lng);
+            const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef.current, true);
+            results.forEach((layer: any) => {
+                if (!data.hasOwnProperty(layer.feature._id)) data[layer.feature._id] = [];
+                data[layer.feature._id].push(marker);
+            });
+        })
+
+        for (let key in data) {
+            const layer: any = geoJsonLayerRef.current.getLayer(key as any);
+            if (layer) layer.markers = data[key];
+            const ix = compFeatures.findIndex((f:any) => f._id == layer.feature._id);
+            if (ix >= 0) { 
+                compFeatures[ix].markers = layer.markers;
+            }
+        }
+
+        setComparedFeatures(compFeatures);
+
+    }, [userMarkers, geoJsonLayerRef, geoJSON])
 
     // Get color for depending on value
     const getColor = (value: number) => {
@@ -142,7 +161,6 @@ const GeoJsonLayer = (props: any) => {
 
         return mapFeatureNotHoveredStyle as PathOptions;
     }
-
 
     useEffect(() => {
         (async () => {
@@ -223,7 +241,7 @@ const GeoJsonLayer = (props: any) => {
     } */
 
     const existsInComparedFeatures = (featureId: string) => {
-        return comparedFeatures.find((feature: any) => feature._id === featureId);
+        return comparedFeatures.find((f: any) => f._id === featureId);
     }
 
     const removeFeatureFromList = (layer: CustomLayer) => {
@@ -298,6 +316,7 @@ const GeoJsonLayer = (props: any) => {
 
     // Highlights a feature of the map when hovered over.
     const highlightFeature = (layer: any) => {
+        if (!layer) return;
         const isComparedFeature = existsInComparedFeatures(layer.feature._id);
         if (isComparedFeature/*  && comparisonMode */){
             setLayerStyle(layer, layerRedHighlightedStyle);
@@ -308,32 +327,21 @@ const GeoJsonLayer = (props: any) => {
     }
 
     // Set clicked feature id
-    const setClickedFeatureId = (event: LeafletMouseEvent & {markerClicked: boolean, markerName: string}) => {
+    const setClickedFeatureId = (event: LeafletMouseEvent & {marker: any, markerRef: any}) => {
         if (!event.target) {
             return;
         }
+    
+        let feature = { ...event.target.feature, markers: event.target.markers, marker: event.marker || { _id: null }, markerRef: event.markerRef };
+        clickedFeatureId = feature._id;
 
-        let feature = { ...event.target.feature };
         const { _id, weather, properties } = feature;
-        clickedFeatureId = _id;
 
-        if (event.markerClicked) {
-            feature = { ...feature, markerName: event.markerName };
-        } 
+        setFeatureProperties({ _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef });
 
-        setFeatureProperties({ _id, weather, properties, markerName: event.markerName });
+        if (!existsInComparedFeatures(_id)) setComparedFeatures([feature, ...comparedFeatures]);
 
-        // Change specific index of comparedFeatures
-        if (existsInComparedFeatures(_id)) {
-            const compFeatures = [...comparedFeatures];
-            const ix = compFeatures.findIndex((f:any) => f._id == feature._id); 
-            compFeatures[ix] = feature;
-            setComparedFeatures(compFeatures);
-        } else {
-            setComparedFeatures([feature, ...comparedFeatures]);
-        }
-
-        //if (!existsInComparedFeatures(_id)) setComparedFeatures([newFeature, ...comparedFeatures])
+        //if (!existsInComparedFeatures(_id)) setComparedFeatures([feature, ...comparedFeatures])
         //if (!comparisonMode && comparedFeatures.length <= 1) setComparedFeatures([feature]);
     }
 
@@ -369,11 +377,11 @@ const GeoJsonLayer = (props: any) => {
      */
     const onEachFeature = (feature: any, layer: CustomLayer, map: LeafletMap | null) => {
         layer.bindPopup(`<strong>${feature.properties.Concelho}</strong><br/>`);
-        layer.getPopup()?.on('remove', () => {
+        layer.getPopup()?.on('remove', () => {   
             newClearFeature();
         })
 
-        layer.off('click');
+        //layer.off('click');
 
         layer.on({
             mouseover: () => {
@@ -383,10 +391,15 @@ const GeoJsonLayer = (props: any) => {
                 newResetHighlightFeature(layer);
             },
             click: (event) => {
-                newSetClickedFeatureId(event as LeafletMouseEvent & { markerClicked: boolean; markerName: string; });
+                newSetClickedFeatureId(event as LeafletMouseEvent & {marker: any, markerRef: any; });
                 layer.setPopupContent(newUpdatePopupContent(layer));
                 setLayerStyle(layer, layerRedHighlightedStyle);
-                if (!event.hasOwnProperty("markerClicked")) layer.openPopup(event.latlng);
+                layer.addedToList = true;
+                const e = event as any;
+                if (!e.marker) layer.openPopup(event.latlng);
+                else {
+                    e.markerRef.openPopup();
+                }
                 
                 //setMarkerPosition(event.latlng);
                 //zoomToFeature(event, map);
@@ -396,9 +409,9 @@ const GeoJsonLayer = (props: any) => {
         });
 
         layer._leaflet_id = feature._id;
+        layer.markers = [];
     }
 
-    console.log("rerender")
     return (
         <LayerGroup>
             <GeoJSON
@@ -410,7 +423,7 @@ const GeoJsonLayer = (props: any) => {
             />
 
             {   userMarkers && userMarkers.map((marker) =>
-                    <UserMarker data={marker} />
+                    <UserMarker key={marker._id} data={marker} />
                 )
             }
         </LayerGroup>
