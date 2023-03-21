@@ -20,7 +20,7 @@ const SidebarTabHead = () => {
 
     return (
         <div className="tabHead">
-            <span>{comparedFeatures.length} localidades selecionadas.</span>
+            <span>{comparedFeatures.length} localidades na lista.</span>
             <a href="#" onClick={clearAll}>
                 <FontAwesomeIcon icon={faTrash} /> Limpar tudo
             </a>

@@ -97,7 +97,7 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
         if (previousSeries) {
             const prevSeries = chartRef?.current?.chart.series.find((s:CustomSeries) => s.userOptions.featureId == previousSeries.userOptions.featureId);
             if (prevSeries) {
-                chartRef?.current?.chart.series[prevSeries.index].update({ color: previousSeries.color, lineWidth: 2 });
+                chartRef?.current?.chart.series[prevSeries.index].update({ color: previousSeries.color, lineWidth: 2, zIndex: 0 });
             }
         }
 
@@ -110,7 +110,7 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
         const series: any = chartRef?.current?.chart.series.find((s:CustomSeries) => s.userOptions.featureId == featureId);
         if (!series) return;
         setPreviousSeries({ ...series });
-        const options = { color: "red", lineWidth: 6 };
+        const options = { color: "red", lineWidth: 6, zIndex: 10 };
         series.update(options);
     }
 
