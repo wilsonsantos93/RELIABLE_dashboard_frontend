@@ -1,5 +1,8 @@
 export interface WeatherPanelState {
 
+    sidebar: L.Control.Sidebar|null
+    setSidebar: (sidebar: L.Control.Sidebar|null) => void
+
     selectMode: string | null
     setSelectMode: (mode: string | null ) => void
 

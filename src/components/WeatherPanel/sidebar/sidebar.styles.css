@@ -11,10 +11,17 @@ tbody tr.comparisonTblRow {
     background-color: black!important;
 }
 
-@media (min-width: 1200px) {
+/* @media (min-width: 1200px) {
     .leaflet-sidebar {
         width: 40vw;
         max-width: 40vw;
+    }
+} */
+
+@media (min-width: 720px) {
+    .leaflet-sidebar {
+        width: 50vw;
+        max-width: 50vw;
     }
 }
 
@@ -25,13 +32,13 @@ tbody tr.comparisonTblRow {
 
 .featuresTable, .featuresChart {
     flex: 1;
-    max-height: 350px;
+    max-height: 50vh;
     overflow: auto;
 }
 
 .recommendations {
     flex: 1;
-    max-height: 200px;
+    max-height: 50vh;
     overflow-y: auto;
 }
 
@@ -41,4 +48,10 @@ tbody tr.comparisonTblRow {
 
 .tablist {
     padding-left: 0px;
+}
+
+.sidebar-badge {
+    position: absolute;
+    right: 15px;
+    font-size: 9px;
 }

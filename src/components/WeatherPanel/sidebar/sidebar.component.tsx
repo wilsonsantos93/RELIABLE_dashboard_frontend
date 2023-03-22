@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import WeatherDateSelector from "../weather-date-selector/weather-date-selector.component";
 import WeatherInfoSelector from "../weather-info-selector/weather-info-selector.component";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
-import { Form } from "react-bootstrap";
+import { Badge, Form } from "react-bootstrap";
 import ParallelCoordinatesChart from "../parallel-coordinates-chart/paralell-coordinates-chart.component.";
 import "./sidebar.styles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -20,9 +20,12 @@ import FeaturesTable from "../features-table/features-table.component";
 const Sidebar = () => {
 
     const setIsTabOpen = WeatherPanelStore(state => state.setIsTabOpen);
-    const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
-    const [sidebar, setSidebar] = useState<L.Control.Sidebar|null>(null);
-    const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
+    //const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
+    //const [sidebar, setSidebar] = useState<L.Control.Sidebar|null>(null);
+    const setSidebar = WeatherPanelStore(state => state.setSidebar);
+    //const sidebar = WeatherPanelStore(state => state.sidebar);
+
+    //const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const map = useMap();
 
     useEffect(() => {
@@ -47,10 +50,10 @@ const Sidebar = () => {
     }, [])
 
 
-    useEffect(() => {
+    /* useEffect(() => {
         if (comparedFeatures.length && !isTabOpen) sidebar?.open("tab1");
         else if (!comparedFeatures.length) sidebar?.close();
-    }, [comparedFeatures])
+    }, [comparedFeatures]) */
 
 
     return (

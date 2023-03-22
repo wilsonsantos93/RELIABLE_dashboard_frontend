@@ -30,3 +30,9 @@
     vertical-align: middle;
     padding-left: 15px;
 }
+
+@media (max-width: 630px)  {
+    .MapFeatureInformation {
+        bottom: 55px;
+    }
+}

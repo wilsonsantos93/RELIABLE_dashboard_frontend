@@ -25,7 +25,8 @@ const Recommendations = () => {
                 Mas aos poucos o Arsenal foi tomando conta do jogo e obrigando os leões a recuarem.
 
                 Até que aos 19 minutos Martinelli remata forte para excelente defesa de Adán, mas na recarga Xhaka coloca 
-                a bola no fundo da baliza portuguesa. Estava o Arsenal em vantagem no jogo e na eliminatória.</span>
+                a bola no fundo da baliza portuguesa. Estava o Arsenal em vantagem no jogo e na eliminatória.
+                </span>
             }
             
         </div>

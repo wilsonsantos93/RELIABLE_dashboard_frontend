@@ -3,6 +3,11 @@ import {WeatherPanelState} from "../types/stores/WeatherPanelState";
 
 const WeatherPanelStore = create<WeatherPanelState>((set, get) => ({
 
+    sidebar: null,
+    setSidebar: (sidebar) => set(state => ({
+        sidebar: sidebar
+    })),
+
     selectMode: "individual",
     setSelectMode: (mode) => set(state => ({
         selectMode: mode
@@ -15,7 +20,7 @@ const WeatherPanelStore = create<WeatherPanelState>((set, get) => ({
 
     selectAreaMode: false,
     setSelectAreaMode: (bool?) => set(state => ({
-        selectAreaMode: bool == undefined ? !state.selectAreaMode : bool
+        selectAreaMode: bool === undefined ? !state.selectAreaMode : bool
     })),
 
     geoJsonLayerRef: undefined,
@@ -67,7 +72,7 @@ const WeatherPanelStore = create<WeatherPanelState>((set, get) => ({
 
     comparisonMode: false,
     setComparisonMode: (bool) => set(state => ({
-        comparisonMode: bool == undefined ? !state.comparisonMode : bool
+        comparisonMode: bool === undefined ? !state.comparisonMode : bool
     }))
 }))
 

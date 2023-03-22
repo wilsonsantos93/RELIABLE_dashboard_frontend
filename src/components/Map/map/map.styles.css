@@ -7,7 +7,12 @@
     top: 56px;
     bottom: 0;
     position: absolute;
-}
+    /* cursor: url("leaflet/dist/images/marker-icon.png"), auto;*/
+} 
+
+/* .leaflet-interactive {
+    cursor: url("leaflet/dist/images/marker-icon.png"), auto;
+} */
 
 .leaflet-control-zoom-in {
     background: #333 !important;
@@ -32,3 +37,4 @@
     text-decoration: none;
     color: black;
 }
+

@@ -27,7 +27,8 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
             enabled: false
         },
         legend: {
-            enabled: true
+            enabled: true,
+            maxHeight: 100
         },
         xAxis: {
           categories: [] as string[],
@@ -147,8 +148,8 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
     useEffect(() => {
         const series = comparedFeatures.map((feature:any, i: any) => {
             const data = weatherFields.map(field => feature.weather[field.name]);
-            const name = feature.markers?.length ? 
-            `${feature.properties.Concelho} (${feature.markers.map((m:any) => m.name).join()})` :
+            const name =/*  feature.markers?.length ? 
+            `${feature.properties.Concelho} (${feature.markers.map((m:any) => m.name).join()})` : */
             feature.properties.Concelho;
 
             return {

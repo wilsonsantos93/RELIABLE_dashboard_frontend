@@ -11,3 +11,19 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+#toastContainer.start-33 {
+  left: 33%!important;
+}
+
+@media (max-width: 440px)  {
+  .toast-container {
+    max-width: 70vw!important;
+  }
+
+  .toast-body {
+    font-size: 11px!important;
+  }
+
+}

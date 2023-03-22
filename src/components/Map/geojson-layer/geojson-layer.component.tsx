@@ -12,14 +12,20 @@ import "@mapbox/leaflet-pip";
 import { useStableCallback } from '../../../hooks/UseStableCallback';
 import UserMarker from '../user-marker/user-marker.component';
 import UserMarkerStore from '../../../stores/UserMarkerStore';
+import "./geojson-layer.styles.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
+import ReactDOM from 'react-dom';
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
+
 
 
 type CustomLayer = { addedToList: boolean, feature: any, _leaflet_id: string, markers: any[] } & Layer;
 
 const layerHighlightedStyle: MapFeatureStyle = {
     color: "black",
+    fillOpacity: 0.5,
     weight: 3
 }
 
@@ -30,11 +36,13 @@ const layerRedHighlightedStyle: MapFeatureStyle = {
 
 const layerNormalStyle: MapFeatureStyle = {
     color: "#a2a2a2",
+    fillOpacity: 0.5,
     weight: 1
 }
 
 const layerNormalHoverStyle: MapFeatureStyle = {
     color: "#a2a2a2",
+    fillOpacity: 0.5,
     weight: 3
 }
 
@@ -72,6 +80,9 @@ const GeoJsonLayer = (props: any) => {
     const setGeoJsonLayerRef = WeatherPanelStore(state => state.setGeoJsonLayerRef);
 
     const userMarkers = UserMarkerStore(state => state.userMarkers);
+
+    const sidebar = WeatherPanelStore(state => state.sidebar);
+    const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
 
     useEffect(() => {
         setGeoJsonLayerRef(geoJsonLayerRef);
@@ -140,7 +151,7 @@ const GeoJsonLayer = (props: any) => {
         let mapFeatureNotHoveredStyle: MapFeatureStyle = {
             fillColor: featureColor,
             opacity: 1,
-            fillOpacity: 0.8,
+            fillOpacity: 0.5,
             ...layerNormalStyle
         };
 
@@ -176,7 +187,9 @@ const GeoJsonLayer = (props: any) => {
     }, [selectedDateId]);
 
     useEffect(() => {
-        map.closePopup();
+        if (!hoveredFeature) return;
+        const layer = getLayer(hoveredFeature._id);
+        layer?.setPopupContent(updatePopupContent(layer));
     }, [selectedWeatherField]);
 
     useEffect(() => {
@@ -261,6 +274,11 @@ const GeoJsonLayer = (props: any) => {
         const button = document.createElement("a");
         button.href = "#";
 
+        /* const markerBtn = document.createElement("button");
+        markerBtn.className = "btn btn-sm btn-light border";
+        ReactDOM.render(<FontAwesomeIcon icon={faLocationDot} />, markerBtn);
+        div.appendChild(markerBtn); */
+
         //const featureInComparison = existsInComparedFeatures(layer.feature._id);
         //if (featureInComparison) {
             button.innerHTML = "Remover da lista";
@@ -340,6 +358,12 @@ const GeoJsonLayer = (props: any) => {
         setFeatureProperties({ _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef });
 
         if (!existsInComparedFeatures(_id)) setComparedFeatures([feature, ...comparedFeatures]);
+
+        if (sidebar && !isTabOpen && !window.mobileCheck()) {
+            sidebar.open("tab1");
+        }
+
+        
 
         //if (!existsInComparedFeatures(_id)) setComparedFeatures([feature, ...comparedFeatures])
         //if (!comparisonMode && comparedFeatures.length <= 1) setComparedFeatures([feature]);

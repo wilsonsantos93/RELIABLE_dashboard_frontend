@@ -1,5 +1,5 @@
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Table } from "react-bootstrap";
 import { useMap } from "react-leaflet";
@@ -15,10 +15,10 @@ const FeaturesTable = () => {
     const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
     const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);
     const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
-    const map = useMap();
+    //const map = useMap();
 
     const hoverFeature = (featureId: string) => {
-        const feature = comparedFeatures.find((f:any) => f._id == featureId);
+        const feature = comparedFeatures.find((f:any) => f._id === featureId);
         setFeatureProperties({
             _id: feature._id, 
             properties: feature.properties, 
@@ -46,13 +46,13 @@ const FeaturesTable = () => {
         } 
     }, [hoveredFeature]) */
 
-    const removeFeature = (e: any, featureId: string) => {
+    /* const removeFeature = (e: any, featureId: string) => {
         e.stopPropagation();
         e.preventDefault();
-        const filteredFeatures = comparedFeatures.filter((f:any) => f._id != featureId);
+        const filteredFeatures = comparedFeatures.filter((f:any) => f._id !== featureId);
         setComparedFeatures(filteredFeatures);
         map.closePopup();
-    }
+    } */
 
     const getColor = (value: number, fieldName: string) => {
         const field = weatherFields.find(field => field.name === fieldName);
@@ -70,7 +70,7 @@ const FeaturesTable = () => {
         {
             name: 'Local',
             selector: (row: any) => row.Concelho,
-            sortable: true,
+            sortable: true
         }
     ];
 
@@ -89,6 +89,7 @@ const FeaturesTable = () => {
     columns = [...columns, ...weatherColumns];
 
     const data = comparedFeatures.map((feature:any) => {
+        //const name = <span>{feature.markers && feature.markers.map((m:any)=> <FontAwesomeIcon title={m.name} icon={faLocationDot} /> )} {feature.properties.Concelho}</span>;
         return {
             id: feature._id,
             Concelho: feature.properties.Concelho,
@@ -98,11 +99,11 @@ const FeaturesTable = () => {
 
     const conditionalRowStyles = [
         {
-            when: (row: any) => row.id == hoveredFeature?._id,
+            when: (row: any) => row.id === hoveredFeature?._id,
             style: (row: any) => ({ fontWeight: 'bold', border: '3px solid red' }),
         }, 
         {
-            when: (row: any) => row.id != hoveredFeature?._id || (!hoveredFeature),
+            when: (row: any) => row.id !== hoveredFeature?._id || (!hoveredFeature),
             style: (row: any) => ({ fontWeight: 'normal', border: '1px solid black' }),
         }
     ];
@@ -121,7 +122,7 @@ const FeaturesTable = () => {
 		setSelectedRows(state.selectedRows);
 	}, []);
 
-    function getDifference(array1: any[], array2: any[]) {
+    const getDifference = (array1: any[], array2: any[]) => {
         return array1.filter(object1 => {
           return !array2.some(object2 => {
             return object1._id === object2.id;
@@ -130,9 +131,15 @@ const FeaturesTable = () => {
     };
 
     const handleDelete = () => {
+        const feature = comparedFeatures.find((f:any) => f._id === hoveredFeature._id);
         setToggleCleared(!toggleCleared);
-        setComparedFeatures(getDifference(comparedFeatures, selectedRows));
-        map.closePopup();
+        setSelectedRows([]);
+        const diff = getDifference(comparedFeatures, selectedRows);
+        setComparedFeatures(diff);
+        if (selectedRows.find((r:any) => r.id === feature._id)) {
+            const layer = geoJsonLayerRef.current.getLayer(feature._id);
+            layer.closePopup();
+        }
     };
     
     return (
@@ -140,7 +147,7 @@ const FeaturesTable = () => {
         { 
             selectedRows.length && comparedFeatures.length ?
             <Button onClick={handleDelete} variant="danger" size="sm">
-                Eliminar selecionados
+                <FontAwesomeIcon icon={faTrash} /> Eliminar selecionados
             </Button> : null
         }
 
@@ -158,7 +165,7 @@ const FeaturesTable = () => {
             selectableRows
 			onSelectedRowsChange={handleRowSelected}
 			clearSelectedRows={toggleCleared}
-            style={{zIndex: 100000}}
+            noDataComponent="Sem localidades na lista"
         />
         
         {/* <Table size="sm" responsive striped bordered hover>
