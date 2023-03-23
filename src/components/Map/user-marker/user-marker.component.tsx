@@ -9,6 +9,9 @@ import "./user-marker.styles.css";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import L from "leaflet";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "react-bootstrap";
+import { faEdit, faEyeSlash, faTrash, faUpDownLeftRight } from "@fortawesome/free-solid-svg-icons";
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -34,7 +37,7 @@ const UserMarker = (props: any) => {
     const userMarkers = UserMarkerStore(state => state.userMarkers); */
 
     const removeUserMarker = UserMarkerStore(state => state.removeUserMarker);
-    const upsertUserMarker = UserMarkerStore(state => state.upsertUserMarker);
+    const updateUserMarker = UserMarkerStore(state => state.updateUserMarker);
     const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
     const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
@@ -46,8 +49,9 @@ const UserMarker = (props: any) => {
             async dragend() {
                 const marker: any = markerRef.current;
                 if (marker != null) {
-                    await upsertUserMarker(props.data._id, undefined, marker.getLatLng());
+                    await updateUserMarker(props.data._id, undefined, marker.getLatLng());
                     toggleDraggable();
+                    marker.fire("click");
                 }
             },
 
@@ -58,7 +62,8 @@ const UserMarker = (props: any) => {
                     setLayer(layer);
                     layer.fire('click', {
                         marker: props.data || { _id: null },
-                        markerRef: markerRef.current || null
+                        markerRef: markerRef.current || null,
+                        latlng: { lat: props.data.lat, lng: props.data.lng}
                     });
                     //const feature = { _id: props.data._id, properties: layer.feature.properties, weather: layer.feature.weather };
                     //setFeatureProperties(layer.feature)
@@ -109,6 +114,12 @@ const UserMarker = (props: any) => {
             <span>{selectedWeatherField?.displayName}: </span>
             <span>{selectedWeatherField && layer.feature.weather ? layer.feature.weather[selectedWeatherField.name] : ''} {selectedWeatherField.unit}</span>
             <br/>
+            <div style={{marginTop: "2px", display: "flex", justifyContent: "space-around"}}>
+                <Button onClick={toggleEditable} title="Editar nome" variant="outline-primary" size="sm"><FontAwesomeIcon icon={faEdit}/></Button>
+                <Button onClick={toggleDraggable} title="Mover" variant="outline-primary" size="sm"><FontAwesomeIcon icon={faUpDownLeftRight}/></Button>
+                <Button onClick={() => onRemove()} title="Eliminar" variant="outline-danger" size="sm"><FontAwesomeIcon icon={faTrash}/></Button>
+                <Button onClick={() => onRemoveFeature()}  title="Remover da lista" variant="outline-danger" size="sm"><FontAwesomeIcon icon={faEyeSlash}/></Button>
+            </div>
         </div>
     }
 
@@ -123,7 +134,7 @@ const UserMarker = (props: any) => {
     const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             const target = e.target as any;
-            await upsertUserMarker(props.data._id, target.value);
+            await updateUserMarker(props.data._id, target.value);
             toggleEditable();
         }
     }
@@ -175,12 +186,12 @@ const UserMarker = (props: any) => {
                     <span>Alterar nome</span> :
                     <>
                     { updatePopupContent(layer) }
-                    <div style={{display: "flex", justifyContent: "space-around"}}>
+                    {/* <div style={{display: "flex", justifyContent: "space-around"}}>
                         <a onClick={toggleEditable} className="marker-popup-link"  href="#">Editar</a> 
                         <a onClick={toggleDraggable} className="marker-popup-link" href="#">Mover</a>
                         <a onClick={() => onRemove()} className="marker-popup-link" href="#">Remover</a>
-                    </div>
-                    <a onClick={() => onRemoveFeature()} href="#">Remover da lista</a>
+                    </div> 
+                    <a onClick={() => onRemoveFeature()} href="#">Remover da lista</a>*/}
                     </>
                 }
             </Popup>

@@ -81,7 +81,7 @@ const FeaturesTable = () => {
             sortable: true,
             conditionalCellStyles: [{
                 when: (row: any) => row[field.name],
-                style: (row: any) => ({ backgroundColor: getColor(row[field.name], field.name) }),
+                style: (row: any) => ({ borderLeft: "1px solid black", backgroundColor: getColor(row[field.name], field.name) }),
             }],
         }
     });
@@ -131,11 +131,12 @@ const FeaturesTable = () => {
     };
 
     const handleDelete = () => {
-        const feature = comparedFeatures.find((f:any) => f._id === hoveredFeature._id);
         setToggleCleared(!toggleCleared);
         setSelectedRows([]);
         const diff = getDifference(comparedFeatures, selectedRows);
         setComparedFeatures(diff);
+        if (!hoveredFeature) return;
+        const feature = comparedFeatures.find((f:any) => f._id === hoveredFeature._id);
         if (selectedRows.find((r:any) => r.id === feature._id)) {
             const layer = geoJsonLayerRef.current.getLayer(feature._id);
             layer.closePopup();

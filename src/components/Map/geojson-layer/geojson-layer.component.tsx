@@ -14,8 +14,9 @@ import UserMarker from '../user-marker/user-marker.component';
 import UserMarkerStore from '../../../stores/UserMarkerStore';
 import "./geojson-layer.styles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
+import { faEyeSlash, faLocationDot, faTrash } from '@fortawesome/free-solid-svg-icons';
 import ReactDOM from 'react-dom';
+import ReactDOMServer from 'react-dom/server';
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -26,7 +27,7 @@ type CustomLayer = { addedToList: boolean, feature: any, _leaflet_id: string, ma
 const layerHighlightedStyle: MapFeatureStyle = {
     color: "black",
     fillOpacity: 0.5,
-    weight: 3
+    weight: 2
 }
 
 const layerRedHighlightedStyle: MapFeatureStyle = {
@@ -43,7 +44,7 @@ const layerNormalStyle: MapFeatureStyle = {
 const layerNormalHoverStyle: MapFeatureStyle = {
     color: "#a2a2a2",
     fillOpacity: 0.5,
-    weight: 3
+    weight: 2
 }
 
 let clickedFeatureId: string | null = null;
@@ -80,6 +81,7 @@ const GeoJsonLayer = (props: any) => {
     const setGeoJsonLayerRef = WeatherPanelStore(state => state.setGeoJsonLayerRef);
 
     const userMarkers = UserMarkerStore(state => state.userMarkers);
+    const addUserMarker = UserMarkerStore(state => state.addUserMarker);
 
     const sidebar = WeatherPanelStore(state => state.sidebar);
     const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
@@ -241,7 +243,7 @@ const GeoJsonLayer = (props: any) => {
     }
 
     // Zooms to the feature clicked
-    /* const zoomToFeature = (event: LeafletMouseEvent) => {
+    const zoomToFeature = (event: LeafletMouseEvent) => {
         if (map !== null) {
             //map.fitBounds(event.target.getBounds());
             const currentZoom = map.getZoom();
@@ -251,7 +253,7 @@ const GeoJsonLayer = (props: any) => {
             }
             map.setView(event.latlng, zoom);
         }
-    } */
+    }
 
     const existsInComparedFeatures = (featureId: string) => {
         return comparedFeatures.find((f: any) => f._id === featureId);
@@ -262,29 +264,51 @@ const GeoJsonLayer = (props: any) => {
         setComparedFeatures(filteredFeatures);
     }
 
-    const updatePopupContent = (layer: any) => {
+    const updatePopupContent = (layer: any, event?: any) => {
         const div = document.createElement("div");
         div.innerHTML = `
-            <strong>${layer.feature.properties.Concelho}</strong><br>
-            <span>${selectedWeatherField?.displayName}:</span>
-            <span>${selectedWeatherField && layer.feature.weather ? layer.feature.weather[selectedWeatherField.name] : ''} ${selectedWeatherField.unit}</span>
-            <br/>
+            <div style="margin-bottom:2px">
+                <strong>${layer.feature.properties.Concelho}</strong><br>
+                <span>${selectedWeatherField?.displayName}:</span>
+                <span>${selectedWeatherField && layer.feature.weather ? layer.feature.weather[selectedWeatherField.name] : ''} ${selectedWeatherField.unit}</span>
+            </div>
         `;
 
+        // marker button
+        const markerBtn = document.createElement("button");
+        markerBtn.className = "btn btn-sm btn-outline-primary";
+        markerBtn.title = "Adicionar marcador";
+        markerBtn.innerHTML = ReactDOMServer.renderToStaticMarkup(<FontAwesomeIcon icon={faLocationDot} />);
+        markerBtn.onclick = function() {
+            addUserMarker(event.latlng);
+            layer.closePopup();
+        }
+        div.appendChild(markerBtn);
+
+
+        // Remove button
+        const removeBtn = document.createElement("button");
+        removeBtn.className = "btn btn-sm btn-outline-danger";
+        removeBtn.title = "Remover da lista";
+        removeBtn.innerHTML = ReactDOMServer.renderToStaticMarkup(<FontAwesomeIcon icon={faEyeSlash} />);
+        removeBtn.onclick = function() {
+            newRemoveFeatureFromList(layer);
+            layer.closePopup();
+            setLayerStyle(layer, layerNormalStyle)
+        }
+        div.appendChild(removeBtn);
+
+
+        // Remove link
         const button = document.createElement("a");
         button.href = "#";
-
-        /* const markerBtn = document.createElement("button");
-        markerBtn.className = "btn btn-sm btn-light border";
-        ReactDOM.render(<FontAwesomeIcon icon={faLocationDot} />, markerBtn);
-        div.appendChild(markerBtn); */
 
         //const featureInComparison = existsInComparedFeatures(layer.feature._id);
         //if (featureInComparison) {
             button.innerHTML = "Remover da lista";
             button.onclick = function() {
                 newRemoveFeatureFromList(layer);
-                layer.closePopup();
+                //layer.closePopup();
                 setLayerStyle(layer, layerNormalStyle)
             }
        // }
@@ -313,7 +337,7 @@ const GeoJsonLayer = (props: any) => {
             }
         }  */
 
-        div.appendChild(button);
+        //div.appendChild(button);
         return div;
     }
 
@@ -345,7 +369,7 @@ const GeoJsonLayer = (props: any) => {
     }
 
     // Set clicked feature id
-    const setClickedFeatureId = (event: LeafletMouseEvent & {marker: any, markerRef: any}) => {
+    const setClickedFeatureId = (event: LeafletMouseEvent & {marker: any, markerRef: any}, layer: any) => {
         if (!event.target) {
             return;
         }
@@ -363,7 +387,12 @@ const GeoJsonLayer = (props: any) => {
             sidebar.open("tab1");
         }
 
-        
+        /* const offset = map.getSize().x * 0.25;
+        const coordinates = layer.getPopup()?.getLatLng();
+        if (coordinates) {
+            map.panTo(coordinates, {animate: false})//.panBy(new L.Point(offset, 0), {animate: false});
+        } */
+
 
         //if (!existsInComparedFeatures(_id)) setComparedFeatures([feature, ...comparedFeatures])
         //if (!comparisonMode && comparedFeatures.length <= 1) setComparedFeatures([feature]);
@@ -415,18 +444,19 @@ const GeoJsonLayer = (props: any) => {
                 newResetHighlightFeature(layer);
             },
             click: (event) => {
-                newSetClickedFeatureId(event as LeafletMouseEvent & {marker: any, markerRef: any; });
-                layer.setPopupContent(newUpdatePopupContent(layer));
+                newSetClickedFeatureId(event as LeafletMouseEvent & {marker: any, markerRef: any; }, layer);
+                layer.setPopupContent(newUpdatePopupContent(layer, event));
                 setLayerStyle(layer, layerRedHighlightedStyle);
-                layer.addedToList = true;
+               
                 const e = event as any;
-                if (!e.marker) layer.openPopup(event.latlng);
+                  
+                if (!e.marker) layer.openPopup(e.latlng);
                 else {
                     e.markerRef.openPopup();
                 }
                 
                 //setMarkerPosition(event.latlng);
-                //zoomToFeature(event, map);
+                //zoomToFeature(event);
                 /* const row = document.getElementById("row_"+event.target.feature._id);  
                 if (row) row.scrollIntoView(true);  */
             },

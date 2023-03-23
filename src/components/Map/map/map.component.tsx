@@ -16,6 +16,7 @@ import AreaSelect from "../AreaSelect";
 import Control from 'react-leaflet-custom-control'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandPointer, faLocationDot, faMapLocationDot, faObjectGroup } from '@fortawesome/free-solid-svg-icons'
+import L from 'leaflet';
 
 function Map() {
 
@@ -28,6 +29,12 @@ function Map() {
     const onSelectAreaMode = (mode?: boolean) => {
         setSelectAreaMode();
     }
+
+   /*  useEffect(() => {
+        if (!mapRef || !mapRef.current) return;
+        const offset = mapRef.current.getSize().x * 0.25;
+        mapRef.current.panBy(new L.Point(offset, 0), {animate: false});
+    }, [mapRef]) */
 
     return (
         <div>
@@ -73,13 +80,13 @@ function Map() {
                     </div>
                 </Control>
 
-                <Control position='topleft'>
+                {/* <Control position='topleft'>
                     <div style={{cursor: 'pointer'}} className="leaflet-bar">
                         <a style={{backgroundColor: selectAreaMode ? '#0d6efd' : ''}} title="Selecionar área" onClick={() => onSelectAreaMode()}>
                             <FontAwesomeIcon icon={faLocationDot} />
                         </a>
                     </div>
-                </Control>
+                </Control> */}
 
 
                 {/* <HoveredFeaturePanel/> */}

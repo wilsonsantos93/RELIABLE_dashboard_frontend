@@ -4,5 +4,7 @@ export interface UserMarkerState {
 
     removeUserMarker: (id: string) => void
 
-    upsertUserMarker: (id: string, name?: string, position?: any) => void
+    addUserMarker: (position: any) => void
+
+    updateUserMarker: (id: string, name?: string, position?: any) => void
 }

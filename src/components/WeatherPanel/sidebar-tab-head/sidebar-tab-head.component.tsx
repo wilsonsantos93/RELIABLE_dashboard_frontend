@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useMap } from 'react-leaflet';
 import WeatherPanelStore from '../../../stores/WeatherPanelStore';
 import "./sidebar-tab-head.styles.css";
@@ -22,7 +22,7 @@ const SidebarTabHead = () => {
 
     return (
         <div className="tabHead">
-            <span>{comparedFeatures.length} localidades na lista</span>
+            <span><FontAwesomeIcon icon={faEye} /> {comparedFeatures.length} localidades na lista</span>
             <a href="#" onClick={clearAll}>
                 <FontAwesomeIcon icon={faTrash} /> Limpar tudo
             </a>

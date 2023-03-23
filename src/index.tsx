@@ -3,7 +3,7 @@ import App from './components/App';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter, Route, Routes,} from "react-router-dom";
 import { createRoot } from "react-dom/client";
-import ReactDOM from 'react-dom';
+//import ReactDOM from 'react-dom';
 
 declare global {
     interface Window { mobileCheck: any; opera: any }
