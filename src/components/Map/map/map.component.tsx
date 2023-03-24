@@ -1,4 +1,4 @@
-import {createRef, useEffect } from 'react';
+import {createRef, Profiler, useEffect } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './map.styles.css'
@@ -80,19 +80,10 @@ function Map() {
                     </div>
                 </Control>
 
-                {/* <Control position='topleft'>
-                    <div style={{cursor: 'pointer'}} className="leaflet-bar">
-                        <a style={{backgroundColor: selectAreaMode ? '#0d6efd' : ''}} title="Selecionar área" onClick={() => onSelectAreaMode()}>
-                            <FontAwesomeIcon icon={faLocationDot} />
-                        </a>
-                    </div>
-                </Control> */}
-
-
                 {/* <HoveredFeaturePanel/> */}
                 
                 <MapLegend />
-
+                
                 <Sidebar /> 
 
             </MapContainer>

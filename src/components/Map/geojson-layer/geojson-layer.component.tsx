@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState} from 'react';
 import { GeoJSON, LayerGroup, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import L, { popup } from 'leaflet';
 import { GeoJsonObject} from "geojson";
 import { GeoJSON as GJSON, LatLng, Layer, LeafletMouseEvent, Map as LeafletMap, PathOptions } from "leaflet";
 import {MapFeatureStyle} from "../../../types/MapFeatureStyle";
@@ -15,12 +15,10 @@ import UserMarkerStore from '../../../stores/UserMarkerStore';
 import "./geojson-layer.styles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEyeSlash, faLocationDot, faTrash } from '@fortawesome/free-solid-svg-icons';
-import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
+import { EndOfLineState } from 'typescript';
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
-
-
 
 type CustomLayer = { addedToList: boolean, feature: any, _leaflet_id: string, markers: any[] } & Layer;
 
@@ -70,11 +68,11 @@ const GeoJsonLayer = (props: any) => {
     const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
 
-    const comparisonMode = WeatherPanelStore(state => state.comparisonMode);
+    //const comparisonMode = WeatherPanelStore(state => state.comparisonMode);
 
     const setLoading = WeatherPanelStore(state => state.setLoading);
 
-    const selectMode = WeatherPanelStore(state => state.selectMode);
+    //const selectMode = WeatherPanelStore(state => state.selectMode);
 
     const geoJsonLayerRef = useRef<GJSON>();
 
@@ -88,6 +86,11 @@ const GeoJsonLayer = (props: any) => {
 
     useEffect(() => {
         setGeoJsonLayerRef(geoJsonLayerRef);
+/*         const popupCloseBtn = document.querySelector("a.leaflet-popup-close-button");
+        if (popupCloseBtn) popupCloseBtn?.addEventListener("click", () => {
+            console.log("Fechou popup");
+        }); */
+
     }, [geoJsonLayerRef])
 
     const map = useMap();
@@ -243,7 +246,7 @@ const GeoJsonLayer = (props: any) => {
     }
 
     // Zooms to the feature clicked
-    const zoomToFeature = (event: LeafletMouseEvent) => {
+    /* const zoomToFeature = (event: LeafletMouseEvent) => {
         if (map !== null) {
             //map.fitBounds(event.target.getBounds());
             const currentZoom = map.getZoom();
@@ -253,7 +256,7 @@ const GeoJsonLayer = (props: any) => {
             }
             map.setView(event.latlng, zoom);
         }
-    }
+    } */
 
     const existsInComparedFeatures = (featureId: string) => {
         return comparedFeatures.find((f: any) => f._id === featureId);
@@ -379,9 +382,15 @@ const GeoJsonLayer = (props: any) => {
 
         const { _id, weather, properties } = feature;
 
+        /* if ((previousLayer && previousLayer.feature._id !== _id) || !previousLayer) {
+            setFeatureProperties({ _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef });
+        } */
+
         setFeatureProperties({ _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef });
 
-        if (!existsInComparedFeatures(_id)) setComparedFeatures([feature, ...comparedFeatures]);
+        if (!existsInComparedFeatures(_id)) {
+            setComparedFeatures([feature, ...comparedFeatures]);
+        }
 
         if (sidebar && !isTabOpen && !window.mobileCheck()) {
             sidebar.open("tab1");
@@ -401,7 +410,6 @@ const GeoJsonLayer = (props: any) => {
     // Clear the layer
     const clearFeature = () => {
         setFeatureProperties(null);
-        //clickedFeatureId = null;
 
         /* if (comparisonMode) {
             const exists = existsInComparedFeatures(layer.feature._id);
@@ -417,6 +425,7 @@ const GeoJsonLayer = (props: any) => {
         } */
     }
 
+
     const newSetClickedFeatureId = useStableCallback(setClickedFeatureId);
     const newResetHighlightFeature = useStableCallback(resetHighlightFeature);
     const newHighlightFeature = useStableCallback(highlightFeature);
@@ -430,9 +439,17 @@ const GeoJsonLayer = (props: any) => {
      */
     const onEachFeature = (feature: any, layer: CustomLayer, map: LeafletMap | null) => {
         layer.bindPopup(`<strong>${feature.properties.Concelho}</strong><br/>`);
-        layer.getPopup()?.on('remove', () => {   
+        
+        layer.getPopup()?.on('remove', (e) => {   
             newClearFeature();
         })
+
+        /* layer.getPopup()?.on('add', (e) => {   
+            const popupCloseBtn = document.querySelector(".leaflet-popup-close-button")
+            if (popupCloseBtn) popupCloseBtn.addEventListener("click", () => {
+                newClearFeature();
+            })
+        }) */
 
         //layer.off('click');
 
@@ -454,7 +471,15 @@ const GeoJsonLayer = (props: any) => {
                 else {
                     e.markerRef.openPopup();
                 }
-                
+
+                const el = document.querySelector(`div#row-${event.target.feature._id}`);
+                const table = document.querySelector(".featuresTable > div");
+                if (el && table) {
+                    const topPos = (el as HTMLElement).offsetTop;
+                    table.scrollTop = topPos - 35;
+
+                }
+               
                 //setMarkerPosition(event.latlng);
                 //zoomToFeature(event);
                 /* const row = document.getElementById("row_"+event.target.feature._id);  

@@ -18,6 +18,8 @@ const FeaturesTable = () => {
     //const map = useMap();
 
     const hoverFeature = (featureId: string) => {
+        if (hoveredFeature && hoveredFeature._id == featureId) return;
+
         const feature = comparedFeatures.find((f:any) => f._id === featureId);
         setFeatureProperties({
             _id: feature._id, 
@@ -88,14 +90,16 @@ const FeaturesTable = () => {
 
     columns = [...columns, ...weatherColumns];
 
-    const data = comparedFeatures.map((feature:any) => {
-        //const name = <span>{feature.markers && feature.markers.map((m:any)=> <FontAwesomeIcon title={m.name} icon={faLocationDot} /> )} {feature.properties.Concelho}</span>;
-        return {
-            id: feature._id,
-            Concelho: feature.properties.Concelho,
-            ...feature.weather
-        }
-    });
+    const data = useMemo(() => {
+        /* const data = */ return comparedFeatures.map((feature:any) => {
+            //const name = <span>{feature.markers && feature.markers.map((m:any)=> <FontAwesomeIcon title={m.name} icon={faLocationDot} /> )} {feature.properties.Concelho}</span>;
+            return {
+                id: feature._id,
+                Concelho: feature.properties.Concelho,
+                ...feature.weather
+            }
+        });
+    }, [comparedFeatures])
 
     const conditionalRowStyles = [
         {
@@ -113,6 +117,7 @@ const FeaturesTable = () => {
             setSelectedRows([]);
             setToggleCleared(!toggleCleared);
         }
+
     }, [comparedFeatures]);
 
     const [selectedRows, setSelectedRows] = useState<any>([]);

@@ -6,8 +6,7 @@ import {Col, Row} from "react-bootstrap";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import { fetchWeatherFields } from '../../../data/fetchWeatherFields';
 
-
-function WeatherInfoSelector(): JSX.Element {
+const WeatherInfoSelector = () => {
 
     const setSelectedInformation = WeatherPanelStore(state => state.setSelectedInformation);
     const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);

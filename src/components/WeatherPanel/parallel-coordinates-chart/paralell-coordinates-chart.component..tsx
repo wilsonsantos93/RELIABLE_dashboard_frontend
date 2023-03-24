@@ -11,7 +11,7 @@ HC_exporting(Highcharts);
 
 type CustomSeries = Series & {userOptions: { featureId: string }};
 
-const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
+const ParallelCoordinatesChart = () => {
     const chartConfig: any = {
         chart: {
           type: 'spline',
@@ -78,21 +78,18 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
     };
     
     const [chartOptions, setChartOptions] = useState<any>(chartConfig);
-
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const weatherFields = WeatherPanelStore(state => state.weatherFields);
     const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
     const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
     const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
-
-
     const [previousSeries, setPreviousSeries] = useState<CustomSeries | undefined>();
 
     const chartRef = useRef<any>();
 
     useEffect(() => {
         onHoveredFeatureChanged();
-    }, [hoveredFeature])
+    }, [hoveredFeature, chartOptions])
 
     const onHoveredFeatureChanged = () => {
         if (previousSeries) {
@@ -140,9 +137,9 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
         })
     }, [geoJsonLayerRef])
 
-    useEffect(() => {
+    /* useEffect(() => {
         onHoveredFeatureChanged();
-    }, [chartOptions])
+    }, [chartOptions]) */
 
 
     useEffect(() => {
@@ -182,11 +179,8 @@ const ParallelCoordinatesChart = (/* { geoJsonLayerRef }: any */) => {
         const el: any = document.querySelector("#sidebar");
         el?.removeEventListener('transitionend', null);
         el?.addEventListener("transitionend", () => {
-            if (isTabOpen) { 
-                return 
-            }
-            else {
-                chartRef?.current?.chart.reflow();
+            if (!isTabOpen) { 
+                chartRef?.current?.chart.reflow(); 
             }
         })
         return () => el?.removeEventListener('transitionend', null);

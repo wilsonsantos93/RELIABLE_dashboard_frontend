@@ -63,7 +63,7 @@ const UserMarker = (props: any) => {
                     layer.fire('click', {
                         marker: props.data || { _id: null },
                         markerRef: markerRef.current || null,
-                        latlng: { lat: props.data.lat, lng: props.data.lng}
+                        latlng: { lat: props.data.lat, lng: props.data.lng }
                     });
                     //const feature = { _id: props.data._id, properties: layer.feature.properties, weather: layer.feature.weather };
                     //setFeatureProperties(layer.feature)
@@ -97,11 +97,11 @@ const UserMarker = (props: any) => {
     
     useEffect(() => {
         const marker: any = markerRef.current;
-        marker.feature = { 
+        /* marker.feature = { 
             type: 'Point', 
             properties: { ...props.data }, 
             geometry: undefined 
-        };
+        }; */
         marker._leaflet_id = props.data._id;
         marker.getPopup().on('remove', function() {
             setEditable(false);
@@ -175,7 +175,7 @@ const UserMarker = (props: any) => {
             >
             <Popup minWidth={90}>
                 { editable ? 
-                    <input type="text" placeholder="Casa, Trabalho..." onKeyDown={handleKeyDown} defaultValue={props.data.name}/> : 
+                    <input type="text" placeholder="Casa, Trabalho..." onKeyDown={handleKeyDown} defaultValue={props.data.name || "Sem nome"}/> : 
                     <strong>{props.data.name}</strong> 
                 }
                 <br/>

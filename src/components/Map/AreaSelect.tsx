@@ -1,4 +1,3 @@
-import L from "leaflet";
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import WeatherPanelStore from "../../stores/WeatherPanelStore";
@@ -37,8 +36,8 @@ const AreaSelect = () => {
         setComparedFeatures([...comparedFeatures, ...features])
     }
 
-    const selectMode = WeatherPanelStore(state => state.selectMode);
-    const setSelectMode = WeatherPanelStore(state => state.setSelectMode);
+    //const selectMode = WeatherPanelStore(state => state.selectMode);
+    //const setSelectMode = WeatherPanelStore(state => state.setSelectMode);
 
     useEffect( () => {
         //if (selectMode == 'area') {
