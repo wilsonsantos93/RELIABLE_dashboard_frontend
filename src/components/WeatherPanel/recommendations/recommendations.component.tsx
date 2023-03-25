@@ -4,7 +4,7 @@ const Recommendations = () => {
     const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
 
     return (
-        <div className="text-left">
+        <div className="text-left pt-2">
             
             <h5>Recomendações
             { 

@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEyeSlash, faLocationDot, faTrash } from '@fortawesome/free-solid-svg-icons';
 import ReactDOMServer from 'react-dom/server';
 import { EndOfLineState } from 'typescript';
+import UserStore from '../../../stores/UserStore';
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -78,11 +79,16 @@ const GeoJsonLayer = (props: any) => {
 
     const setGeoJsonLayerRef = WeatherPanelStore(state => state.setGeoJsonLayerRef);
 
-    const userMarkers = UserMarkerStore(state => state.userMarkers);
-    const addUserMarker = UserMarkerStore(state => state.addUserMarker);
+    /* const userMarkers = UserMarkerStore(state => state.userMarkers);
+    const addUserMarker = UserMarkerStore(state => state.addUserMarker); */
+
+    const userMarkers = UserStore(state => state.getUserMarkers());
+    const addUserMarker = UserStore(state => state.addUserMarker);
 
     const sidebar = WeatherPanelStore(state => state.sidebar);
     const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
+
+    const isLoggedIn = UserStore(state => state.isLoggedIn);
 
     useEffect(() => {
         setGeoJsonLayerRef(geoJsonLayerRef);
@@ -130,7 +136,7 @@ const GeoJsonLayer = (props: any) => {
 
         setComparedFeatures(compFeatures);
 
-    }, [userMarkers, geoJsonLayerRef, geoJSON])
+    }, [userMarkers, geoJsonLayerRef])
 
     // Get color for depending on value
     const getColor = (value: number) => {
@@ -278,15 +284,17 @@ const GeoJsonLayer = (props: any) => {
         `;
 
         // marker button
-        const markerBtn = document.createElement("button");
-        markerBtn.className = "btn btn-sm btn-outline-primary";
-        markerBtn.title = "Adicionar marcador";
-        markerBtn.innerHTML = ReactDOMServer.renderToStaticMarkup(<FontAwesomeIcon icon={faLocationDot} />);
-        markerBtn.onclick = function() {
-            addUserMarker(event.latlng);
-            layer.closePopup();
+        if (isLoggedIn()) {
+            const markerBtn = document.createElement("button");
+            markerBtn.className = "btn btn-sm btn-outline-primary";
+            markerBtn.title = "Adicionar marcador";
+            markerBtn.innerHTML = ReactDOMServer.renderToStaticMarkup(<FontAwesomeIcon icon={faLocationDot} />);
+            markerBtn.onclick = function() {
+                addUserMarker(event.latlng);
+                layer.closePopup();
+            }
+            div.appendChild(markerBtn);
         }
-        div.appendChild(markerBtn);
 
 
         // Remove button
@@ -501,7 +509,7 @@ const GeoJsonLayer = (props: any) => {
                 style={getStyle}
             />
 
-            {   userMarkers && userMarkers.map((marker) =>
+            {   ( isLoggedIn() && userMarkers) && userMarkers.map((marker) =>
                     <UserMarker key={marker._id} data={marker} />
                 )
             }

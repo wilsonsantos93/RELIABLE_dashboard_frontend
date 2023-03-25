@@ -3,6 +3,11 @@ import {WeatherPanelState} from "../types/stores/WeatherPanelState";
 
 const WeatherPanelStore = create<WeatherPanelState>((set, get) => ({
 
+    toastMsg: null,
+    setToastMsg: (message, type) => set(state => ({
+        toastMsg: { message, type }
+    })),
+
     sidebar: null,
     setSidebar: (sidebar) => set(state => ({
         sidebar: sidebar

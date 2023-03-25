@@ -9,6 +9,7 @@ import "./features-table.styles.css";
 import DataTable from 'react-data-table-component';
 
 const FeaturesTable = () => {
+    ////console.time("component")
     const weatherFields = WeatherPanelStore(state => state.weatherFields);
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
@@ -17,7 +18,9 @@ const FeaturesTable = () => {
     const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
     //const map = useMap();
 
+    
     const hoverFeature = (featureId: string) => {
+        ////console.time("hoverFeature")
         if (hoveredFeature && hoveredFeature._id == featureId) return;
 
         const feature = comparedFeatures.find((f:any) => f._id === featureId);
@@ -36,7 +39,9 @@ const FeaturesTable = () => {
         } */
         const layer = geoJsonLayerRef.current.getLayer(feature._id);
         layer.fireEvent("click");
+        //console.timeEnd("hoverFeature")
     }
+    
 
     /* useEffect(() => {
         if (!hoveredFeature) return;
@@ -56,6 +61,7 @@ const FeaturesTable = () => {
         map.closePopup();
     } */
 
+    //console.time("getColor")
     const getColor = (value: number, fieldName: string) => {
         const field = weatherFields.find(field => field.name === fieldName);
         if (field) {
@@ -67,7 +73,9 @@ const FeaturesTable = () => {
         }
         return "#808080";
     }
+    //console.timeEnd("getColor")
 
+    //console.time("table columns")
     let columns = [
         {
             name: 'Local',
@@ -76,6 +84,7 @@ const FeaturesTable = () => {
         }
     ];
 
+    
     const weatherColumns = weatherFields.map((field:any) => {
         return {
             name: field.displayName,
@@ -89,7 +98,9 @@ const FeaturesTable = () => {
     });
 
     columns = [...columns, ...weatherColumns];
+    //console.timeEnd("table columns")
 
+    //console.time("table data")
     const data = useMemo(() => {
         /* const data = */ return comparedFeatures.map((feature:any) => {
             //const name = <span>{feature.markers && feature.markers.map((m:any)=> <FontAwesomeIcon title={m.name} icon={faLocationDot} /> )} {feature.properties.Concelho}</span>;
@@ -100,6 +111,7 @@ const FeaturesTable = () => {
             }
         });
     }, [comparedFeatures])
+    //console.timeEnd("table data")
 
     const conditionalRowStyles = [
         {
@@ -113,10 +125,12 @@ const FeaturesTable = () => {
     ];
 
     useEffect(() => {
+        //console.time("use effect compared features")
         if (!comparedFeatures.length) {
             setSelectedRows([]);
             setToggleCleared(!toggleCleared);
         }
+        //console.timeEnd("use effect compared features")
 
     }, [comparedFeatures]);
 
@@ -127,6 +141,7 @@ const FeaturesTable = () => {
 		setSelectedRows(state.selectedRows);
 	}, []);
 
+    //console.time("get difference")
     const getDifference = (array1: any[], array2: any[]) => {
         return array1.filter(object1 => {
           return !array2.some(object2 => {
@@ -134,6 +149,7 @@ const FeaturesTable = () => {
           });
         });
     };
+    //console.timeEnd("get differnce")
 
     const handleDelete = () => {
         setToggleCleared(!toggleCleared);
@@ -148,6 +164,7 @@ const FeaturesTable = () => {
         }
     };
     
+    ////console.timeEnd("component")
     return (
         <>
         { 
@@ -172,6 +189,7 @@ const FeaturesTable = () => {
 			onSelectedRowsChange={handleRowSelected}
 			clearSelectedRows={toggleCleared}
             noDataComponent="Sem localidades na lista"
+            selectableRowsHighlight
         />
         
         {/* <Table size="sm" responsive striped bordered hover>

@@ -17,6 +17,14 @@ code {
   left: 33%!important;
 }
 
+.modal-backdrop {
+  z-index: 2100!important;
+}
+
+.modal {
+  z-index: 2200!important;
+}
+
 @media (max-width: 440px)  {
   .toast-container {
     max-width: 70vw!important;
@@ -25,5 +33,4 @@ code {
   .toast-body {
     font-size: 11px!important;
   }
-
 }

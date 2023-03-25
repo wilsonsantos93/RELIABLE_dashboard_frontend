@@ -12,6 +12,7 @@ import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 import { faEdit, faEyeSlash, faTrash, faUpDownLeftRight } from "@fortawesome/free-solid-svg-icons";
+import UserStore from "../../../stores/UserStore";
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -29,15 +30,11 @@ const markerIcon = new Icon({
 const UserMarker = (props: any) => {
     const [draggable, setDraggable] = useState(false);
     const [editable, setEditable] = useState(false);
-    //const [position, setPosition] = useState(null);
     const [layer, setLayer] = useState<any>(null);
     const markerRef = useRef(null);
 
-    /* const setUserMarkers = UserMarkerStore(state => state.setUserMarkers);
-    const userMarkers = UserMarkerStore(state => state.userMarkers); */
-
-    const removeUserMarker = UserMarkerStore(state => state.removeUserMarker);
-    const updateUserMarker = UserMarkerStore(state => state.updateUserMarker);
+    const removeUserMarker = UserStore(state => state.removeUserMarker);
+    const updateUserMarker = UserStore(state => state.updateUserMarker);
     const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
     const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
@@ -58,6 +55,7 @@ const UserMarker = (props: any) => {
             click() {
                 const latlngPoint = new L.LatLng(props.data.lat, props.data.lng);
                 const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef.current, true);
+                if (!results || !results.length) return;
                 results.forEach(function(layer: any) {
                     setLayer(layer);
                     layer.fire('click', {
@@ -65,9 +63,7 @@ const UserMarker = (props: any) => {
                         markerRef: markerRef.current || null,
                         latlng: { lat: props.data.lat, lng: props.data.lng }
                     });
-                    //const feature = { _id: props.data._id, properties: layer.feature.properties, weather: layer.feature.weather };
-                    //setFeatureProperties(layer.feature)
-                    
+
                     const feature = { 
                         _id: layer.feature._id, 
                         properties: layer.feature.properties, 
@@ -141,6 +137,7 @@ const UserMarker = (props: any) => {
 
     const onRemove = () => {
         const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
+        if (!l) return;
         l.markers = l.markers.filter((m:any) => m._id != props.data._id)
         removeUserMarker(props.data._id);
         //onRemoveFeature();
@@ -175,7 +172,7 @@ const UserMarker = (props: any) => {
             >
             <Popup minWidth={90}>
                 { editable ? 
-                    <input type="text" placeholder="Casa, Trabalho..." onKeyDown={handleKeyDown} defaultValue={props.data.name || "Sem nome"}/> : 
+                    <input autoFocus type="text" placeholder="Casa, Trabalho..." onKeyDown={handleKeyDown} defaultValue={props.data.name || ""}/> : 
                     <strong>{props.data.name}</strong> 
                 }
                 <br/>

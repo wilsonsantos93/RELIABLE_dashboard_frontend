@@ -1,9 +1,10 @@
 import create from 'zustand'
 import { UserMarkerState } from "../types/stores/UserMarkerState";
+import UserStore from './UserStore';
 
 const UserMarkerStore = create<UserMarkerState>((set, get) => ({
     userMarkers: [
-        {
+       /*  {
             _id: 'efg01xasdasd',
             name: "Casa",
             lat: 38.724425,
@@ -14,7 +15,7 @@ const UserMarkerStore = create<UserMarkerState>((set, get) => ({
             name: "Trabalho",
             lat: 38.724425,
             lng: -9.105481,
-        }
+        } */
     ],
 
     setUserMarkers: (userMarkers) => set(() => ({
@@ -27,7 +28,7 @@ const UserMarkerStore = create<UserMarkerState>((set, get) => ({
                 method: 'POST',
             });
             
-            //if (!response?.ok) throw "Error in request";
+            if (!response?.ok) throw "Error in request";
 
             const userMarkers = get().userMarkers;
             const filteredMarkers = userMarkers.filter((marker: any) => marker._id != id);
@@ -45,16 +46,16 @@ const UserMarkerStore = create<UserMarkerState>((set, get) => ({
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${UserStore.getState().token}`
                 },
-                body: JSON.stringify({ lat: position.lat, lng: position.lng })
+                body: JSON.stringify({ name: "Sem nome", lat: position.lat, lng: position.lng })
             });
             
-            //if (!response?.ok) throw "Error in request";
+            if (!response?.ok) throw "Error in request";
 
             const userMarkers = [...get().userMarkers];
-            //const marker = await response.json();
-            const marker = { _id: new Date().valueOf(), name: "Sem nome", lat: position.lat, lng: position.lng }
+            const marker = await response.json();
             userMarkers.push(marker);
            
             get().setUserMarkers(userMarkers);
@@ -83,7 +84,7 @@ const UserMarkerStore = create<UserMarkerState>((set, get) => ({
                 body: JSON.stringify(body)
             });
 
-            //if (!response?.ok) throw "Error in request";
+            if (!response?.ok) throw "Error in request";
 
             const userMarkers = [...get().userMarkers];
 

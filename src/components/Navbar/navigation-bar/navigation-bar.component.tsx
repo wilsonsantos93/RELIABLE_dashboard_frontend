@@ -1,5 +1,8 @@
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Navbar, Container, Nav } from "react-bootstrap";
+import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
+import UserStore from "../../../stores/UserStore";
 import Contacts from "../contacts/contacts.component";
 import Login from "../login/login.component";
 import Register from "../register/register.component";
@@ -8,6 +11,10 @@ const NavigationBar = () => {
     const [showContacts, setShowContacts] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
+    const isLoggedIn = UserStore(state => state.isLoggedIn);
+    const user = UserStore(state => state.user);
+    const setUser = UserStore(state => state.setUser);
+    const setToken = UserStore(state => state.setToken);
 
     const handleShowContacts = () => {
         setShowContacts(true);
@@ -33,20 +40,43 @@ const NavigationBar = () => {
         setShowRegister(false);
     }
 
+    const logout = () => {
+        setUser(null);
+        setToken(null);
+    }
+
     return (
         <>
-        <Navbar bg="dark" fixed="top" variant="dark">
+        <Navbar bg="dark" fixed="top" variant="dark" style={{zIndex:2200}}>
             <Container fluid>
                 <Navbar.Brand href="#home">RELIABLE</Navbar.Brand>
                 <Nav className="me-auto">
                     <Nav.Link onClick={() => handleShowContacts()} href="#">Contactos</Nav.Link>
                 </Nav>
-                <Nav>
-                    <Nav.Link onClick={() => handleShowRegister()} href="#">Registar</Nav.Link>
-                </Nav>
-                <Nav>
-                    <Nav.Link onClick={() => handleShowLogin()} href="#">Entrar</Nav.Link>
-                </Nav>
+              
+                {  !isLoggedIn() ?  
+                    <>
+                    <Nav>
+                        <Nav.Link onClick={() => handleShowRegister()} href="#">Registar</Nav.Link>
+                    </Nav>
+                    <Nav>
+                        <Nav.Link onClick={() => handleShowLogin()} href="#">Entrar</Nav.Link>
+                    </Nav>
+                    </> : 
+
+                    <NavDropdown align="end" title={
+                    <span style={{color: 'white'}}>
+                        <FontAwesomeIcon icon={faUser} /> {user.email.split("@")[0]}
+                    </span>} id="basic-nav-dropdown">
+                        <NavDropdown.Item href="#">Alterar palavra-passe</NavDropdown.Item>
+                        <NavDropdown.Divider />
+                        <NavDropdown.Item onClick={logout} href="#">
+                           Sair
+                        </NavDropdown.Item>
+                    </NavDropdown>
+                    
+                }
+                
             </Container>
         </Navbar>
 

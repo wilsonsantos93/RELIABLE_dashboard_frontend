@@ -2,22 +2,24 @@ import { useState } from 'react';
 import { Alert, Modal } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import UserMarkerStore from '../../../stores/UserMarkerStore';
+import UserStore from '../../../stores/UserStore';
 
 const loginUser = async (credentials: any) => {
     try {
         const response = await fetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(credentials)
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(credentials)
         });
-
+       
         if (!response?.ok) {
             if (response.status == 401) throw "Credenciais incorretas.";
             if (response.status > 401) throw "Ocorreu um erro.";
         }
-
+    
         const user = await response.json();
         return user;
     } catch (e) {
@@ -26,22 +28,18 @@ const loginUser = async (credentials: any) => {
 }
 
 const Login = ({ show, handleClose }: any) => {
-    //const [validated, setValidated] = useState(false);
     const [email, setEmail] = useState<string>();
     const [password, setPassword] = useState<string>();
     const [error, setError] = useState(null);
+    const setUser = UserStore(state => state.setUser);
+    const setToken = UserStore(state => state.setToken);
 
     const handleSubmit = async (event: any) => {
-        /* const form = event.currentTarget;
-        if (form.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        setValidated(true); */
-
         try {
-            const user = await loginUser({ email, password });
-            //setUser(user);
+            const data = await loginUser({ username: email, password });
+            setUser(data.user);
+            setToken(data.jwt);
+            handleClose();
         } catch (e: any) {
             setError(e);
         }
@@ -49,11 +47,11 @@ const Login = ({ show, handleClose }: any) => {
 
     return (
         <>
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={handleClose} >
             <Modal.Header closeButton>
                 <Modal.Title>Entrar</Modal.Title>
             </Modal.Header>
-            <Modal.Body >
+            <Modal.Body>
                 {   error &&
                     <Alert key="danger" variant="danger"> 
                         {error}

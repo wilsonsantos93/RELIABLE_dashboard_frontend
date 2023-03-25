@@ -144,7 +144,7 @@ const ParallelCoordinatesChart = () => {
 
     useEffect(() => {
         const series = comparedFeatures.map((feature:any, i: any) => {
-            const data = weatherFields.map(field => feature.weather[field.name]);
+            const data = weatherFields.map(field => feature.weather ? feature.weather[field.name] : null);
             const name =/*  feature.markers?.length ? 
             `${feature.properties.Concelho} (${feature.markers.map((m:any) => m.name).join()})` : */
             feature.properties.Concelho;

@@ -1,6 +1,8 @@
 export interface WeatherPanelState {
+    toastMsg: { message: string, type: "danger" | "success" } | null
+    setToastMsg: (message: string, type: "danger" | "success") => void
 
-    sidebar: L.Control.Sidebar|null
+    sidebar: L.Control.Sidebar | null
     setSidebar: (sidebar: L.Control.Sidebar|null) => void
 
     selectMode: string | null

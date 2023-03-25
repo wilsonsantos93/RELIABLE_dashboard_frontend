@@ -18,7 +18,15 @@ const registerUser = async (data: any) => {
 
         if (!response?.ok) {
             if (response.status == 401) throw "Não autorizado.";
-            if (response.status > 401) throw "Ocorreu um erro.";
+
+            const error = await response.json();
+            
+            switch (error) {
+                case "EMAIL_ALREADY_IN_USE":
+                    throw "Endereço e-mail já em uso."
+                default:
+                    throw "Ocorreu um erro.";
+            }
         }
 
         const user = await response.json();
@@ -39,9 +47,10 @@ const Register = ({ show, handleClose }: RegisterProps) => {
   const [password, setPassword] = useState<string>();
   const [confirmPassword, setConfirmPassword] = useState<string>();
   const [email, setEmail] = useState<string>();
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<string | null>();
 
-  const handleSubmit = (event: any) => {
+  const handleSubmit = async (event: any) => {
+    setError(null);
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
       event.preventDefault();
@@ -49,8 +58,14 @@ const Register = ({ show, handleClose }: RegisterProps) => {
     }
     setValidated(true);
 
-    const data = { email, password, confirmPassword };
-
+    const data = { username: email, password, confirmPassword };
+    try {
+        const user = await registerUser(data);
+        console.log(user);
+        handleClose();
+    } catch (e: any) {
+        setError(e);
+    }
   };
 
   return (
@@ -106,7 +121,7 @@ const Register = ({ show, handleClose }: RegisterProps) => {
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
-                <Button type="submit">Registar</Button>
+                <Button disabled={!password || !confirmPassword || !email} type="submit">Registar</Button>
             </Form>
         </Modal.Body>
     </Modal>
