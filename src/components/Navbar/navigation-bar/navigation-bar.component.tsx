@@ -2,6 +2,9 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { signOutSuccess } from "../../../store/user/user.action";
+import { selectUser, selectUserIsLoggedIn } from "../../../store/user/user.selector";
 import UserStore from "../../../stores/UserStore";
 import Contacts from "../contacts/contacts.component";
 import Login from "../login/login.component";
@@ -11,10 +14,14 @@ const NavigationBar = () => {
     const [showContacts, setShowContacts] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
-    const isLoggedIn = UserStore(state => state.isLoggedIn);
-    const user = UserStore(state => state.user);
-    const setUser = UserStore(state => state.setUser);
-    const setToken = UserStore(state => state.setToken);
+    /*const isLoggedIn = UserStore(state => state.isLoggedIn());
+     const user = UserStore(state => state.user);
+    const setUser = UserStore(state => state.setUser); 
+    const setToken = UserStore(state => state.setToken);*/
+    
+    const user = useSelector(selectUser);
+    const isLoggedIn = useSelector(selectUserIsLoggedIn);
+    const dispatch = useDispatch<any>();
 
     const handleShowContacts = () => {
         setShowContacts(true);
@@ -41,9 +48,14 @@ const NavigationBar = () => {
     }
 
     const logout = () => {
-        setUser(null);
-        setToken(null);
+       /*  setUser(null);
+        setToken(null); */
+        dispatch(signOutSuccess());
     }
+
+    const titleComponent = <span style={{color: 'white'}}>
+        <FontAwesomeIcon icon={faUser} /> {user?.email.split("@")[0]}
+    </span>
 
     return (
         <>
@@ -54,7 +66,7 @@ const NavigationBar = () => {
                     <Nav.Link onClick={() => handleShowContacts()} href="#">Contactos</Nav.Link>
                 </Nav>
               
-                {  !isLoggedIn() ?  
+                {  !isLoggedIn ?  
                     <>
                     <Nav>
                         <Nav.Link onClick={() => handleShowRegister()} href="#">Registar</Nav.Link>
@@ -64,10 +76,7 @@ const NavigationBar = () => {
                     </Nav>
                     </> : 
 
-                    <NavDropdown align="end" title={
-                    <span style={{color: 'white'}}>
-                        <FontAwesomeIcon icon={faUser} /> {user.email.split("@")[0]}
-                    </span>} id="basic-nav-dropdown">
+                    <NavDropdown align="end" title={titleComponent} id="basic-nav-dropdown">
                         <NavDropdown.Item href="#">Alterar palavra-passe</NavDropdown.Item>
                         <NavDropdown.Divider />
                         <NavDropdown.Item onClick={logout} href="#">

@@ -13,6 +13,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 import { faEdit, faEyeSlash, faTrash, faUpDownLeftRight } from "@fortawesome/free-solid-svg-icons";
 import UserStore from "../../../stores/UserStore";
+import { useDispatch, useSelector } from "react-redux";
+import { removeUserLocation, updateUserLocation } from "../../../store/user/user.action";
+import { selectUserLocations } from "../../../store/user/user.selector";
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -33,8 +36,11 @@ const UserMarker = (props: any) => {
     const [layer, setLayer] = useState<any>(null);
     const markerRef = useRef(null);
 
-    const removeUserMarker = UserStore(state => state.removeUserMarker);
-    const updateUserMarker = UserStore(state => state.updateUserMarker);
+    const dispatch = useDispatch<any>();
+
+   /*  const removeUserMarker = UserStore(state => state.removeUserMarker);
+    const updateUserMarker = UserStore(state => state.updateUserMarker); */
+    const userLocations = useSelector(selectUserLocations);
     const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
     const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
@@ -46,7 +52,8 @@ const UserMarker = (props: any) => {
             async dragend() {
                 const marker: any = markerRef.current;
                 if (marker != null) {
-                    await updateUserMarker(props.data._id, undefined, marker.getLatLng());
+                    //await updateUserMarker(props.data._id, undefined, marker.getLatLng());
+                    dispatch(updateUserLocation(userLocations, { _id: props.data._id, name: props.data.name, position: marker.getLatLng() }));
                     toggleDraggable();
                     marker.fire("click");
                 }
@@ -130,7 +137,8 @@ const UserMarker = (props: any) => {
     const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             const target = e.target as any;
-            await updateUserMarker(props.data._id, target.value);
+            //await updateUserMarker(props.data._id, target.value);
+            dispatch(updateUserLocation(userLocations, { _id: props.data._id, name: target.value, position: props.data.position }));
             toggleEditable();
         }
     }
@@ -139,7 +147,8 @@ const UserMarker = (props: any) => {
         const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
         if (!l) return;
         l.markers = l.markers.filter((m:any) => m._id != props.data._id)
-        removeUserMarker(props.data._id);
+        //removeUserMarker(props.data._id);
+        dispatch(removeUserLocation(userLocations, props.data_id));
         //onRemoveFeature();
 
 /*         // update comparedFeatures list

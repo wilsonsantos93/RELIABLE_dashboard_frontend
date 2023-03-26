@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Alert, Modal } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import UserMarkerStore from '../../../stores/UserMarkerStore';
+import { useDispatch } from 'react-redux';
+import { loginUser } from '../../../store/user/user.action';
 import UserStore from '../../../stores/UserStore';
 
-const loginUser = async (credentials: any) => {
+const loginUserX = async (credentials: any) => {
     try {
         const response = await fetch('http://localhost:8000/api/login', {
             method: 'POST',
@@ -30,18 +31,24 @@ const loginUser = async (credentials: any) => {
 const Login = ({ show, handleClose }: any) => {
     const [email, setEmail] = useState<string>();
     const [password, setPassword] = useState<string>();
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string>();
     const setUser = UserStore(state => state.setUser);
     const setToken = UserStore(state => state.setToken);
+    const setMarkers = UserStore(state => state.setMarkers);
+    const dispatch = useDispatch<any>();
 
     const handleSubmit = async (event: any) => {
         try {
-            const data = await loginUser({ username: email, password });
-            setUser(data.user);
+            const credentials = { username: email, password };
+            /*const data = await loginUserX(credentials);
+             setUser(data.user);
             setToken(data.jwt);
+            setMarkers(data.user.locations) */
+            dispatch(loginUser(credentials));
             handleClose();
         } catch (e: any) {
-            setError(e);
+            console.error(e);
+            //setError(JSON.stringify(e));
         }
     };
 
@@ -57,7 +64,7 @@ const Login = ({ show, handleClose }: any) => {
                         {error}
                     </Alert>
                 }
-                <Form /* noValidate validated={validated}  */onSubmit={handleSubmit}>
+                <Form onSubmit={handleSubmit}>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label>Endereço e-mail:</Form.Label>
                         <Form.Control onChange={e => setEmail(e.target.value)} required type="email" placeholder="Insira o e-mail" />

@@ -30,11 +30,11 @@ function Map() {
         setSelectAreaMode();
     }
 
-   /*  useEffect(() => {
+    useEffect(() => {
         if (!mapRef || !mapRef.current) return;
         const offset = mapRef.current.getSize().x * 0.25;
         mapRef.current.panBy(new L.Point(offset, 0), {animate: false});
-    }, [mapRef]) */
+    }, [mapRef])
 
     return (
         <div>

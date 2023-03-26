@@ -3,27 +3,28 @@ import App from './components/App';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter, Route, Routes,} from "react-router-dom";
 import { createRoot } from "react-dom/client";
-//import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 
 declare global {
     interface Window { mobileCheck: any; opera: any }
 }
-
 
 const container = document.getElementById('root');
 
 if (container !== null) {
 
     const root = createRoot(container);
-    //const root = createRoot(document.getElementById("root") as HTMLElement);
 
     root.render(
         //<React.StrictMode>
+        <Provider store={store}>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<App/>}/>
                 </Routes>
             </BrowserRouter>
+        </Provider>
         //</React.StrictMode>,
     )
 }

@@ -11,13 +11,13 @@ import {fetchWeatherGeoJSON} from "../../../data/fetchWeatherGeoJSON";
 import "@mapbox/leaflet-pip";
 import { useStableCallback } from '../../../hooks/UseStableCallback';
 import UserMarker from '../user-marker/user-marker.component';
-import UserMarkerStore from '../../../stores/UserMarkerStore';
 import "./geojson-layer.styles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEyeSlash, faLocationDot, faTrash } from '@fortawesome/free-solid-svg-icons';
 import ReactDOMServer from 'react-dom/server';
-import { EndOfLineState } from 'typescript';
 import UserStore from '../../../stores/UserStore';
+import { useSelector } from 'react-redux';
+import { selectUserIsLoggedIn, selectUserLocations } from '../../../store/user/user.selector';
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -82,28 +82,27 @@ const GeoJsonLayer = (props: any) => {
     /* const userMarkers = UserMarkerStore(state => state.userMarkers);
     const addUserMarker = UserMarkerStore(state => state.addUserMarker); */
 
-    const userMarkers = UserStore(state => state.getUserMarkers());
+    //const userMarkers = UserStore(state => state.markers);
+    //const getUserMarkersRef = useRef(UserStore.getState().getUserMarkers)
+    const userMarkers = useSelector(selectUserLocations);
     const addUserMarker = UserStore(state => state.addUserMarker);
 
     const sidebar = WeatherPanelStore(state => state.sidebar);
     const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
 
-    const isLoggedIn = UserStore(state => state.isLoggedIn);
+    //const isLoggedIn = UserStore(state => state.isLoggedIn());
+    const isLoggedIn = useSelector(selectUserIsLoggedIn);
+    const map = useMap();
 
     useEffect(() => {
         setGeoJsonLayerRef(geoJsonLayerRef);
-/*         const popupCloseBtn = document.querySelector("a.leaflet-popup-close-button");
-        if (popupCloseBtn) popupCloseBtn?.addEventListener("click", () => {
-            console.log("Fechou popup");
-        }); */
-
     }, [geoJsonLayerRef])
 
-    const map = useMap();
 
     useEffect(() => {
         if (!geoJsonLayerRef || !geoJsonLayerRef.current) return;
 
+        console.log("Running effect", userMarkers)
         const compFeatures = [...comparedFeatures];
         if (!userMarkers.length) {
             map.eachLayer((layer: any) => {
@@ -116,7 +115,7 @@ const GeoJsonLayer = (props: any) => {
         }
 
         const data: any = {};
-        userMarkers.forEach(marker => {
+        userMarkers.forEach((marker:any) => {
             const latlngPoint = new L.LatLng(marker.lat, marker.lng);
             const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef.current, true);
             results.forEach((layer: any) => {
@@ -284,7 +283,7 @@ const GeoJsonLayer = (props: any) => {
         `;
 
         // marker button
-        if (isLoggedIn()) {
+        if (isLoggedIn) {
             const markerBtn = document.createElement("button");
             markerBtn.className = "btn btn-sm btn-outline-primary";
             markerBtn.title = "Adicionar marcador";
@@ -509,9 +508,10 @@ const GeoJsonLayer = (props: any) => {
                 style={getStyle}
             />
 
-            {   ( isLoggedIn() && userMarkers) && userMarkers.map((marker) =>
+            {   (isLoggedIn && userMarkers.length) ? 
+                userMarkers.map((marker: any) =>
                     <UserMarker key={marker._id} data={marker} />
-                )
+                ) : null
             }
         </LayerGroup>
     );

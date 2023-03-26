@@ -18,12 +18,19 @@ const UserStore = create<UserState>()(persist((set, get) => ({
         token: token
     })),
 
+    markers: [],
+    setMarkers: (markers) => set(() => ({
+        markers: markers
+    })),
+
     isLoggedIn: () => {
         return !!get().token;
     },
 
     getUserMarkers: () => {
-        return get().user?.locations || [];
+        const user = get().user;
+        if (user) return user.locations;
+        return [];
     },
 
     setUserMarkers: (markers) => {

@@ -3,6 +3,8 @@ export interface UserState {
     setUser: (user: any) => void
     token: string | null
     setToken: (token: string | null) => void
+    markers: any[]
+    setMarkers: (markers: any[]) => void
     isLoggedIn: () => boolean
     getUserMarkers: () => any[]
     setUserMarkers: (markers: any[]) => void
