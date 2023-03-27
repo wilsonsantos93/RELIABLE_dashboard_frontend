@@ -1,20 +1,25 @@
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import { useDispatch, useSelector } from "react-redux";
+import { updateComparedFeatures } from "../../store/map/map.action";
+import { selectComparedFeatures } from "../../store/map/map.selector";
+import { selectGeoJsonLayerRef } from "../../store/refs/refs.selector";
 import { setAreaMode } from "../../store/settings/settings.action";
 import { selectAreaMode } from "../../store/settings/settings.selector";
 import WeatherPanelStore from "../../stores/WeatherPanelStore";
 
 const AreaSelect = () => {
-    const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
+    /* const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
-    const geoJsonLayerRef  = WeatherPanelStore(state => state.geoJsonLayerRef);
+    const geoJsonLayerRef  = WeatherPanelStore(state => state.geoJsonLayerRef); */
     //const setSelectAreaMode = WeatherPanelStore(state => state.setSelectAreaMode);
     //const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
-    const areaMode = useSelector(selectAreaMode);
-    const dispatch = useDispatch<any>();
-    
     const map: any = useMap();
+    const areaMode = useSelector(selectAreaMode);
+    const comparedFeatures = useSelector(selectComparedFeatures);
+    const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
+
+    const dispatch = useDispatch<any>();
 
     const getFeaturesInView = (area: any) => {
         var features: any = [];
@@ -38,7 +43,8 @@ const AreaSelect = () => {
             }
             
         });
-        setComparedFeatures([...comparedFeatures, ...features])
+        dispatch(updateComparedFeatures([...comparedFeatures, ...features]))
+        //setComparedFeatures([...comparedFeatures, ...features])
     }
 
     //const selectMode = WeatherPanelStore(state => state.selectMode);

@@ -7,30 +7,43 @@ import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import "./features-table.styles.css";
 import DataTable from 'react-data-table-component';
+import { useDispatch, useSelector } from "react-redux";
+import { selectComparedFeatures, selectSelectedFeature } from "../../../store/map/map.selector";
+import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
+import { selectFeature, updateComparedFeatures } from "../../../store/map/map.action";
+import { selectWeatherFields } from "../../../store/settings/settings.selector";
 
 const FeaturesTable = () => {
     ////console.time("component")
-    const weatherFields = WeatherPanelStore(state => state.weatherFields);
+    /* const weatherFields = WeatherPanelStore(state => state.weatherFields);
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
     const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
     const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);
-    const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
+    const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef); */
     //const map = useMap();
 
+    const dispatch = useDispatch<any>();
+    const weatherFields = useSelector(selectWeatherFields);
+    const comparedFeatures = useSelector(selectComparedFeatures);
+    const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
+    const selectedFeature = useSelector(selectSelectedFeature);
     
     const hoverFeature = (featureId: string) => {
+        if (!geoJsonLayerRef) return;
         ////console.time("hoverFeature")
-        if (hoveredFeature && hoveredFeature._id == featureId) return;
+        //if (hoveredFeature && hoveredFeature._id == featureId) return;
+        if (selectedFeature && selectedFeature._id == featureId) return;
 
         const feature = comparedFeatures.find((f:any) => f._id === featureId);
-        setFeatureProperties({
+        /* setFeatureProperties({
             _id: feature._id, 
             properties: feature.properties, 
             weather: feature.weather, 
             marker: feature.marker || { _id: null },
             markerRef: feature.markerRef
-        });
+        }); */
+        dispatch(selectFeature(feature));
 
         /* if (feature.markerRef) feature.markerRef.fire("click");
         else {        
@@ -115,11 +128,11 @@ const FeaturesTable = () => {
 
     const conditionalRowStyles = [
         {
-            when: (row: any) => row.id === hoveredFeature?._id,
+            when: (row: any) => row.id === selectedFeature?._id,
             style: (row: any) => ({ fontWeight: 'bold', border: '3px solid red' }),
         }, 
         {
-            when: (row: any) => row.id !== hoveredFeature?._id || (!hoveredFeature),
+            when: (row: any) => row.id !== selectedFeature?._id || (!selectedFeature),
             style: (row: any) => ({ fontWeight: 'normal', border: '1px solid black' }),
         }
     ];
@@ -152,12 +165,14 @@ const FeaturesTable = () => {
     //console.timeEnd("get differnce")
 
     const handleDelete = () => {
+        if (!geoJsonLayerRef) return;
         setToggleCleared(!toggleCleared);
         setSelectedRows([]);
         const diff = getDifference(comparedFeatures, selectedRows);
-        setComparedFeatures(diff);
-        if (!hoveredFeature) return;
-        const feature = comparedFeatures.find((f:any) => f._id === hoveredFeature._id);
+        //setComparedFeatures(diff);
+        dispatch(updateComparedFeatures(diff));
+        if (!selectedFeature) return;
+        const feature = comparedFeatures.find((f:any) => f._id === selectedFeature._id);
         if (selectedRows.find((r:any) => r.id === feature._id)) {
             const layer = geoJsonLayerRef.current.getLayer(feature._id);
             layer.closePopup();
