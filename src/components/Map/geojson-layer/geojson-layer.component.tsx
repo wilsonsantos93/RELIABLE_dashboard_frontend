@@ -16,8 +16,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEyeSlash, faLocationDot, faTrash } from '@fortawesome/free-solid-svg-icons';
 import ReactDOMServer from 'react-dom/server';
 import UserStore from '../../../stores/UserStore';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectUserIsLoggedIn, selectUserLocations } from '../../../store/user/user.selector';
+import { addUserLocation } from '../../../store/user/user.action';
+import { setGeoJsonLayer } from '../../../store/refs/refs.action';
+import { selectSidebarRef } from '../../../store/refs/refs.selector';
+import { selectIsSidebarOpen, selectSelectedDateId, selectSelectedWeatherField, selectWeatherFields } from '../../../store/settings/settings.selector';
+import { selectComparedFeatures, selectSelectedFeature } from '../../../store/map/map.selector';
+import { changeLoading } from '../../../store/settings/settings.action';
+import { addFeatureToComparedFeatures, removeFromComparedFeatures, selectFeature, updateComparedFeatures } from '../../../store/map/map.action';
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -54,55 +61,53 @@ const sleep = (ms: number) => {
 }
 
 const GeoJsonLayer = (props: any) => {
+    const geoJsonLayerRef = useRef<GJSON>();
     const [geoJSON, setGeoJSON] = useState<GeoJsonObject | null>(null);
-
-    const weatherFields = WeatherPanelStore(state => state.weatherFields);
-    const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
-
-    const selectedDateId = WeatherPanelStore(state => state.selectedDateDatabaseId);
-
-    const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);
-    const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
-
     const [previousLayer, setPreviousLayer] = useState<any>(null);
+    const map = useMap();
 
-    const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
-    const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
+    /* const weatherFields = WeatherPanelStore(state => state.weatherFields);
+    const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
+    const selectedDateId = WeatherPanelStore(state => state.selectedDateDatabaseId); */
 
+    /* const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);
+    const hoveredFeature = HoveredFeatureStore(state => state.featureProperties); */
+
+    //const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
+    //const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     //const comparisonMode = WeatherPanelStore(state => state.comparisonMode);
 
-    const setLoading = WeatherPanelStore(state => state.setLoading);
+    //const setLoading = WeatherPanelStore(state => state.setLoading);
 
     //const selectMode = WeatherPanelStore(state => state.selectMode);
-
-    const geoJsonLayerRef = useRef<GJSON>();
-
-    const setGeoJsonLayerRef = WeatherPanelStore(state => state.setGeoJsonLayerRef);
+    //const setGeoJsonLayerRef = WeatherPanelStore(state => state.setGeoJsonLayerRef);
 
     /* const userMarkers = UserMarkerStore(state => state.userMarkers);
     const addUserMarker = UserMarkerStore(state => state.addUserMarker); */
 
-    //const userMarkers = UserStore(state => state.markers);
-    //const getUserMarkersRef = useRef(UserStore.getState().getUserMarkers)
+    /* const sidebar = WeatherPanelStore(state => state.sidebar);
+    const isTabOpen = WeatherPanelStore(state => state.isTabOpen); */
+    const weatherFields = useSelector(selectWeatherFields);
+    const selectedWeatherField = useSelector(selectSelectedWeatherField);
+    const selectedDateId = useSelector(selectSelectedDateId);
+    const sidebarRef = useSelector(selectSidebarRef);
+    const isSidebarOpen = useSelector(selectIsSidebarOpen);
     const userMarkers = useSelector(selectUserLocations);
-    const addUserMarker = UserStore(state => state.addUserMarker);
-
-    const sidebar = WeatherPanelStore(state => state.sidebar);
-    const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
-
-    //const isLoggedIn = UserStore(state => state.isLoggedIn());
     const isLoggedIn = useSelector(selectUserIsLoggedIn);
-    const map = useMap();
+    const comparedFeatures = useSelector(selectComparedFeatures);
+    const selectedFeature = useSelector(selectSelectedFeature);
+
+    const dispatch = useDispatch<any>();
 
     useEffect(() => {
-        setGeoJsonLayerRef(geoJsonLayerRef);
+        //setGeoJsonLayerRef(geoJsonLayerRef);
+        dispatch(setGeoJsonLayer(geoJsonLayerRef));
     }, [geoJsonLayerRef])
 
 
     useEffect(() => {
-        if (!geoJsonLayerRef || !geoJsonLayerRef.current) return;
+        if (!geoJsonLayerRef || !geoJsonLayerRef.current || !userMarkers) return;
 
-        console.log("Running effect", userMarkers)
         const compFeatures = [...comparedFeatures];
         if (!userMarkers.length) {
             map.eachLayer((layer: any) => {
@@ -110,13 +115,14 @@ const GeoJsonLayer = (props: any) => {
                 const ix = compFeatures.findIndex((f:any) => f._id == layer._leaflet_id);
                 if (ix >= 0) compFeatures[ix].markers = layer.markers;
             });
-            setComparedFeatures(compFeatures);
+            //setComparedFeatures(compFeatures);
+            dispatch(updateComparedFeatures(compFeatures));
             return;
         }
 
         const data: any = {};
         userMarkers.forEach((marker:any) => {
-            const latlngPoint = new L.LatLng(marker.lat, marker.lng);
+            const latlngPoint = new L.LatLng(marker.position.lat, marker.position.lng);
             const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef.current, true);
             results.forEach((layer: any) => {
                 if (!data.hasOwnProperty(layer.feature._id)) data[layer.feature._id] = [];
@@ -133,13 +139,14 @@ const GeoJsonLayer = (props: any) => {
             }
         }
 
-        setComparedFeatures(compFeatures);
+        //setComparedFeatures(compFeatures);
+        dispatch(updateComparedFeatures(compFeatures));
 
     }, [userMarkers, geoJsonLayerRef])
 
     // Get color for depending on value
     const getColor = (value: number) => {
-        const field = weatherFields.find(field => field.name === selectedWeatherField.name);
+        const field = weatherFields.find((field:any) => field.name === selectedWeatherField.name);
         if (field) {
             for (let r of field.colours) {
                 const min = r.min != null ? r.min : -Infinity; 
@@ -167,7 +174,7 @@ const GeoJsonLayer = (props: any) => {
 
         if (comparedFeatures.find((f:any) => f._id == feature._id)) {
 
-            if (hoveredFeature && hoveredFeature._id == feature._id) {
+            if (selectedFeature && selectedFeature._id == feature._id) {
                 mapFeatureNotHoveredStyle = { 
                     ...mapFeatureNotHoveredStyle, 
                     ...layerRedHighlightedStyle 
@@ -186,36 +193,38 @@ const GeoJsonLayer = (props: any) => {
     useEffect(() => {
         (async () => {
             if (selectedDateId) {
-                setLoading(true);
+                //setLoading(true);
+                dispatch(changeLoading(true));
                 const data = await fetchWeatherGeoJSON(selectedDateId);
                 setGeoJSON(data);
                 if (geoJsonLayerRef.current) {
                     geoJsonLayerRef.current.clearLayers().addData(data);
                 }
+                dispatch(changeLoading(false));
             }
         })()
     }, [selectedDateId]);
 
     useEffect(() => {
-        if (!hoveredFeature) return;
-        const layer = getLayer(hoveredFeature._id);
+        if (!selectedFeature) return;
+        const layer = getLayer(selectedFeature._id);
         layer?.setPopupContent(updatePopupContent(layer));
     }, [selectedWeatherField]);
 
-    useEffect(() => {
-        if (geoJSON) setLoading(false);
-     }, [geoJSON])
+    /* useEffect(() => {
+        if (geoJSON) dispatch(changeLoading(false));//setLoading(false);
+    }, [geoJSON]) */
 
 
     useEffect(() => {
         resetHighlightFeature(previousLayer);
-        if (!hoveredFeature) {
+        if (!selectedFeature) {
             clickedFeatureId = null;
             return;
         }
 
         //if (previousLayer && previousLayer.feature._id != hoveredFeature._id) previousLayer.closePopup();
-        const layer = getLayer(hoveredFeature._id);
+        const layer = getLayer(selectedFeature._id);
         //const isOnComparisonList = existsInComparedFeatures(hoveredFeature._id);
     
         //if (comparedFeatures.length > 1 && (hoveredFeature.rowHover || isOnComparisonList)) {
@@ -232,7 +241,7 @@ const GeoJsonLayer = (props: any) => {
         }  */
         highlightFeature(layer);
         setPreviousLayer(layer);
-    }, [hoveredFeature])
+    }, [selectedFeature])
 
 
     // Get layer by id
@@ -268,8 +277,9 @@ const GeoJsonLayer = (props: any) => {
     }
 
     const removeFeatureFromList = (layer: CustomLayer) => {
-        const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
-        setComparedFeatures(filteredFeatures);
+        /* const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
+        setComparedFeatures(filteredFeatures); */
+        dispatch(removeFromComparedFeatures(comparedFeatures, layer.feature._id));
     }
 
     const updatePopupContent = (layer: any, event?: any) => {
@@ -282,14 +292,15 @@ const GeoJsonLayer = (props: any) => {
             </div>
         `;
 
-        // marker button
+        // add marker button
         if (isLoggedIn) {
             const markerBtn = document.createElement("button");
             markerBtn.className = "btn btn-sm btn-outline-primary";
             markerBtn.title = "Adicionar marcador";
             markerBtn.innerHTML = ReactDOMServer.renderToStaticMarkup(<FontAwesomeIcon icon={faLocationDot} />);
             markerBtn.onclick = function() {
-                addUserMarker(event.latlng);
+                //addUserMarker(event.latlng);
+                dispatch(addUserLocation(userMarkers, { ...event.latlng }));
                 layer.closePopup();
             }
             div.appendChild(markerBtn);
@@ -393,14 +404,22 @@ const GeoJsonLayer = (props: any) => {
             setFeatureProperties({ _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef });
         } */
 
-        setFeatureProperties({ _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef });
+        //setFeatureProperties({ _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef });
+        
+        const obj = { _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef };
+        dispatch(selectFeature(obj));
 
         if (!existsInComparedFeatures(_id)) {
-            setComparedFeatures([feature, ...comparedFeatures]);
+            //setComparedFeatures([feature, ...comparedFeatures]);
+            dispatch(addFeatureToComparedFeatures(comparedFeatures, feature));
         }
 
-        if (sidebar && !isTabOpen && !window.mobileCheck()) {
+       /*  if (sidebar && !isTabOpen && !window.mobileCheck()) {
             sidebar.open("tab1");
+        } */
+
+        if (sidebarRef?.current && !isSidebarOpen && !window.mobileCheck()) {
+            sidebarRef.current.open("tab1");
         }
 
         /* const offset = map.getSize().x * 0.25;
@@ -416,7 +435,8 @@ const GeoJsonLayer = (props: any) => {
 
     // Clear the layer
     const clearFeature = () => {
-        setFeatureProperties(null);
+        //setFeatureProperties(null);
+        dispatch(selectFeature(null));
 
         /* if (comparisonMode) {
             const exists = existsInComparedFeatures(layer.feature._id);

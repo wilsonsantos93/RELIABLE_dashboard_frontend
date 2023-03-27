@@ -1,4 +1,4 @@
-import { signInFailed, signInSuccess, signOutFailed, signUpFailed, signOutSuccess } from "./user.action";
+import { signInFailed, signInSuccess, signOutFailed, signUpFailed, signOutSuccess, setUserLocationsFailed, setUserLocationsSuccess } from "./user.action";
 import { AnyAction } from "redux";
 
 export type UserState = {
@@ -23,11 +23,12 @@ export const userReducer = (state = INITIAL_STATE, action: AnyAction): UserState
       ...state,
       currentUser: action.payload.user,
       locations: action.payload.user.locations,
-      token: action.payload.jwt
+      token: action.payload.jwt,
+      error: null
     }; 
   }
 
-  if (signOutFailed.match(action) || signUpFailed.match(action) || signInFailed.match(action)) {
+  if (signOutFailed.match(action) || signUpFailed.match(action) || signInFailed.match(action) || setUserLocationsFailed.match(action)) {
     return {
       ...state,
       error: action.payload,
@@ -38,7 +39,16 @@ export const userReducer = (state = INITIAL_STATE, action: AnyAction): UserState
     return {
       ...state,
       currentUser: null,
-      token: null
+      token: null,
+      error: null
+    };
+  }
+
+  if (setUserLocationsSuccess.match(action)) {
+    return {
+      ...state,
+      error: null,
+      locations: action.payload
     };
   }
 

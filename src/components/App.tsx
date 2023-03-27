@@ -6,14 +6,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faObjectGroup, faHandPointer } from '@fortawesome/free-solid-svg-icons'
 import NavigationBar from './Navbar/navigation-bar/navigation-bar.component';
 import "../styles/Index.css";
+import { useSelector } from 'react-redux';
+import { selectAreaMode, selectIsSidebarOpen, selectLoading } from '../store/settings/settings.selector';
 
 function App(): JSX.Element {
-    const loading = WeatherPanelStore(state => state.loading);
+    //const loading = WeatherPanelStore(state => state.loading);
+    const loading = useSelector(selectLoading);
     //const comparisonMode = WeatherPanelStore(state => state.comparisonMode);
     const selectMode = WeatherPanelStore(state => state.selectMode);
-    const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
-
-    const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
+    //const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
+    const areaMode = useSelector(selectAreaMode);
+    //const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
+    const isSidebarOpen = useSelector(selectIsSidebarOpen);
 
     return (
         <Container fluid>
@@ -25,7 +29,7 @@ function App(): JSX.Element {
                 </Col>
             </Row>
 
-            <ToastContainer style={{zIndex:999}} id="toastContainer" className={isTabOpen ? 'start-33' : ''} position="bottom-center">
+            <ToastContainer style={{zIndex:999}} id="toastContainer" className={isSidebarOpen ? 'start-33' : ''} position="bottom-center">
                 <Toast bg="dark" show={loading} animation={true}>
                     <Toast.Body className='text-white'>
                         <Spinner size="sm" animation="border" role="status" /> A carregar...
@@ -40,12 +44,12 @@ function App(): JSX.Element {
                     <Toast.Body className='text-white'> 
                     {
                         //selectMode === 'area' && 
-                        selectAreaMode &&
+                        areaMode &&
                         <span><FontAwesomeIcon icon={faObjectGroup} />  Clique e arraste para selecionar uma área</span>
                     } 
                     {
                         //selectMode === 'individual' && 
-                        !selectAreaMode &&
+                        !areaMode &&
                         <span>
                             <FontAwesomeIcon icon={faHandPointer} />  Clique nas localidades para adicionar à lista
                         </span>

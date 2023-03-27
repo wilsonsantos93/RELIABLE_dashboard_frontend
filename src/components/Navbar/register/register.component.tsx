@@ -5,8 +5,10 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Row from 'react-bootstrap/Row';
+import { useDispatch } from 'react-redux';
+import { signUpUser } from '../../../store/user/user.action';
 
-const registerUser = async (data: any) => {
+/* const registerUser = async (data: any) => {
     try {
         const response = await fetch('http://localhost:8000/api/register', {
             method: 'POST',
@@ -34,7 +36,7 @@ const registerUser = async (data: any) => {
     } catch (e) {
         throw e;
     }
-}
+} */
 
 
 type RegisterProps = {
@@ -48,6 +50,7 @@ const Register = ({ show, handleClose }: RegisterProps) => {
   const [confirmPassword, setConfirmPassword] = useState<string>();
   const [email, setEmail] = useState<string>();
   const [error, setError] = useState<string | null>();
+  const dispatch = useDispatch<any>();
 
   const handleSubmit = async (event: any) => {
     setError(null);
@@ -60,11 +63,16 @@ const Register = ({ show, handleClose }: RegisterProps) => {
 
     const data = { username: email, password, confirmPassword };
     try {
-        const user = await registerUser(data);
-        console.log(user);
-        handleClose();
-    } catch (e: any) {
-        setError(e);
+        /* const user = await registerUser(data);
+        handleClose(); */
+        dispatch(signUpUser(data)).then(() =>  { 
+            handleClose();
+        })
+        .catch((error: any) => {
+            setError(JSON.stringify(error))
+        });;
+    } catch (error: any) {
+        setError(JSON.stringify(error));
     }
   };
 

@@ -1,5 +1,4 @@
-import { compose, createStore, applyMiddleware, Middleware, Action, AnyAction } from "redux";
-/* import logger from "redux-logger"; */
+import { compose, createStore, applyMiddleware, AnyAction } from "redux";
 import thunk, { ThunkAction } from "redux-thunk";
 import { rootReducer } from "./root-reducer";
 
@@ -39,7 +38,6 @@ export const store = createStore(
 );
 
 
-export type AppDispatch = typeof store.dispatch;
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
   RootState,

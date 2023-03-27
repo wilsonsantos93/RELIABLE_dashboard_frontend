@@ -3,7 +3,7 @@ import "leaflet-sidebar-v2";
 import "leaflet/dist/leaflet.css";
 import "leaflet-sidebar-v2/css/leaflet-sidebar.min.css";
 import { useMap } from "react-leaflet";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import WeatherDateSelector from "../weather-date-selector/weather-date-selector.component";
 import WeatherInfoSelector from "../weather-info-selector/weather-info-selector.component";
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
@@ -15,6 +15,8 @@ import { faTable, faChartLine, faCog, faWindowClose } from '@fortawesome/free-so
 import Recommendations from "../recommendations/recommendations.component";
 import SidebarTabHead from "../sidebar-tab-head/sidebar-tab-head.component";
 import FeaturesTable from "../features-table/features-table.component";
+import { useDispatch } from "react-redux";
+import { setSidebar } from "../../../store/refs/refs.action";
 
 
 const Sidebar = () => {
@@ -22,20 +24,23 @@ const Sidebar = () => {
     const setIsTabOpen = WeatherPanelStore(state => state.setIsTabOpen);
     //const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
     //const [sidebar, setSidebar] = useState<L.Control.Sidebar|null>(null);
-    const setSidebar = WeatherPanelStore(state => state.setSidebar);
+    //const setSidebar = WeatherPanelStore(state => state.setSidebar);
     //const sidebar = WeatherPanelStore(state => state.sidebar);
 
     //const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const map = useMap();
+    const dispatch = useDispatch<any>();
+
+    const sidebar = L.control.sidebar({
+        autopan: true,       // whether to maintain the centered map point when opening the sidebar
+        closeButton: true,    // whether t add a close button to the panes
+        container: 'sidebar', // the DOM container or #ID of a predefined sidebar container that should be used
+        position: 'right',     // left or right
+    });
+
+    const sidebarRef = useRef(sidebar);
 
     useEffect(() => {
-        const sidebar = L.control.sidebar({
-            autopan: true,       // whether to maintain the centered map point when opening the sidebar
-            closeButton: true,    // whether t add a close button to the panes
-            container: 'sidebar', // the DOM container or #ID of a predefined sidebar container that should be used
-            position: 'right',     // left or right
-        });
-
         sidebar.on("opening", () => {
             setIsTabOpen(true);
         });
@@ -45,7 +50,9 @@ const Sidebar = () => {
         });
 
         map.addControl(sidebar);
-        setSidebar(sidebar);
+
+        //setSidebar(sidebar);
+        dispatch(setSidebar(sidebarRef));
         return () => { map.removeControl(sidebar) };
     }, [])
 

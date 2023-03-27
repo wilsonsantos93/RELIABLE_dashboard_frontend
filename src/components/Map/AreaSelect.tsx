@@ -1,13 +1,18 @@
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
+import { useDispatch, useSelector } from "react-redux";
+import { setAreaMode } from "../../store/settings/settings.action";
+import { selectAreaMode } from "../../store/settings/settings.selector";
 import WeatherPanelStore from "../../stores/WeatherPanelStore";
 
 const AreaSelect = () => {
     const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const geoJsonLayerRef  = WeatherPanelStore(state => state.geoJsonLayerRef);
-    const setSelectAreaMode = WeatherPanelStore(state => state.setSelectAreaMode);
-    const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
+    //const setSelectAreaMode = WeatherPanelStore(state => state.setSelectAreaMode);
+    //const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
+    const areaMode = useSelector(selectAreaMode);
+    const dispatch = useDispatch<any>();
     
     const map: any = useMap();
 
@@ -41,23 +46,23 @@ const AreaSelect = () => {
 
     useEffect( () => {
         //if (selectMode == 'area') {
-        if (selectAreaMode){
+        if (areaMode){
             map.selectArea?.setControlKey(false); 
             map.selectArea.enable();
         }
         else map.selectArea.disable();
-    }, [selectAreaMode])
+    }, [areaMode])
 
   
     useEffect(() => {
       if (!map.selectArea) return;
   
       map.on("areaselected", (e: any) => {
-        console.log(e.bounds.toBBoxString());
         //L.rectangle(e.bounds, { color: "blue", weight: 1 }).addTo(map);
         getFeaturesInView(e.bounds);
         map.selectArea.disable();
-        setSelectAreaMode(false);
+        dispatch(setAreaMode(false));
+        //setSelectAreaMode(false);
         //setSelectMode("individual");
         //setComparisonMode(true);
       });

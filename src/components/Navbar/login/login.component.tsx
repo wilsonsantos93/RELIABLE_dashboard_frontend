@@ -32,23 +32,27 @@ const Login = ({ show, handleClose }: any) => {
     const [email, setEmail] = useState<string>();
     const [password, setPassword] = useState<string>();
     const [error, setError] = useState<string>();
-    const setUser = UserStore(state => state.setUser);
+    /* const setUser = UserStore(state => state.setUser);
     const setToken = UserStore(state => state.setToken);
-    const setMarkers = UserStore(state => state.setMarkers);
+    const setMarkers = UserStore(state => state.setMarkers); */
     const dispatch = useDispatch<any>();
 
     const handleSubmit = async (event: any) => {
+        event.preventDefault();
         try {
             const credentials = { username: email, password };
             /*const data = await loginUserX(credentials);
              setUser(data.user);
             setToken(data.jwt);
             setMarkers(data.user.locations) */
-            dispatch(loginUser(credentials));
-            handleClose();
-        } catch (e: any) {
-            console.error(e);
-            //setError(JSON.stringify(e));
+            dispatch(loginUser(credentials)).then(() =>  { 
+                handleClose();
+            })
+            .catch((error: any) => {
+                setError(JSON.stringify(error))
+            });
+        } catch (error: any) {
+            setError(JSON.stringify(error))
         }
     };
 

@@ -33,7 +33,7 @@ const UserStore = create<UserState>()(persist((set, get) => ({
         return [];
     },
 
-    setUserMarkers: (markers) => {
+    setUserMarkers: (markers) => { 
        const user = { ...get().user };
        user.locations = markers;
        get().setUser(user);

@@ -1,8 +1,8 @@
-import {createRef, Profiler, useEffect } from 'react';
+import {createRef, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './map.styles.css'
-import { GeoJSON, Map as LeafletMap } from "leaflet";
+import { Map as LeafletMap } from "leaflet";
 /* import HoveredFeaturePanel from "../HoveredFeaturePanel"; */
 import GeoJsonLayer from "../geojson-layer/geojson-layer.component";
 import Sidebar from '../../WeatherPanel/sidebar/sidebar.component';
@@ -15,26 +15,30 @@ import "leaflet-area-select";
 import AreaSelect from "../AreaSelect";
 import Control from 'react-leaflet-custom-control'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHandPointer, faLocationDot, faMapLocationDot, faObjectGroup } from '@fortawesome/free-solid-svg-icons'
+import { faObjectGroup } from '@fortawesome/free-solid-svg-icons'
 import L from 'leaflet';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectAreaMode } from '../../../store/settings/settings.selector';
+import { setAreaMode } from '../../../store/settings/settings.action';
 
 function Map() {
 
     let mapRef = createRef<LeafletMap>();
 
-    const setSelectAreaMode = WeatherPanelStore(state => state.setSelectAreaMode);
-    const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
+    //const setSelectAreaMode = WeatherPanelStore(state => state.setSelectAreaMode);
+    //const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
+    const areaMode = useSelector(selectAreaMode);
+    const dispatch = useDispatch<any>();
 
-
-    const onSelectAreaMode = (mode?: boolean) => {
-        setSelectAreaMode();
+    const onSelectAreaMode = () => {
+        dispatch(setAreaMode(!areaMode));
     }
 
-    useEffect(() => {
+    /* useEffect(() => {
         if (!mapRef || !mapRef.current) return;
         const offset = mapRef.current.getSize().x * 0.25;
         mapRef.current.panBy(new L.Point(offset, 0), {animate: false});
-    }, [mapRef])
+    }, [mapRef]) */
 
     return (
         <div>
@@ -74,7 +78,7 @@ function Map() {
 
                 <Control position='topleft'>
                     <div style={{cursor: 'pointer'}} className="leaflet-bar">
-                        <a style={{backgroundColor: selectAreaMode ? '#0d6efd' : ''}} title="Selecionar área" onClick={() => onSelectAreaMode()}>
+                        <a style={{backgroundColor: areaMode ? '#0d6efd' : ''}} title="Selecionar área" onClick={() => onSelectAreaMode()}>
                             <FontAwesomeIcon icon={faObjectGroup} />
                         </a>
                     </div>

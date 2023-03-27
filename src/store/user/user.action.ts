@@ -57,14 +57,68 @@ export const loginUser = (credentials: any): AppThunk => {
     }
 }
 
+export const signUpUser = (data: any): AppThunk => {
+    return async (dispatch) => {
+        try {
+            const response = await fetch('http://localhost:8000/api/register', {
+                method: 'POST',
+                headers: authHeader(),
+                body: JSON.stringify(data)
+            });
+    
+            if (!response?.ok) {
+                if (response.status == 401) throw "Não autorizado.";
+    
+                const error = await response.json();
+                
+                switch (error) {
+                    case "EMAIL_ALREADY_IN_USE":
+                        throw "Endereço e-mail já em uso."
+                    default:
+                        throw "Ocorreu um erro.";
+                }
+            }
+    
+            const user = await response.json();
+            dispatch(signInSuccess(user));
+        } catch (error) {
+            dispatch(signUpFailed(error as Error));
+            throw error;
+        }
+    }
+}
 
-export const setUserLocations = withMatcher(
-    (locations: any[]) => createAction(USER_ACTION_TYPES.SET_USER_LOCATIONS, locations)
+
+export const setUserLocationsSuccess = withMatcher(
+    (locations: any[]) => createAction(USER_ACTION_TYPES.SET_USER_LOCATIONS_SUCCESS, locations)
 )
 
-export const addUserLocation = (userLocations: any[], item: any)  => {
-    const locations = [...userLocations, item];
-    return setUserLocations(locations);
+export const setUserLocationsFailed = withMatcher(
+    (error: Error) => createAction(USER_ACTION_TYPES.SET_USER_LOCATIONS_FAILED, error)
+)
+
+
+export const addUserLocation = (userLocations: any[], position: any): AppThunk  => {
+    return async (dispatch) => {
+        try {
+            if (!position) throw "Coordinates not specified";
+
+            const response = await fetch(`http://localhost:8000/api/user/location`, {
+                method: 'POST',
+                headers: authHeader(),
+                body: JSON.stringify({ name: null, position: position })
+            });
+            
+            if (!response?.ok) throw "Não foi possível adicionar o marcador";
+
+            const location = await response.json();
+            const locations = [...userLocations, location];
+
+            dispatch(setUserLocationsSuccess(locations));
+        } catch (error) {
+            dispatch(setUserLocationsFailed(error as Error));
+        }
+    }
 };
 
 export const updateUserLocation = (userLocations: any[], item: any): AppThunk => {
@@ -76,26 +130,34 @@ export const updateUserLocation = (userLocations: any[], item: any): AppThunk =>
                 body: JSON.stringify(item)
             });
         
-            if (!response?.ok) {
-                if (response.status == 401) throw "Credenciais incorretas.";
-                if (response.status > 401) throw "Ocorreu um erro.";
-            }
+            if (!response?.ok) throw "Não foi possível atualizar o marcador";
         
-            //const user = await response.json();
             const ix = userLocations.findIndex(location => location._id == item._id);
             const locations = [...userLocations];
             locations[ix] = item;
-            console.log(item)
-            dispatch(setUserLocations(locations));
+            dispatch(setUserLocationsSuccess(locations));
         } catch (error) {
-            //dispatch(signInFailed(error as Error));
-            throw error;
+            dispatch(setUserLocationsFailed(error as Error));
         }
     }
 
 };
   
-export const removeUserLocation = (userLocations: any[], id: string) => {
-    const locations = userLocations.filter(location => location._id != id);
-    return setUserLocations(locations);
+export const removeUserLocation = (userLocations: any[], id: string): AppThunk => {
+    return async (dispatch) => {
+        try {
+            const response = await fetch(`http://localhost:8000/api/user/location/${id}/delete`, {
+                method: 'POST',
+                headers: authHeader(),
+            });
+            
+            if (!response?.ok) throw "Não foi possível remover o marcador";
+
+            const locations = userLocations.filter(location => location._id != id);
+            dispatch(setUserLocationsSuccess(locations));
+
+        } catch (error) {
+            dispatch(setUserLocationsFailed(error as Error));
+        }
+    }
 };

@@ -15,8 +15,8 @@ export const selectUserToken = createSelector(
 )
 
 export const selectUserLocations = createSelector(
-    [selectUser],
-    (user) => user.locations
+    [selectUserReducer],
+    (userSlice) => userSlice.locations || []
 ) 
 
 export const selectUserIsLoggedIn = createSelector(

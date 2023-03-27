@@ -4,11 +4,14 @@ import { useMap } from 'react-leaflet';
 import 'leaflet-geosearch/dist/geosearch.css';
 import L from 'leaflet';
 import WeatherPanelStore from '../../stores/WeatherPanelStore';
+import { useSelector } from 'react-redux';
+import { selectGeoJsonLayerRef } from '../../store/refs/refs.selector';
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
 const LeafletGeoSearch = (props: any) => {
-    const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
+    //const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
+    const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
 
     const provider = new OpenStreetMapProvider({
         params: {
@@ -31,6 +34,7 @@ const LeafletGeoSearch = (props: any) => {
     const map = useMap();
 
     useEffect(() => {
+        if (!geoJsonLayerRef) return;
         map.removeEventListener('geosearch/showlocation');
         map.on('geosearch/showlocation', (result: any) => {
             const latlngPoint = new L.LatLng(result.location.y, result.location.x);

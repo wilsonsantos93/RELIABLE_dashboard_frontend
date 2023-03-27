@@ -16,6 +16,10 @@ import UserStore from "../../../stores/UserStore";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUserLocation, updateUserLocation } from "../../../store/user/user.action";
 import { selectUserLocations } from "../../../store/user/user.selector";
+import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
+import { selectSelectedWeatherField } from "../../../store/settings/settings.selector";
+import { selectComparedFeatures } from "../../../store/map/map.selector";
+import { removeFromComparedFeatures, selectFeature } from "../../../store/map/map.action";
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -37,15 +41,19 @@ const UserMarker = (props: any) => {
     const markerRef = useRef(null);
 
     const dispatch = useDispatch<any>();
+    
+    const userLocations = useSelector(selectUserLocations);
+    const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
+    const selectedWeatherField = useSelector(selectSelectedWeatherField);
+    const comparedFeatures = useSelector(selectComparedFeatures);
 
    /*  const removeUserMarker = UserStore(state => state.removeUserMarker);
-    const updateUserMarker = UserStore(state => state.updateUserMarker); */
-    const userLocations = useSelector(selectUserLocations);
+    const updateUserMarker = UserStore(state => state.updateUserMarker); 
     const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
     const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
     const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
-    const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);
+    const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);*/
 
     const eventHandlers = useMemo(
         () => ({
@@ -60,7 +68,9 @@ const UserMarker = (props: any) => {
             },
 
             click() {
-                const latlngPoint = new L.LatLng(props.data.lat, props.data.lng);
+                if (!geoJsonLayerRef) return;
+                const { lat, lng } = props.data.position;
+                const latlngPoint = new L.LatLng(lat, lng);
                 const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef.current, true);
                 if (!results || !results.length) return;
                 results.forEach(function(layer: any) {
@@ -68,7 +78,7 @@ const UserMarker = (props: any) => {
                     layer.fire('click', {
                         marker: props.data || { _id: null },
                         markerRef: markerRef.current || null,
-                        latlng: { lat: props.data.lat, lng: props.data.lng }
+                        latlng: { lat: lat, lng: lng }
                     });
 
                     const feature = { 
@@ -79,7 +89,8 @@ const UserMarker = (props: any) => {
                         marker: props.data || { _id: null }, 
                         markerRef: markerRef.current
                     }
-                    setFeatureProperties(feature)
+                    //setFeatureProperties(feature)
+                    dispatch(selectFeature(feature));
                 });
             },
         }),
@@ -144,11 +155,12 @@ const UserMarker = (props: any) => {
     }
 
     const onRemove = () => {
+        if (!geoJsonLayerRef) return;
         const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
         if (!l) return;
-        l.markers = l.markers.filter((m:any) => m._id != props.data._id)
+        //l.markers = l.markers.filter((m:any) => m._id != props.data._id)
         //removeUserMarker(props.data._id);
-        dispatch(removeUserLocation(userLocations, props.data_id));
+        dispatch(removeUserLocation(userLocations, props.data._id));
         //onRemoveFeature();
 
 /*         // update comparedFeatures list
@@ -161,14 +173,17 @@ const UserMarker = (props: any) => {
     }
 
     const onRemoveFeature = () => {
-        if (!layer) return;
-        const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
-        setComparedFeatures(filteredFeatures);
+        if (!layer || !geoJsonLayerRef) return;
+        /* const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
+        setComparedFeatures(filteredFeatures); */
+        dispatch(removeFromComparedFeatures(comparedFeatures, layer.feature._id));
+
         const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
         l.closePopup();
         const marker: any = markerRef.current;
         marker.closePopup();
-        setFeatureProperties(null);
+        dispatch(selectFeature(null));
+        //setFeatureProperties(null);
     }
   
     return (
@@ -176,20 +191,23 @@ const UserMarker = (props: any) => {
             icon={markerIcon}
             draggable={draggable}
             eventHandlers={eventHandlers}
-            position={[props.data.lat, props.data.lng]}
+            position={[props.data.position.lat, props.data.position.lng]}
             ref={markerRef}
             >
             <Popup minWidth={90}>
                 { editable ? 
                     <input autoFocus type="text" placeholder="Casa, Trabalho..." onKeyDown={handleKeyDown} defaultValue={props.data.name || ""}/> : 
-                    <strong>{props.data.name}</strong> 
+                    <strong>{props.data.name || "Sem nome"}</strong> 
                 }
                 <br/>
                 {
                     draggable ? 
                     <span>Arraste para outra localização</span> : 
                     editable ?
-                    <span>Alterar nome</span> :
+                    <div>
+                        <span>Alterar nome</span><br/>
+                        <a href="#" onClick={() => toggleEditable()}>Cancelar</a>
+                    </div> :
                     <>
                     { updatePopupContent(layer) }
                     {/* <div style={{display: "flex", justifyContent: "space-around"}}>
