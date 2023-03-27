@@ -1,20 +1,23 @@
+import { useSelector } from "react-redux";
+import { selectSelectedFeature } from "../../../store/map/map.selector";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 
 const Recommendations = () => {
-    const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
+    //const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
+    const selectedFeature = useSelector(selectSelectedFeature);
 
     return (
         <div className="text-left pt-2">
             
             <h5>Recomendações
             { 
-                hoveredFeature ? 
-                (!hoveredFeature.markerName ? ` ${hoveredFeature.properties.Concelho}` : ` ${hoveredFeature.markerName} (${hoveredFeature?.properties.Concelho})`) :
+                selectedFeature ? 
+                (!selectedFeature.markerName ? ` ${selectedFeature.properties.Concelho}` : ` ${selectedFeature.markerName} (${selectedFeature?.properties.Concelho})`) :
                 null
             }
             </h5>
             {
-                !hoveredFeature ? <span>Sem localidade selecionada</span>
+                !selectedFeature ? <span>Sem localidade selecionada</span>
                 :
                 <span>
                 Noite épica para o Sporting, que foi melhor nos 120 minutos, mas precisou do desempate por pontapés de 

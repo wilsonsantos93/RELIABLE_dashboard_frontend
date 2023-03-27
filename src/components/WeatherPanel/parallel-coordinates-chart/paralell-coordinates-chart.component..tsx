@@ -6,6 +6,10 @@ import HighchartsParallelCoordinates from 'highcharts/modules/parallel-coordinat
 import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 import HC_exporting from 'highcharts/modules/exporting'
+import { useDispatch, useSelector } from "react-redux";
+import { selectIsSidebarOpen, selectWeatherFields } from "../../../store/settings/settings.selector";
+import { selectComparedFeatures, selectSelectedFeature } from "../../../store/map/map.selector";
+import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
 HighchartsParallelCoordinates(Highcharts);
 HC_exporting(Highcharts);
 
@@ -76,20 +80,27 @@ const ParallelCoordinatesChart = () => {
           }
       },
     };
-    
+
+    const chartRef = useRef<any>();
     const [chartOptions, setChartOptions] = useState<any>(chartConfig);
-    const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
+    const [previousSeries, setPreviousSeries] = useState<CustomSeries | undefined>();
+
+    /* const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const weatherFields = WeatherPanelStore(state => state.weatherFields);
     const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
     const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
-    const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
-    const [previousSeries, setPreviousSeries] = useState<CustomSeries | undefined>();
+    const isTabOpen = WeatherPanelStore(state => state.isTabOpen); */
 
-    const chartRef = useRef<any>();
+    const weatherFields = useSelector(selectWeatherFields);
+    const comparedFeatures = useSelector(selectComparedFeatures);
+    const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
+    const selectedFeature = useSelector(selectSelectedFeature);
+    const isSidebarOpen = useSelector(selectIsSidebarOpen);
+
 
     useEffect(() => {
         onHoveredFeatureChanged();
-    }, [hoveredFeature, chartOptions])
+    }, [selectedFeature, chartOptions])
 
     const onHoveredFeatureChanged = () => {
         if (previousSeries) {
@@ -99,8 +110,8 @@ const ParallelCoordinatesChart = () => {
             }
         }
 
-        if (!hoveredFeature) return;
-        updateColor(hoveredFeature._id);
+        if (!selectedFeature) return;
+        updateColor(selectedFeature._id);
     }
 
     const updateColor = (featureId: string) => {
@@ -136,11 +147,6 @@ const ParallelCoordinatesChart = () => {
             }
         })
     }, [geoJsonLayerRef])
-
-    /* useEffect(() => {
-        onHoveredFeatureChanged();
-    }, [chartOptions]) */
-
 
     useEffect(() => {
         const series = comparedFeatures.map((feature:any, i: any) => {
@@ -179,12 +185,12 @@ const ParallelCoordinatesChart = () => {
         const el: any = document.querySelector("#sidebar");
         el?.removeEventListener('transitionend', null);
         el?.addEventListener("transitionend", () => {
-            if (!isTabOpen) { 
+            if (!isSidebarOpen) { 
                 chartRef?.current?.chart.reflow(); 
             }
         })
         return () => el?.removeEventListener('transitionend', null);
-    }, [isTabOpen]);
+    }, [isSidebarOpen]);
 
 
     return ( 

@@ -38,3 +38,18 @@ export const selectLoading = createSelector(
     [selectSettingsReducer],
     (settingsSlice: SettingsState) => settingsSlice.loading
 )
+
+export const selectInfoMsg = createSelector(
+    [selectSettingsReducer],
+    (settingsSlice: SettingsState) => settingsSlice.info
+)
+
+export const selectErrorMsg = createSelector(
+    [selectSettingsReducer],
+    (settingsSlice: SettingsState) => settingsSlice.error
+)
+
+export const selectSuccessMsg = createSelector(
+    [selectSettingsReducer],
+    (settingsSlice: SettingsState) => settingsSlice.success
+)

@@ -1,4 +1,4 @@
-import { setSelectAreaMode, setSelectedWeatherField, fetchWeatherFieldsSuccess, fetchWeatherFieldsFailed, setSelectedDateId, fetchWeatherDatesFailed, fetchWeatherDatesSuccess, setLoading } from "./settings.action";
+import { setSelectAreaMode, setSelectedWeatherField, fetchWeatherFieldsSuccess, fetchWeatherFieldsFailed, setSelectedDateId, fetchWeatherDatesFailed, fetchWeatherDatesSuccess, setLoading, setIsSidebarOpen, setSuccessMsg, setErrorMsg, setInfoMsg } from "./settings.action";
 import { AnyAction } from "redux";
 
 export type SettingsState = {
@@ -9,7 +9,9 @@ export type SettingsState = {
   readonly selectedDateId: string | null,
   readonly isSidebarOpen: boolean,
   readonly loading: boolean,
-  readonly error: Error | null
+  readonly error: string | null,
+  readonly success: string | null,
+  readonly info: string | null
 }
 
 const INITIAL_STATE: SettingsState = {
@@ -20,7 +22,9 @@ const INITIAL_STATE: SettingsState = {
     selectedDateId: null,
     isSidebarOpen: false,
     loading: false,
-    error: null
+    error: null,
+    success: null,
+    info: null,
 };
 
 export const settingsReducer = (state = INITIAL_STATE, action: AnyAction): SettingsState => {
@@ -76,6 +80,34 @@ export const settingsReducer = (state = INITIAL_STATE, action: AnyAction): Setti
     return {
       ...state,
       loading: action.payload,
+    }; 
+  }
+
+  if (setIsSidebarOpen.match(action)) {
+    return {
+      ...state,
+      isSidebarOpen: action.payload,
+    }; 
+  }
+
+  if (setInfoMsg.match(action)) {
+    return {
+      ...state,
+      info: action.payload,
+    }; 
+  }
+
+  if (setErrorMsg.match(action)) {
+    return {
+      ...state,
+      error: action.payload,
+    }; 
+  }
+
+  if (setSuccessMsg.match(action)) {
+    return {
+      ...state,
+      success: action.payload,
     }; 
   }
 

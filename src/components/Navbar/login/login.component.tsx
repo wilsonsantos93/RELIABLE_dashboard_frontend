@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import { useDispatch } from 'react-redux';
 import { loginUser } from '../../../store/user/user.action';
 import UserStore from '../../../stores/UserStore';
+import "./login.styles.css";
 
 const loginUserX = async (credentials: any) => {
     try {
@@ -60,7 +61,7 @@ const Login = ({ show, handleClose }: any) => {
         <>
         <Modal show={show} onHide={handleClose} >
             <Modal.Header closeButton>
-                <Modal.Title>Entrar</Modal.Title>
+                <Modal.Title className="login-form-header">Login utilizador</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {   error &&
@@ -70,17 +71,17 @@ const Login = ({ show, handleClose }: any) => {
                 }
                 <Form onSubmit={handleSubmit}>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
-                        <Form.Label>Endereço e-mail:</Form.Label>
-                        <Form.Control onChange={e => setEmail(e.target.value)} required type="email" placeholder="Insira o e-mail" />
+                        <Form.Label className="login-form-label">Endereço e-mail:</Form.Label>
+                        <Form.Control className="login-form-input" onChange={e => setEmail(e.target.value)} required type="email" />
                     </Form.Group>
 
                     <Form.Group className="mb-3" controlId="formBasicPassword">
-                        <Form.Label>Palavra-passe:</Form.Label>
-                        <Form.Control onChange={e => setPassword(e.target.value)} required minLength={6} type="password" placeholder="Insira a palavra-passe" />
+                        <Form.Label className="login-form-label">Palavra-passe:</Form.Label>
+                        <Form.Control className="login-form-input" onChange={e => setPassword(e.target.value)} required minLength={6} type="password" />
                     </Form.Group>
 
                     <div className="d-grid gap-2">
-                        <Button variant="primary" type="submit">
+                        <Button className="login-form-btn" variant="primary" type="submit">
                             Entrar
                         </Button>
                     </div>

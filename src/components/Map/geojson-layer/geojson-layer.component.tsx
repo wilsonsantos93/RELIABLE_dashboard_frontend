@@ -105,15 +105,16 @@ const GeoJsonLayer = (props: any) => {
     }, [geoJsonLayerRef])
 
 
-    useEffect(() => {
+    /* useEffect(() => {
         if (!geoJsonLayerRef || !geoJsonLayerRef.current || !userMarkers) return;
 
+        console.log("userMarkers", userMarkers)
         const compFeatures = [...comparedFeatures];
         if (!userMarkers.length) {
             map.eachLayer((layer: any) => {
                 layer.markers = [];
                 const ix = compFeatures.findIndex((f:any) => f._id == layer._leaflet_id);
-                if (ix >= 0) compFeatures[ix].markers = layer.markers;
+                if (ix >= 0) compFeatures[ix].markers = [];
             });
             //setComparedFeatures(compFeatures);
             dispatch(updateComparedFeatures(compFeatures));
@@ -142,7 +143,7 @@ const GeoJsonLayer = (props: any) => {
         //setComparedFeatures(compFeatures);
         dispatch(updateComparedFeatures(compFeatures));
 
-    }, [userMarkers, geoJsonLayerRef])
+    }, [userMarkers, geoJsonLayerRef]) */
 
     // Get color for depending on value
     const getColor = (value: number) => {
@@ -494,7 +495,7 @@ const GeoJsonLayer = (props: any) => {
                
                 const e = event as any;
                   
-                if (!e.marker) layer.openPopup(e.latlng);
+                if (!e.markerRef) layer.openPopup(e.latlng);
                 else {
                     e.markerRef.openPopup();
                 }
@@ -528,10 +529,12 @@ const GeoJsonLayer = (props: any) => {
                 style={getStyle}
             />
 
-            {   (isLoggedIn && userMarkers.length) ? 
+            {   
+                (isLoggedIn && userMarkers.length) ?
                 userMarkers.map((marker: any) =>
                     <UserMarker key={marker._id} data={marker} />
-                ) : null
+                )
+                : null
             }
         </LayerGroup>
     );

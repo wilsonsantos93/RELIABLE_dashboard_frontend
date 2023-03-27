@@ -40,6 +40,7 @@ export const userReducer = (state = INITIAL_STATE, action: AnyAction): UserState
       ...state,
       currentUser: null,
       token: null,
+      locations: [],
       error: null
     };
   }

@@ -1,5 +1,6 @@
 import authHeader from "../../utils/reducer/authHeader.utils";
 import { createAction, withMatcher, Action, ActionWithPayload } from "../../utils/reducer/reducer.utils";
+import { setErrorMsg, setSuccessMsg, showErrorMsg, showSuccessMsg } from "../settings/settings.action";
 import { AppThunk } from "../store";
 import { USER_ACTION_TYPES } from "./user.types";
 
@@ -44,12 +45,13 @@ export const loginUser = (credentials: any): AppThunk => {
             });
         
             if (!response?.ok) {
-                if (response.status == 401) throw "Credenciais incorretas.";
+                if (response.status === 401) throw "Credenciais incorretas.";
                 if (response.status > 401) throw "Ocorreu um erro.";
             }
         
             const user = await response.json();
             dispatch(signInSuccess(user));
+            dispatch(showSuccessMsg("Sessão iniciada!"));
         } catch (error) {
             dispatch(signInFailed(error as Error));
             throw error;
@@ -67,7 +69,7 @@ export const signUpUser = (data: any): AppThunk => {
             });
     
             if (!response?.ok) {
-                if (response.status == 401) throw "Não autorizado.";
+                if (response.status === 403) throw "Acesso negado.";
     
                 const error = await response.json();
                 
@@ -81,6 +83,7 @@ export const signUpUser = (data: any): AppThunk => {
     
             const user = await response.json();
             dispatch(signInSuccess(user));
+            dispatch(showSuccessMsg("Utilizador registado com sucesso. Sessão iniciada."));
         } catch (error) {
             dispatch(signUpFailed(error as Error));
             throw error;
@@ -115,8 +118,10 @@ export const addUserLocation = (userLocations: any[], position: any): AppThunk  
             const locations = [...userLocations, location];
 
             dispatch(setUserLocationsSuccess(locations));
+            dispatch(showSuccessMsg("Marcador adicionado com sucesso!"));
         } catch (error) {
             dispatch(setUserLocationsFailed(error as Error));
+            dispatch(showErrorMsg(error as string));
         }
     }
 };
@@ -132,12 +137,14 @@ export const updateUserLocation = (userLocations: any[], item: any): AppThunk =>
         
             if (!response?.ok) throw "Não foi possível atualizar o marcador";
         
-            const ix = userLocations.findIndex(location => location._id == item._id);
             const locations = [...userLocations];
+            const ix = locations.findIndex(location => location._id == item._id);
             locations[ix] = item;
             dispatch(setUserLocationsSuccess(locations));
+            dispatch(showSuccessMsg("Marcador atualizado com sucesso!"));
         } catch (error) {
             dispatch(setUserLocationsFailed(error as Error));
+            dispatch(showErrorMsg(error as string));
         }
     }
 
@@ -155,9 +162,10 @@ export const removeUserLocation = (userLocations: any[], id: string): AppThunk =
 
             const locations = userLocations.filter(location => location._id != id);
             dispatch(setUserLocationsSuccess(locations));
-
+            dispatch(showSuccessMsg("Marcador removido com sucesso!"));
         } catch (error) {
             dispatch(setUserLocationsFailed(error as Error));
+            dispatch(showErrorMsg(error as string));
         }
     }
 };

@@ -17,11 +17,12 @@ import SidebarTabHead from "../sidebar-tab-head/sidebar-tab-head.component";
 import FeaturesTable from "../features-table/features-table.component";
 import { useDispatch } from "react-redux";
 import { setSidebar } from "../../../store/refs/refs.action";
+import { openSidebar } from "../../../store/settings/settings.action";
 
 
 const Sidebar = () => {
 
-    const setIsTabOpen = WeatherPanelStore(state => state.setIsTabOpen);
+    //const setIsTabOpen = WeatherPanelStore(state => state.setIsTabOpen);
     //const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
     //const [sidebar, setSidebar] = useState<L.Control.Sidebar|null>(null);
     //const setSidebar = WeatherPanelStore(state => state.setSidebar);
@@ -42,11 +43,13 @@ const Sidebar = () => {
 
     useEffect(() => {
         sidebar.on("opening", () => {
-            setIsTabOpen(true);
+            //setIsTabOpen(true);
+            dispatch(openSidebar(true));
         });
 
         sidebar.on("closing", () => {
-            setIsTabOpen(false);
+            //setIsTabOpen(false);
+            dispatch(openSidebar(false));
         });
 
         map.addControl(sidebar);

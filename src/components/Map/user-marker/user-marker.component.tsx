@@ -1,6 +1,6 @@
 import { Marker, Popup } from "react-leaflet";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Icon } from "leaflet";
+import { Icon, LatLng } from "leaflet";
 import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
@@ -20,6 +20,7 @@ import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
 import { selectSelectedWeatherField } from "../../../store/settings/settings.selector";
 import { selectComparedFeatures } from "../../../store/map/map.selector";
 import { removeFromComparedFeatures, selectFeature } from "../../../store/map/map.action";
+import { setErrorMsg, setSuccessMsg } from "../../../store/settings/settings.action";
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -55,46 +56,58 @@ const UserMarker = (props: any) => {
     const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
     const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);*/
 
+    const findLayerByLatLng = (latlngPoint: LatLng) => {
+        const { lat, lng } = latlngPoint;
+        const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef?.current, true);
+        if (!results || !results.length) return;
+        results.forEach((layer: any) => {
+            setLayer(layer);
+            layer.fire('click', {
+                marker: props.data,
+                markerRef: markerRef.current || null,
+                latlng: { lat: lat, lng: lng }
+            });
+
+            const feature = { 
+                _id: layer.feature._id, 
+                properties: layer.feature.properties, 
+                weather: layer.feature.weather,
+                markers: layer.markers,
+                marker: props.data || { _id: null }, 
+                markerRef: markerRef.current
+            }
+            //setFeatureProperties(feature)
+            dispatch(selectFeature(feature));
+        });
+    }
+
     const eventHandlers = useMemo(
         () => ({
             async dragend() {
                 const marker: any = markerRef.current;
                 if (marker != null) {
                     //await updateUserMarker(props.data._id, undefined, marker.getLatLng());
-                    dispatch(updateUserLocation(userLocations, { _id: props.data._id, name: props.data.name, position: marker.getLatLng() }));
-                    toggleDraggable();
-                    marker.fire("click");
+                    const loc = { _id: props.data._id, name: props.data.name, position: marker.getLatLng() };
+                    dispatch(updateUserLocation(userLocations, loc)).then(() => {
+                        toggleDraggable();
+                        const { lat, lng } = marker.getLatLng();
+                        const latlngPoint = new L.LatLng(lat, lng);
+                        findLayerByLatLng(latlngPoint);
+                    });
                 }
             },
 
             click() {
                 if (!geoJsonLayerRef) return;
-                const { lat, lng } = props.data.position;
+                const marker: any = markerRef.current;
+                if (marker == null) return;
+                const { lat, lng } = marker.getLatLng();
+                //const { lat, lng } = props.data.position;
                 const latlngPoint = new L.LatLng(lat, lng);
-                const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef.current, true);
-                if (!results || !results.length) return;
-                results.forEach(function(layer: any) {
-                    setLayer(layer);
-                    layer.fire('click', {
-                        marker: props.data || { _id: null },
-                        markerRef: markerRef.current || null,
-                        latlng: { lat: lat, lng: lng }
-                    });
-
-                    const feature = { 
-                        _id: layer.feature._id, 
-                        properties: layer.feature.properties, 
-                        weather: layer.feature.weather,
-                        markers: layer.markers,
-                        marker: props.data || { _id: null }, 
-                        markerRef: markerRef.current
-                    }
-                    //setFeatureProperties(feature)
-                    dispatch(selectFeature(feature));
-                });
+                findLayerByLatLng(latlngPoint);
             },
-        }),
-        [geoJsonLayerRef, comparedFeatures],
+        }), 
+        [geoJsonLayerRef, comparedFeatures]
     );
 
     /* useEffect(() => {
@@ -116,7 +129,7 @@ const UserMarker = (props: any) => {
             properties: { ...props.data }, 
             geometry: undefined 
         }; */
-        marker._leaflet_id = props.data._id;
+        //marker._leaflet_id = props.data._id;
         marker.getPopup().on('remove', function() {
             setEditable(false);
         });

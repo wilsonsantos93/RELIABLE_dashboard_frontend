@@ -31,7 +31,7 @@ export const fetchWeatherFieldsSuccess = withMatcher(
 )
 
 export const fetchWeatherFieldsFailed = withMatcher(
-    (error: Error) => createAction(SETTINGS_ACTION_TYPES.FETCH_WEATHER_FIELDS_FAILED, error)
+    (error: string) => createAction(SETTINGS_ACTION_TYPES.FETCH_WEATHER_FIELDS_FAILED, error)
 )
 
 export const getWeatherFields = (): AppThunk => {
@@ -41,7 +41,7 @@ export const getWeatherFields = (): AppThunk => {
             dispatch(fetchWeatherFieldsSuccess(data));
             dispatch(setWeatherField(data[0]));
         } catch (error) {
-            dispatch(fetchWeatherFieldsFailed(error as Error));
+            dispatch(fetchWeatherFieldsFailed(error as string));
         }
     }
 }
@@ -53,7 +53,7 @@ export const fetchWeatherDatesSuccess = withMatcher(
 )
 
 export const fetchWeatherDatesFailed = withMatcher(
-    (error: Error) => createAction(SETTINGS_ACTION_TYPES.FETCH_WEATHER_DATES_FAILED, error)
+    (error: string) => createAction(SETTINGS_ACTION_TYPES.FETCH_WEATHER_DATES_FAILED, error)
 )
 
 export const getWeatherDates = (): AppThunk => {
@@ -64,7 +64,7 @@ export const getWeatherDates = (): AppThunk => {
             const firstDate = dates.find(d => d.date.valueOf() <= new Date().valueOf());
             if (firstDate) dispatch(setDateId(firstDate?._id));
         } catch (error) {
-            dispatch(fetchWeatherFieldsFailed(error as Error));
+            dispatch(fetchWeatherFieldsFailed(error as string));
         }
     }
 }
@@ -86,4 +86,41 @@ export const setLoading = withMatcher(
 
 export const changeLoading = (bool: boolean) => {
     return setLoading(bool);
+}
+
+
+// sidebar open
+export const setIsSidebarOpen = withMatcher(
+    (bool: boolean) => createAction(SETTINGS_ACTION_TYPES.SET_IS_SIDEBAR_OPEN, bool)
+)
+
+export const openSidebar = (bool: boolean) => {
+    return setIsSidebarOpen(bool);
+}
+
+
+// set messages
+export const setInfoMsg = withMatcher(
+    (msg: string | null) => createAction(SETTINGS_ACTION_TYPES.SET_INFO_MESSAGE, msg)
+)
+
+export const setErrorMsg = withMatcher(
+    (msg: string | null) => createAction(SETTINGS_ACTION_TYPES.SET_ERROR_MESSAGE, msg)
+)
+
+export const setSuccessMsg = withMatcher(
+    (msg: string | null) => createAction(SETTINGS_ACTION_TYPES.SET_SUCCESS_MESSAGE, msg)
+)
+
+
+export const showInfoMsg = (msg: string | null) => {
+    return setInfoMsg(msg);
+}
+
+export const showErrorMsg = (msg: string | null) => {
+    return setErrorMsg(msg);
+}
+
+export const showSuccessMsg = (msg: string | null) => {
+    return setSuccessMsg(msg);
 }

@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { setInfoMsg } from "../../../store/settings/settings.action";
 import { signOutSuccess } from "../../../store/user/user.action";
 import { selectUser, selectUserIsLoggedIn } from "../../../store/user/user.selector";
 import UserStore from "../../../stores/UserStore";
@@ -51,6 +52,7 @@ const NavigationBar = () => {
        /*  setUser(null);
         setToken(null); */
         dispatch(signOutSuccess());
+        dispatch(setInfoMsg("Sessão terminada."));
     }
 
     const titleComponent = <span style={{color: 'white'}}>
