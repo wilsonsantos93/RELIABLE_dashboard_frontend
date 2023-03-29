@@ -1,10 +1,10 @@
-import {ChangeEvent, useEffect, useState} from 'react';
+import {ChangeEvent, useEffect, /* useState */} from 'react';
 import Form from 'react-bootstrap/Form'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../../styles/WeatherPanel.css';
 import {Col, Row} from "react-bootstrap";
-import WeatherPanelStore from "../../../stores/WeatherPanelStore";
-import {fetchWeatherDates} from "../../../data/fetchWeatherDates";
+/* import WeatherPanelStore from "../../../stores/WeatherPanelStore";
+import {fetchWeatherDates} from "../../../data/fetchWeatherDates"; */
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -16,10 +16,10 @@ dayjs.extend(timezone);
 const tz = "Europe/Lisbon";
 
 function WeatherDateSelector(): JSX.Element {
-    type WeatherDate = {
+    /* type WeatherDate = {
         date: Date,
         _id: string
-    }[] | undefined;
+    }[] | undefined; */
 
     /* const setSelectedDateDatabaseId = WeatherPanelStore(state => state.setSelectedDateDatabaseId);
     const selectedDateDatabaseId = WeatherPanelStore(state => state.selectedDateDatabaseId); */

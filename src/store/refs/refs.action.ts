@@ -1,5 +1,5 @@
 import { REFS_ACTION_TYPES } from "./refs.types";
-import { createAction, withMatcher, Action, ActionWithPayload } from "../../utils/reducer/reducer.utils";
+import { createAction, withMatcher } from "../../utils/reducer/reducer.utils";
 
 // Set geoJsonLayerRef
 export const setGeoJsonLayerRef = withMatcher(

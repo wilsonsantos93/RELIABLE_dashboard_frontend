@@ -7,6 +7,7 @@ import { setInfoMsg } from "../../../store/settings/settings.action";
 import { signOutSuccess } from "../../../store/user/user.action";
 import { selectUser, selectUserIsLoggedIn } from "../../../store/user/user.selector";
 import UserStore from "../../../stores/UserStore";
+import ChangePassword from "../change-password/change-password.component";
 import Contacts from "../contacts/contacts.component";
 import Login from "../login/login.component";
 import Register from "../register/register.component";
@@ -15,6 +16,7 @@ const NavigationBar = () => {
     const [showContacts, setShowContacts] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
+    const [showUpdatePassword, setShowUpdatePassword] = useState(false);
     /*const isLoggedIn = UserStore(state => state.isLoggedIn());
      const user = UserStore(state => state.user);
     const setUser = UserStore(state => state.setUser); 
@@ -48,6 +50,14 @@ const NavigationBar = () => {
         setShowRegister(false);
     }
 
+    const handleShowUpdatePassword = () => {
+        setShowUpdatePassword(true);
+    }
+
+    const closeUpdatePassword = () => {
+        setShowUpdatePassword(false);
+    }
+
     const logout = () => {
        /*  setUser(null);
         setToken(null); */
@@ -79,7 +89,7 @@ const NavigationBar = () => {
                     </> : 
 
                     <NavDropdown align="end" title={titleComponent} id="basic-nav-dropdown">
-                        <NavDropdown.Item href="#">Alterar palavra-passe</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => handleShowUpdatePassword()} href="#">Alterar palavra-passe</NavDropdown.Item>
                         <NavDropdown.Divider />
                         <NavDropdown.Item onClick={logout} href="#">
                            Sair
@@ -94,6 +104,7 @@ const NavigationBar = () => {
         <Contacts show={showContacts} handleClose={() => closeContacts()} />
         { showLogin && <Login show={showLogin} handleClose={() => closeLogin()} /> }
         { showRegister && <Register show={showRegister} handleClose={() => closeRegister()} /> }
+        { showUpdatePassword && <ChangePassword show={showUpdatePassword} handleClose={() => closeUpdatePassword()} /> }
         </>
     );
 }

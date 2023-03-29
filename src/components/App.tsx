@@ -3,7 +3,7 @@ import {Col, Container, Row, Spinner, Toast, ToastContainer} from "react-bootstr
 import Map from "./Map/map/map.component";
 import WeatherPanelStore from '../stores/WeatherPanelStore';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faObjectGroup, faHandPointer, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
+import { faObjectGroup, faHandPointer, faCircleInfo, faXmark, faCheck } from '@fortawesome/free-solid-svg-icons'
 import NavigationBar from './Navbar/navigation-bar/navigation-bar.component';
 import "../styles/Index.css";
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,7 +11,9 @@ import { selectAreaMode, selectErrorMsg, selectInfoMsg, selectIsSidebarOpen, sel
 import { useEffect } from 'react';
 import fetchIntercept from 'fetch-intercept';
 import { signOutSuccess } from '../store/user/user.action';
-import { setErrorMsg, setInfoMsg, setSuccessMsg, showErrorMsg, showInfoMsg, showSuccessMsg } from '../store/settings/settings.action';
+import { showErrorMsg, showInfoMsg, showSuccessMsg } from '../store/settings/settings.action';
+import { selectFeature } from '../store/map/map.action';
+import { selectSidebarRef } from '../store/refs/refs.selector';
 
 function App(): JSX.Element {
     //const loading = WeatherPanelStore(state => state.loading);
@@ -25,6 +27,7 @@ function App(): JSX.Element {
     const infoMsg = useSelector(selectInfoMsg);
     const successMsg = useSelector(selectSuccessMsg);
     const errorMsg = useSelector(selectErrorMsg);
+    const sidebarRef = useSelector(selectSidebarRef);
     const dispatch = useDispatch<any>();
 
     useEffect(() => {
@@ -33,12 +36,14 @@ function App(): JSX.Element {
                 if (!response.ok && response.status === 401) {
                     dispatch(signOutSuccess());
                     dispatch(showInfoMsg("Sessão expirada. Entre novamente."));
+                    dispatch(selectFeature(null));
+                    sidebarRef?.current.close();
                 }
                 return response;
             },
         });
         return () => unregister();
-    }, [])
+    }, [sidebarRef])
 
     return (
         <Container fluid>
@@ -58,12 +63,12 @@ function App(): JSX.Element {
                 </Toast> 
                 <Toast onClose={() => dispatch(showSuccessMsg(null))} bg="success" show={Boolean(successMsg)} animation={true} delay={2000} autohide>
                     <Toast.Body className='text-white'>
-                        { infoMsg }
+                        <FontAwesomeIcon icon={faCheck} ></FontAwesomeIcon> { successMsg }
                     </Toast.Body>
                 </Toast>
                 <Toast onClose={() => dispatch(showErrorMsg(null))} bg="danger" show={Boolean(errorMsg)} animation={true} delay={2000} autohide>
                     <Toast.Body className='text-white'>
-                        { infoMsg }
+                        <FontAwesomeIcon icon={faXmark} ></FontAwesomeIcon> { errorMsg }
                     </Toast.Body>
                 </Toast>
             </ToastContainer>

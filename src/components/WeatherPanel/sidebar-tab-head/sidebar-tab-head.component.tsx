@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useMap } from 'react-leaflet';
-import WeatherPanelStore from '../../../stores/WeatherPanelStore';
+/* import WeatherPanelStore from '../../../stores/WeatherPanelStore'; */
 import "./sidebar-tab-head.styles.css";
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSidebarRef } from '../../../store/refs/refs.selector';

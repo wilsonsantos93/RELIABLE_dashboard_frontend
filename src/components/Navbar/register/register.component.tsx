@@ -7,37 +7,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Row from 'react-bootstrap/Row';
 import { useDispatch } from 'react-redux';
 import { signUpUser } from '../../../store/user/user.action';
-
-/* const registerUser = async (data: any) => {
-    try {
-        const response = await fetch('http://localhost:8000/api/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (!response?.ok) {
-            if (response.status == 401) throw "Não autorizado.";
-
-            const error = await response.json();
-            
-            switch (error) {
-                case "EMAIL_ALREADY_IN_USE":
-                    throw "Endereço e-mail já em uso."
-                default:
-                    throw "Ocorreu um erro.";
-            }
-        }
-
-        const user = await response.json();
-        return user;
-    } catch (e) {
-        throw e;
-    }
-} */
-
+import "./register.styles.css";
 
 type RegisterProps = {
     show: boolean
@@ -53,6 +23,7 @@ const Register = ({ show, handleClose }: RegisterProps) => {
   const dispatch = useDispatch<any>();
 
   const handleSubmit = async (event: any) => {
+    event.preventDefault();
     setError(null);
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
@@ -79,7 +50,7 @@ const Register = ({ show, handleClose }: RegisterProps) => {
   return (
     <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-            <Modal.Title>Criar conta utilizador</Modal.Title>
+            <Modal.Title className="signup-form-header">Criar conta utilizador</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -89,47 +60,48 @@ const Register = ({ show, handleClose }: RegisterProps) => {
                 </Alert>
             }
             <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                <Row className="mb-3">
-                    <Form.Group as={Col} controlId="validationCustomEmail">
-                        <Form.Label>Endereço e-mail</Form.Label>
-                        <InputGroup hasValidation>
-                            <Form.Control
-                                type="email"
-                                placeholder="Email"
-                                aria-describedby="inputGroupPrepend"
-                                onChange={e => setEmail(e.target.value)}
-                                required
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                Insira um e-mail.
-                            </Form.Control.Feedback>
-                        </InputGroup>
-                    </Form.Group>
-                </Row>
 
-                <Row className="mb-3">
-                    <Form.Group as={Col} controlId="validationCustomPassword">
-                        <Form.Label>Palavra-passe</Form.Label>
-                        <Form.Control onChange={e => setPassword(e.target.value)} minLength={6} type="password" placeholder="Palavra-passe" required />
-                        <Form.Control.Feedback type="invalid">
-                            Palavra-passe deve ter pelo menos 6 caracteres.
-                        </Form.Control.Feedback> 
-                    </Form.Group>
-                    <Form.Group as={Col} controlId="validationCustomPasswordConfirm">
-                        <Form.Label>Confirmar palavra-passe</Form.Label>
-                        <Form.Control 
-                            onChange={e => setConfirmPassword(e.target.value)} 
-                            isInvalid={(confirmPassword as string != password as string)} 
-                            type="password" 
-                            placeholder="Repita a palavra-passe" 
-                            required 
+                <Form.Group className="mb-3" controlId="validationCustomEmail">
+                    <Form.Label className="signup-form-label">Endereço e-mail</Form.Label>
+                    <InputGroup hasValidation>
+                        <Form.Control
+                            type="email"
+                            className="signup-form-input2"
+                            placeholder="Insira o endereço de email"
+                            aria-describedby="inputGroupPrepend"
+                            onChange={e => setEmail(e.target.value)}
+                            required
                         />
                         <Form.Control.Feedback type="invalid">
-                           A palavra-passe não coincide.
+                            Insira um e-mail.
                         </Form.Control.Feedback>
-                    </Form.Group>
-                </Row>
-                <Button disabled={!password || !confirmPassword || !email} type="submit">Registar</Button>
+                    </InputGroup>
+                </Form.Group>
+
+                <Form.Group className="mb-3" controlId="validationCustomPassword">
+                    <Form.Label className="signup-form-label">Palavra-passe</Form.Label>
+                    <Form.Control onChange={e => setPassword(e.target.value)} minLength={6} type="password" placeholder="Insira a palavra-passe" required />
+                    <Form.Control.Feedback type="invalid">
+                        Palavra-passe deve ter pelo menos 6 caracteres.
+                    </Form.Control.Feedback> 
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="validationCustomPasswordConfirm">
+                    <Form.Label className="signup-form-label">Confirmar palavra-passe</Form.Label>
+                    <Form.Control 
+                        onChange={e => setConfirmPassword(e.target.value)} 
+                        /* isInvalid={(confirmPassword as string != password as string)}  */
+                        type="password" 
+                        minLength={6}
+                        placeholder="Repita a palavra-passe" 
+                        required 
+                    />
+                    <Form.Control.Feedback type="invalid">
+                        Palavra-passe deve ter pelo menos 6 caracteres.
+                        {/* A palavra-passe não coincide. */}
+                    </Form.Control.Feedback>
+                </Form.Group>
+
+                <Button className="signup-form-btn" disabled={!password || !confirmPassword || !email} type="submit">Registar</Button>
             </Form>
         </Modal.Body>
     </Modal>

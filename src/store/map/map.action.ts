@@ -1,5 +1,5 @@
 import { MAP_ACTION_TYPES } from "./map.types";
-import { createAction, withMatcher, Action, ActionWithPayload } from "../../utils/reducer/reducer.utils";
+import { createAction, withMatcher } from "../../utils/reducer/reducer.utils";
 
 // Set compared features
 export const setComparedFeatures = withMatcher(
@@ -21,7 +21,7 @@ export const updateComparedFeatures = (features: any[]) => {
 }
 
 export const removeFromComparedFeatures = (comparedFeatures: any[], featureId: string) => {
-    const features = comparedFeatures.filter((f:any) => f._id != featureId);
+    const features = comparedFeatures.filter((f:any) => f._id !== featureId);
     return setComparedFeatures(features);
 }
 

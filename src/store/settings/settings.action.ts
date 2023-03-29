@@ -1,5 +1,5 @@
 import { SETTINGS_ACTION_TYPES } from "./settings.types";
-import { createAction, withMatcher, Action, ActionWithPayload } from "../../utils/reducer/reducer.utils";
+import { createAction, withMatcher } from "../../utils/reducer/reducer.utils";
 import { AppThunk } from "../store";
 import { fetchWeatherFields } from "../../data/fetchWeatherFields";
 import { fetchWeatherDates } from "../../data/fetchWeatherDates";
@@ -89,7 +89,7 @@ export const changeLoading = (bool: boolean) => {
 }
 
 
-// sidebar open
+// is sidebar open
 export const setIsSidebarOpen = withMatcher(
     (bool: boolean) => createAction(SETTINGS_ACTION_TYPES.SET_IS_SIDEBAR_OPEN, bool)
 )

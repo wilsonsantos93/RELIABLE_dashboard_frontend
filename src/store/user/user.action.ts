@@ -1,6 +1,6 @@
 import authHeader from "../../utils/reducer/authHeader.utils";
 import { createAction, withMatcher, Action, ActionWithPayload } from "../../utils/reducer/reducer.utils";
-import { setErrorMsg, setSuccessMsg, showErrorMsg, showSuccessMsg } from "../settings/settings.action";
+import { showErrorMsg, showSuccessMsg } from "../settings/settings.action";
 import { AppThunk } from "../store";
 import { USER_ACTION_TYPES } from "./user.types";
 
@@ -45,7 +45,7 @@ export const loginUser = (credentials: any): AppThunk => {
             });
         
             if (!response?.ok) {
-                if (response.status === 401) throw "Credenciais incorretas.";
+                if (response.status === 404) throw "Credenciais incorretas.";
                 if (response.status > 401) throw "Ocorreu um erro.";
             }
         
@@ -67,7 +67,7 @@ export const signUpUser = (data: any): AppThunk => {
                 headers: authHeader(),
                 body: JSON.stringify(data)
             });
-    
+
             if (!response?.ok) {
                 if (response.status === 403) throw "Acesso negado.";
     
@@ -86,6 +86,42 @@ export const signUpUser = (data: any): AppThunk => {
             dispatch(showSuccessMsg("Utilizador registado com sucesso. Sessão iniciada."));
         } catch (error) {
             dispatch(signUpFailed(error as Error));
+            throw error;
+        }
+    }
+}
+
+export const changePassword = (data: any): AppThunk => {
+    return async (dispatch) => {
+        try {
+            const response = await fetch('http://localhost:8000/api/user/updatePassword', {
+                method: 'POST',
+                headers: authHeader(),
+                body: JSON.stringify(data)
+            });
+
+            if (!response?.ok) {
+                if (response.status === 403) throw "Acesso negado.";
+                if (response.status === 401) throw "UNAUTHORIZED";
+    
+                const error = await response.json();
+                
+                switch (error) {
+                    case "PASSWORD_MISSING":
+                        throw "Palavra-passe em falta."
+                    case "CONFIRM_PASSWORD_MISSING":
+                        throw "Confirmação de palavra-passe em falta."
+                    case "PASSWORDS_MUST_HAVE_SIX_CHARACTERS":
+                        throw "A palavra-passe deve ter pelo menos 6 caracteres."
+                    case "PASSWORDS_DO_NOT_MATCH":
+                        throw "As palavras-passe não coincidem."
+                    default:
+                        throw "Ocorreu um erro.";
+                }
+            }
+    
+            dispatch(showSuccessMsg("Palavra-passe alterada com sucesso!"));
+        } catch (error) {
             throw error;
         }
     }
@@ -138,7 +174,7 @@ export const updateUserLocation = (userLocations: any[], item: any): AppThunk =>
             if (!response?.ok) throw "Não foi possível atualizar o marcador";
         
             const locations = [...userLocations];
-            const ix = locations.findIndex(location => location._id == item._id);
+            const ix = locations.findIndex(location => location._id === item._id);
             locations[ix] = item;
             dispatch(setUserLocationsSuccess(locations));
             dispatch(showSuccessMsg("Marcador atualizado com sucesso!"));
@@ -160,7 +196,7 @@ export const removeUserLocation = (userLocations: any[], id: string): AppThunk =
             
             if (!response?.ok) throw "Não foi possível remover o marcador";
 
-            const locations = userLocations.filter(location => location._id != id);
+            const locations = userLocations.filter(location => location._id !== id);
             dispatch(setUserLocationsSuccess(locations));
             dispatch(showSuccessMsg("Marcador removido com sucesso!"));
         } catch (error) {

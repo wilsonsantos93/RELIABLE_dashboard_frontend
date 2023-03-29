@@ -3,11 +3,11 @@ import "leaflet-sidebar-v2";
 import "leaflet/dist/leaflet.css";
 import "leaflet-sidebar-v2/css/leaflet-sidebar.min.css";
 import { useMap } from "react-leaflet";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, /* useState */ } from "react";
 import WeatherDateSelector from "../weather-date-selector/weather-date-selector.component";
 import WeatherInfoSelector from "../weather-info-selector/weather-info-selector.component";
-import WeatherPanelStore from "../../../stores/WeatherPanelStore";
-import { Badge, Form } from "react-bootstrap";
+/* import WeatherPanelStore from "../../../stores/WeatherPanelStore"; */
+import { /* Badge, */ Form } from "react-bootstrap";
 import ParallelCoordinatesChart from "../parallel-coordinates-chart/paralell-coordinates-chart.component.";
 import "./sidebar.styles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'

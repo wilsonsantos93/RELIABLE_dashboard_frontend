@@ -29,7 +29,7 @@ const AreaSelect = () => {
                 const bound = layer.getBounds();
                 if (bound.getCenter) {
                     if (area.contains(bound.getCenter())) {
-                        if (!comparedFeatures.length || !comparedFeatures.find((f:any) => f._id == layer.feature._id)) {
+                        if (!comparedFeatures.length || !comparedFeatures.find((f:any) => f._id === layer.feature._id)) {
                             features.push({
                                 _id: layer.feature._id, 
                                 properties: layer.feature.properties,
