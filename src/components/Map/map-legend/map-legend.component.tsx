@@ -14,8 +14,8 @@ const MapLegend = () => {
             setData([]);
             return;
         }
-        const colours = selectedWeatherField.colours.sort((a:any, b:any) => b.min - a.min);
-        setData(colours);
+        const colors = selectedWeatherField.ranges.sort((a:any, b:any) => b.min - a.min);
+        setData(colors);
     }, [selectedWeatherField])
 
     const POSITION_CLASSES = {
@@ -31,8 +31,8 @@ const MapLegend = () => {
                 <span>{selectedWeatherField?.displayName}</span>
                 {
                     data && data.map((d:any) => 
-                        <div key={d.colour+"_item"} className="legend-list-item">
-                            <span className="legend-color" style={{backgroundColor: d.colour}}></span>
+                        <div key={d.color+"_item"} className="legend-list-item">
+                            <span className="legend-color" style={{backgroundColor: d.color}}></span>
                             <span className="legend-text">
                                 { d.min == null && `< ${d.max}` }
                                 { d.max == null && `> ${d.min}` }

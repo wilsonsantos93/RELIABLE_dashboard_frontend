@@ -12,8 +12,9 @@ import { useEffect } from 'react';
 import fetchIntercept from 'fetch-intercept';
 import { signOutSuccess } from '../store/user/user.action';
 import { showErrorMsg, showInfoMsg, showSuccessMsg } from '../store/settings/settings.action';
-import { selectFeature } from '../store/map/map.action';
+import { getWeatherAlerts, selectFeature } from '../store/map/map.action';
 import { selectSidebarRef } from '../store/refs/refs.selector';
+import { selectUserIsLoggedIn } from '../store/user/user.selector';
 
 function App(): JSX.Element {
     //const loading = WeatherPanelStore(state => state.loading);
@@ -28,6 +29,7 @@ function App(): JSX.Element {
     const successMsg = useSelector(selectSuccessMsg);
     const errorMsg = useSelector(selectErrorMsg);
     const sidebarRef = useSelector(selectSidebarRef);
+    const isLoggedIn = useSelector(selectUserIsLoggedIn);
     const dispatch = useDispatch<any>();
 
     useEffect(() => {
@@ -45,6 +47,10 @@ function App(): JSX.Element {
         return () => unregister();
     }, [sidebarRef])
 
+    useEffect(() => {
+        if (isLoggedIn) dispatch(getWeatherAlerts());
+    }, [])
+
     return (
         <Container fluid>
             <NavigationBar />
@@ -55,7 +61,7 @@ function App(): JSX.Element {
                 </Col>
             </Row>
 
-            <ToastContainer style={{zIndex:9999}} position="top-center">
+            <ToastContainer style={{textAlign: "center", zIndex:9999}} position="top-center">
                 <Toast onClose={() => dispatch(showInfoMsg(null))} bg="primary" show={Boolean(infoMsg)} animation={true} delay={2000} autohide>
                     <Toast.Body className='text-white'>
                         <FontAwesomeIcon icon={faCircleInfo} ></FontAwesomeIcon> { infoMsg }
@@ -73,7 +79,7 @@ function App(): JSX.Element {
                 </Toast>
             </ToastContainer>
 
-            <ToastContainer style={{zIndex:999}} id="toastContainer" className={isSidebarOpen ? 'start-33' : ''} position="bottom-center">
+            <ToastContainer style={{textAlign: "center", zIndex:999}} id="toastContainer" className={isSidebarOpen ? 'start-33' : ''} position="bottom-center">
                 <Toast bg="dark" show={loading} animation={true}>
                     <Toast.Body className='text-white'>
                         <Spinner size="sm" animation="border" role="status" /> A carregar...

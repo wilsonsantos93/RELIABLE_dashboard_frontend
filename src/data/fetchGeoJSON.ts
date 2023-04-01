@@ -1,5 +1,5 @@
 import {GeoJsonObject} from "geojson";
-const base_url = process.env.REACT_APP_API_URI;
+const base_url = process.env.REACT_APP_API_BASE_URL;
 
 /**
  * Fetches and returns the geoJSON with only the border information.

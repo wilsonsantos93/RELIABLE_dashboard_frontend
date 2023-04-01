@@ -39,9 +39,11 @@ export const getWeatherFields = (): AppThunk => {
         try {
             const data = await fetchWeatherFields();
             dispatch(fetchWeatherFieldsSuccess(data));
-            dispatch(setWeatherField(data[0]));
+            const mainField = data.find((f:any) => f.main == true);
+            if (mainField) dispatch(setWeatherField(mainField));
+            else dispatch(setWeatherField(data[0]));
         } catch (error) {
-            dispatch(fetchWeatherFieldsFailed(error as string));
+            dispatch(showErrorMsg("Não foi possível obter os metadados."));
         }
     }
 }
@@ -61,10 +63,12 @@ export const getWeatherDates = (): AppThunk => {
         try {
             const dates = await fetchWeatherDates();
             dispatch(fetchWeatherDatesSuccess(dates));
-            const firstDate = dates.find(d => d.date.valueOf() <= new Date().valueOf());
+            const datesSorted = [...dates]; 
+            datesSorted.sort((a,b) => a.date.valueOf() + b.date.valueOf())
+            const firstDate = datesSorted.find(d => d.date.valueOf() <= new Date().valueOf());
             if (firstDate) dispatch(setDateId(firstDate?._id));
         } catch (error) {
-            dispatch(fetchWeatherFieldsFailed(error as string));
+            dispatch(showErrorMsg("Não foi possível obter as datas."));
         }
     }
 }

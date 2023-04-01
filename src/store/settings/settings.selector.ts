@@ -19,6 +19,11 @@ export const selectWeatherFields = createSelector(
     (settingsSlice: SettingsState) => settingsSlice.weatherFields
 )
 
+export const selectMainWeatherField = createSelector(
+    [selectWeatherFields],
+    (weatherFields: any[]) => weatherFields.find(f => f.main)
+)
+
 export const selectSelectedDateId = createSelector(
     [selectSettingsReducer],
     (settingsSlice: SettingsState) => settingsSlice.selectedDateId

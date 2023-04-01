@@ -201,7 +201,7 @@ const ParallelCoordinatesChart = () => {
             highcharts={Highcharts}
             options={chartOptions}
         /> :
-        <span>Sem localidades na lista.</span>
+        <div className="text-center"><span>Sem localidades na lista.</span></div>
     )
 }
 

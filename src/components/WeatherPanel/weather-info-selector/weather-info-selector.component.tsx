@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect } from 'react';
 import Form from 'react-bootstrap/Form'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../../../styles/WeatherPanel.css';
+/* import '../../../styles/WeatherPanel.css'; */
 import {Col, Row} from "react-bootstrap";
 /* import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import { fetchWeatherFields } from '../../../data/fetchWeatherFields'; */
@@ -37,6 +37,7 @@ const WeatherInfoSelector = () => {
 
 
     return (
+        <>
         <Form.Group as={Row} className="mb-3">
             <Form.Label column sm={4}>
                 Selecionar informação:
@@ -52,6 +53,9 @@ const WeatherInfoSelector = () => {
             </Form.Select>
             </Col>
         </Form.Group>
+
+        <p>{selectedWeatherField?.description}</p>
+        </>
     )
 }
 

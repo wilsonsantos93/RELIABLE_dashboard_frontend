@@ -1,5 +1,6 @@
 import authHeader from "../../utils/reducer/authHeader.utils";
 import { createAction, withMatcher, Action, ActionWithPayload } from "../../utils/reducer/reducer.utils";
+import { getWeatherAlerts } from "../map/map.action";
 import { showErrorMsg, showSuccessMsg } from "../settings/settings.action";
 import { AppThunk } from "../store";
 import { USER_ACTION_TYPES } from "./user.types";
@@ -52,6 +53,7 @@ export const loginUser = (credentials: any): AppThunk => {
             const user = await response.json();
             dispatch(signInSuccess(user));
             dispatch(showSuccessMsg("Sessão iniciada!"));
+            dispatch(getWeatherAlerts());
         } catch (error) {
             dispatch(signInFailed(error as Error));
             throw error;
@@ -183,7 +185,6 @@ export const updateUserLocation = (userLocations: any[], item: any): AppThunk =>
             dispatch(showErrorMsg(error as string));
         }
     }
-
 };
   
 export const removeUserLocation = (userLocations: any[], id: string): AppThunk => {

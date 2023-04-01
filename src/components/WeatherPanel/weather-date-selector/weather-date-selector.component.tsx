@@ -1,7 +1,7 @@
 import {ChangeEvent, useEffect, /* useState */} from 'react';
 import Form from 'react-bootstrap/Form'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../../../styles/WeatherPanel.css';
+/* import '../../../styles/WeatherPanel.css'; */
 import {Col, Row} from "react-bootstrap";
 /* import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import {fetchWeatherDates} from "../../../data/fetchWeatherDates"; */
@@ -57,7 +57,7 @@ function WeatherDateSelector(): JSX.Element {
                 { 
                     weatherDates?.map(date => 
                     <option key={date._id} value={date._id}>
-                        {dayjs(date.date.toISOString()).tz(tz).format("YYYY-MM-DD HH:mm")}
+                        {dayjs(date.date.toISOString()).tz(tz).format(date.format)}
                     </option>)
                 }
             </Form.Select>

@@ -10,7 +10,7 @@ import DataTable from 'react-data-table-component';
 import { useDispatch, useSelector } from "react-redux";
 import { selectComparedFeatures, selectSelectedFeature } from "../../../store/map/map.selector";
 import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
-import { selectFeature, updateComparedFeatures } from "../../../store/map/map.action";
+import { selectFeature, setSelectedFeature, updateComparedFeatures } from "../../../store/map/map.action";
 import { selectWeatherFields } from "../../../store/settings/settings.selector";
 
 const FeaturesTable = () => {
@@ -78,17 +78,17 @@ const FeaturesTable = () => {
     const getColor = (value: number, fieldName: string) => {
         const field = weatherFields.find(field => field.name === fieldName);
         if (field) {
-            for (let r of field.colours) {
-                const min = r.min != null ? r.min : -Infinity; 
-                const max = r.max != null ? r.max : Infinity;
-                if (min <= value && value < max) return r.colour
+            for (let r of field.ranges) {
+                const min = (r.min != null || !isNaN(r.min)) ? r.min : -Infinity; 
+                const max = (r.max != null || !isNaN(r.max)) ? r.max : Infinity;
+                if (min <= value && value < max) {
+                    return r.color
+                }
             }
         }
         return "#808080";
     }
-    //console.timeEnd("getColor")
 
-    //console.time("table columns")
     let columns = [
         {
             name: 'Local',
@@ -162,7 +162,6 @@ const FeaturesTable = () => {
           });
         });
     };
-    //console.timeEnd("get differnce")
 
     const handleDelete = () => {
         if (!geoJsonLayerRef) return;
@@ -176,10 +175,10 @@ const FeaturesTable = () => {
         if (selectedRows.find((r:any) => r.id === feature._id)) {
             const layer = geoJsonLayerRef.current.getLayer(feature._id);
             layer.closePopup();
+            dispatch(setSelectedFeature(null));
         }
     };
     
-    ////console.timeEnd("component")
     return (
         <>
         { 

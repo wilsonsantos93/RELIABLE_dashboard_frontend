@@ -11,6 +11,7 @@ import ChangePassword from "../change-password/change-password.component";
 import Contacts from "../contacts/contacts.component";
 import Login from "../login/login.component";
 import Register from "../register/register.component";
+import WeatherAlerts from "../weather-alerts/weather-alerts.component";
 
 const NavigationBar = () => {
     const [showContacts, setShowContacts] = useState(false);
@@ -80,22 +81,24 @@ const NavigationBar = () => {
               
                 {  !isLoggedIn ?  
                     <>
-                    <Nav>
-                        <Nav.Link onClick={() => handleShowRegister()} href="#">Registar</Nav.Link>
-                    </Nav>
-                    <Nav>
-                        <Nav.Link onClick={() => handleShowLogin()} href="#">Entrar</Nav.Link>
-                    </Nav>
-                    </> : 
-
-                    <NavDropdown align="end" title={titleComponent} id="basic-nav-dropdown">
-                        <NavDropdown.Item onClick={() => handleShowUpdatePassword()} href="#">Alterar palavra-passe</NavDropdown.Item>
-                        <NavDropdown.Divider />
-                        <NavDropdown.Item onClick={logout} href="#">
-                           Sair
-                        </NavDropdown.Item>
-                    </NavDropdown>
-                    
+                        <Nav>
+                            <Nav.Link onClick={() => handleShowRegister()} href="#">Registar</Nav.Link>
+                        </Nav>
+                        <Nav>
+                            <Nav.Link onClick={() => handleShowLogin()} href="#">Entrar</Nav.Link>
+                        </Nav>
+                    </> 
+                    : 
+                    <>
+                        <WeatherAlerts />
+                        <NavDropdown align="end" title={titleComponent} id="basic-nav-dropdown">
+                            <NavDropdown.Item onClick={() => handleShowUpdatePassword()} href="#">Alterar palavra-passe</NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item onClick={logout} href="#">
+                            Sair
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    </>
                 }
                 
             </Container>

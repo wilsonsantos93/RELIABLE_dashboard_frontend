@@ -22,9 +22,9 @@ import { addUserLocation } from '../../../store/user/user.action';
 import { setGeoJsonLayer } from '../../../store/refs/refs.action';
 import { selectSidebarRef } from '../../../store/refs/refs.selector';
 import { selectIsSidebarOpen, selectSelectedDateId, selectSelectedWeatherField, selectWeatherFields } from '../../../store/settings/settings.selector';
-import { selectComparedFeatures, selectSelectedFeature } from '../../../store/map/map.selector';
+import { selectComparedFeatures, selectGeoJsonData, selectNextLayer, selectSelectedFeature } from '../../../store/map/map.selector';
 import { changeLoading } from '../../../store/settings/settings.action';
-import { addFeatureToComparedFeatures, removeFromComparedFeatures, selectFeature, updateComparedFeatures } from '../../../store/map/map.action';
+import { addFeatureToComparedFeatures, getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -62,9 +62,9 @@ const sleep = (ms: number) => {
 
 const GeoJsonLayer = (props: any) => {
     const geoJsonLayerRef = useRef<GJSON>();
-    const [geoJSON, setGeoJSON] = useState<GeoJsonObject | null>(null);
+    const [geoJsonData, setGeoJsonData] = useState<GeoJsonObject | null>(null);
     const [previousLayer, setPreviousLayer] = useState<any>(null);
-    const map = useMap();
+    //const map = useMap();
 
     /* const weatherFields = WeatherPanelStore(state => state.weatherFields);
     const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
@@ -96,6 +96,7 @@ const GeoJsonLayer = (props: any) => {
     const isLoggedIn = useSelector(selectUserIsLoggedIn);
     const comparedFeatures = useSelector(selectComparedFeatures);
     const selectedFeature = useSelector(selectSelectedFeature);
+    const nextLayer = useSelector(selectNextLayer);
 
     const dispatch = useDispatch<any>();
 
@@ -149,10 +150,10 @@ const GeoJsonLayer = (props: any) => {
     const getColor = (value: number) => {
         const field = weatherFields.find((field:any) => field.name === selectedWeatherField.name);
         if (field) {
-            for (let r of field.colours) {
+            for (let r of field.ranges) {
                 const min = r.min != null ? r.min : -Infinity; 
                 const max = r.max != null ? r.max : Infinity;
-                if (min <= value && value < max) return r.colour
+                if (min <= value && value < max) return r.color
             }
         }
         return "#808080";
@@ -195,13 +196,34 @@ const GeoJsonLayer = (props: any) => {
         (async () => {
             if (selectedDateId) {
                 //setLoading(true);
-                dispatch(changeLoading(true));
+                /* dispatch(changeLoading(true));
                 const data = await fetchWeatherGeoJSON(selectedDateId);
-                setGeoJSON(data);
-                if (geoJsonLayerRef.current) {
-                    geoJsonLayerRef.current.clearLayers().addData(data);
-                }
-                dispatch(changeLoading(false));
+                setGeoJSON(data); */
+                dispatch(changeLoading(true));
+                dispatch(getGeoJsonData(selectedDateId)).then((data: GeoJsonObject) => {
+                    setGeoJsonData(data);
+                    if (geoJsonLayerRef.current) {
+                        geoJsonLayerRef.current.clearLayers().addData(data);
+                        //update comparedFeatures
+                        if (comparedFeatures.length) {
+                            const updatedFeatures = []
+                            for (const f of comparedFeatures) {
+                                const layer = geoJsonLayerRef.current.getLayer(f._id) as CustomLayer;
+                                if (!layer) continue;
+                                const feature = { ...f, weather: layer?.feature?.weather }
+                                updatedFeatures.push(feature);
+                            }
+                            if (updatedFeatures.length) dispatch(updateComparedFeatures(updatedFeatures));
+                        }
+
+                        if (nextLayer) {
+                            const layer = geoJsonLayerRef.current.getLayer(nextLayer);
+                            layer?.fire("click");
+                            dispatch(updateNextLayer(null));
+                        }
+                    }
+                    dispatch(changeLoading(false));
+                }).catch(() => dispatch(changeLoading(false)));
             }
         })()
     }, [selectedDateId]);
@@ -211,10 +233,6 @@ const GeoJsonLayer = (props: any) => {
         const layer = getLayer(selectedFeature._id);
         layer?.setPopupContent(updatePopupContent(layer));
     }, [selectedWeatherField]);
-
-    /* useEffect(() => {
-        if (geoJSON) dispatch(changeLoading(false));//setLoading(false);
-    }, [geoJSON]) */
 
 
     useEffect(() => {
@@ -288,8 +306,8 @@ const GeoJsonLayer = (props: any) => {
         div.innerHTML = `
             <div style="margin-bottom:2px">
                 <strong>${layer.feature.properties.Concelho}</strong><br>
-                <span>${selectedWeatherField?.displayName}:</span>
-                <span>${selectedWeatherField && layer.feature.weather ? layer.feature.weather[selectedWeatherField.name] : ''} ${selectedWeatherField.unit}</span>
+                <span>${selectedWeatherField ? selectedWeatherField.displayName+':' : ''}</span>
+                <span>${selectedWeatherField && layer.feature.weather ? layer.feature.weather[selectedWeatherField.name] : ''} ${selectedWeatherField ? selectedWeatherField.unit : ''}</span>
             </div>
         `;
 
@@ -395,6 +413,7 @@ const GeoJsonLayer = (props: any) => {
         if (!event.target) {
             return;
         }
+
     
         let feature = { ...event.target.feature, markers: event.target.markers, marker: event.marker || { _id: null }, markerRef: event.markerRef };
         clickedFeatureId = feature._id;
@@ -410,9 +429,15 @@ const GeoJsonLayer = (props: any) => {
         const obj = { _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef };
         dispatch(selectFeature(obj));
 
-        if (!existsInComparedFeatures(_id)) {
+        const table = document.querySelector(".featuresTable > div");
+        if (!existsInComparedFeatures(_id) && feature.weather) {
             //setComparedFeatures([feature, ...comparedFeatures]);
             dispatch(addFeatureToComparedFeatures(comparedFeatures, feature));
+            if (table) table.scrollTop = 0;
+        } else {
+            const el = document.querySelector(`div#row-${event.target.feature._id}`);
+            const topPos = (el as HTMLElement).offsetTop;
+            if (table) table.scrollTop = topPos - 35;
         }
 
        /*  if (sidebar && !isTabOpen && !window.mobileCheck()) {
@@ -422,6 +447,7 @@ const GeoJsonLayer = (props: any) => {
         if (sidebarRef?.current && !isSidebarOpen && !window.mobileCheck()) {
             sidebarRef.current.open("tab1");
         }
+
 
         /* const offset = map.getSize().x * 0.25;
         const coordinates = layer.getPopup()?.getLatLng();
@@ -495,19 +521,11 @@ const GeoJsonLayer = (props: any) => {
                
                 const e = event as any;
                   
-                if (!e.markerRef) layer.openPopup(e.latlng);
+                if (!e.markerRef) { console.log("OPENING POPUP"); layer.openPopup(e.latlng); }
                 else {
                     e.markerRef.openPopup();
                 }
 
-                const el = document.querySelector(`div#row-${event.target.feature._id}`);
-                const table = document.querySelector(".featuresTable > div");
-                if (el && table) {
-                    const topPos = (el as HTMLElement).offsetTop;
-                    table.scrollTop = topPos - 35;
-
-                }
-               
                 //setMarkerPosition(event.latlng);
                 //zoomToFeature(event);
                 /* const row = document.getElementById("row_"+event.target.feature._id);  
@@ -519,11 +537,13 @@ const GeoJsonLayer = (props: any) => {
         layer.markers = [];
     }
 
+    console.log("rerender")
+
     return (
         <LayerGroup>
             <GeoJSON
                 ref={geoJsonLayerRef}
-                data={geoJSON as GeoJsonObject}
+                data={geoJsonData as GeoJsonObject}
                 onEachFeature={(feature, layer:CustomLayer) => onEachFeature(feature, layer, props.mapRef.current)}
                 // @ts-ignore
                 style={getStyle}

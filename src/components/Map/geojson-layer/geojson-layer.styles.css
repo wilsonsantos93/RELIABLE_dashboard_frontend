@@ -1,3 +1,7 @@
 .cursorMarker {
     cursor: url("leaflet/dist/images/marker-icon.png"), auto;
 }
+
+.leaflet-popup-content {
+    text-align: center;
+}

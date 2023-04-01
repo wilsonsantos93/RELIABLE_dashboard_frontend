@@ -18,3 +18,18 @@ export const selectHoveredFeature = createSelector(
     [selectMapReducer],
     (mapSlice: MapState) => mapSlice.hoveredFeature
 )
+
+export const selectGeoJsonData = createSelector(
+    [selectMapReducer],
+    (mapSlice: MapState) => mapSlice.geoJsonData
+)
+
+export const selectWeatherAlerts = createSelector(
+    [selectMapReducer],
+    (mapSlice: MapState) => mapSlice.weatherAlerts
+)
+
+export const selectNextLayer = createSelector(
+    [selectMapReducer],
+    (mapSlice: MapState) => mapSlice.nextLayer
+)
