@@ -1,0 +1,21 @@
+.alerts-dropdown {
+    max-height: 70vh;
+    max-width: 65vw;
+    width: 60vw;
+    overflow-y: auto;
+}
+
+.alerts-dropdown .alerts-item {
+    word-wrap: break-word;
+    white-space: pre-wrap; /* CSS3 */    
+    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space: -pre-wrap; /* Opera 4-6 */    
+    white-space: -o-pre-wrap; /* Opera 7 */    
+}
+
+@media (min-width: 768px)  {
+    .alerts-dropdown {
+        max-width: 45vw;
+        width: 45vw;
+    }
+}

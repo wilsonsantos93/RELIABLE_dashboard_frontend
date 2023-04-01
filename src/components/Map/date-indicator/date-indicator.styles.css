@@ -1,0 +1,9 @@
+.date-indicator { 
+    position: absolute;
+    background-color: #333;
+    opacity: 0.7;
+    color: white; 
+    margin-left: 10px; 
+    top: 10px; 
+    z-index: 999;
+}
