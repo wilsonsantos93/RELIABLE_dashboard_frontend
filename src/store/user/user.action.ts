@@ -1,6 +1,5 @@
 import authHeader from "../../utils/reducer/authHeader.utils";
 import { createAction, withMatcher, Action, ActionWithPayload } from "../../utils/reducer/reducer.utils";
-import { getWeatherAlerts } from "../map/map.action";
 import { showErrorMsg, showSuccessMsg } from "../settings/settings.action";
 import { AppThunk } from "../store";
 import { USER_ACTION_TYPES } from "./user.types";
@@ -36,6 +35,13 @@ export const signOutFailed = withMatcher(
     (error: Error) => createAction(USER_ACTION_TYPES.SIGN_OUT_FAILED, error)
 )
 
+export const signOut = (): AppThunk => {
+    return async (dispatch) => {
+        dispatch(setWeatherAlerts([]));
+        dispatch(signOutSuccess());
+    }
+}
+
 export const loginUser = (credentials: any): AppThunk => {
     return async (dispatch) => {
         try {
@@ -51,6 +57,7 @@ export const loginUser = (credentials: any): AppThunk => {
             }
         
             const user = await response.json();
+
             dispatch(signInSuccess(user));
             dispatch(showSuccessMsg("Sessão iniciada!"));
             dispatch(getWeatherAlerts());
@@ -202,6 +209,30 @@ export const removeUserLocation = (userLocations: any[], id: string): AppThunk =
             dispatch(showSuccessMsg("Marcador removido com sucesso!"));
         } catch (error) {
             dispatch(setUserLocationsFailed(error as Error));
+            dispatch(showErrorMsg(error as string));
+        }
+    }
+};
+
+// Fetch weather alerts for user
+export const setWeatherAlerts = withMatcher(
+    (data: any) => createAction(USER_ACTION_TYPES.SET_WEATHER_ALERTS, data)
+)
+
+export const getWeatherAlerts = (): AppThunk => {
+    return async (dispatch, getState) => {
+        try {
+            const token = getState().user.token;
+            const headers = token ? { "Authorization": `Bearer ${token}` } : authHeader();
+            const response = await fetch(`http://localhost:8000/api/user/alerts`, {
+                method: 'GET',
+                headers: headers
+            });
+            
+            if (!response?.ok) throw "Não foi possível obter os alertas";
+            const data = await response.json();
+            dispatch(setWeatherAlerts(data));
+        } catch (error) {
             dispatch(showErrorMsg(error as string));
         }
     }

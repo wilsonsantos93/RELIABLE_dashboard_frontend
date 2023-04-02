@@ -3,6 +3,7 @@
     max-width: 65vw;
     width: 60vw;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .alerts-dropdown .alerts-item {

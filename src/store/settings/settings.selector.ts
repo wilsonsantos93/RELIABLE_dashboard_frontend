@@ -58,3 +58,8 @@ export const selectSuccessMsg = createSelector(
     [selectSettingsReducer],
     (settingsSlice: SettingsState) => settingsSlice.success
 )
+
+export const selectRegionNamePath = createSelector(
+    [selectSettingsReducer],
+    (settingsSlice: SettingsState) => settingsSlice.regionNamePath
+)

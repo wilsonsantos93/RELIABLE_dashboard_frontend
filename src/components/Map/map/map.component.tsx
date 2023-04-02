@@ -6,13 +6,13 @@ import { Map as LeafletMap } from "leaflet";
 /* import HoveredFeaturePanel from "../HoveredFeaturePanel"; */
 import GeoJsonLayer from "../geojson-layer/geojson-layer.component";
 import Sidebar from '../../WeatherPanel/sidebar/sidebar.component';
-import LeafletGeoSearch from '../LeafletGeoSearch';
+import LeafletGeoSearch from '../geosearch/leaflet-geosearch.component';
 import "leaflet-fullscreen";
 import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 import MapLegend from '../map-legend/map-legend.component';
 import WeatherPanelStore from '../../../stores/WeatherPanelStore';
 import "leaflet-area-select";
-import AreaSelect from "../AreaSelect";
+import AreaSelect from "../area-select/area-select.component";
 import Control from 'react-leaflet-custom-control'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faObjectGroup } from '@fortawesome/free-solid-svg-icons'

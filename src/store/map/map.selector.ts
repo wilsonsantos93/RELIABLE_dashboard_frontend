@@ -24,11 +24,6 @@ export const selectGeoJsonData = createSelector(
     (mapSlice: MapState) => mapSlice.geoJsonData
 )
 
-export const selectWeatherAlerts = createSelector(
-    [selectMapReducer],
-    (mapSlice: MapState) => mapSlice.weatherAlerts
-)
-
 export const selectNextLayer = createSelector(
     [selectMapReducer],
     (mapSlice: MapState) => mapSlice.nextLayer

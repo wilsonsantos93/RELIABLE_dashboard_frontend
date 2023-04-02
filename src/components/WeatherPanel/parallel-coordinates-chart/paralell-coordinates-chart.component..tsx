@@ -7,9 +7,10 @@ import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 import HC_exporting from 'highcharts/modules/exporting'
 import { useDispatch, useSelector } from "react-redux";
-import { selectIsSidebarOpen, selectWeatherFields } from "../../../store/settings/settings.selector";
+import { selectIsSidebarOpen, selectRegionNamePath, selectWeatherFields } from "../../../store/settings/settings.selector";
 import { selectComparedFeatures, selectSelectedFeature } from "../../../store/map/map.selector";
 import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
+import { getObjectValue } from "../../../utils/reducer/getObjectValue.utils";
 HighchartsParallelCoordinates(Highcharts);
 HC_exporting(Highcharts);
 
@@ -96,6 +97,7 @@ const ParallelCoordinatesChart = () => {
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
     const selectedFeature = useSelector(selectSelectedFeature);
     const isSidebarOpen = useSelector(selectIsSidebarOpen);
+    const regionNamePath = useSelector(selectRegionNamePath);
 
 
     useEffect(() => {
@@ -153,7 +155,7 @@ const ParallelCoordinatesChart = () => {
             const data = weatherFields.map(field => feature.weather ? feature.weather[field.name] : null);
             const name =/*  feature.markers?.length ? 
             `${feature.properties.Concelho} (${feature.markers.map((m:any) => m.name).join()})` : */
-            feature.properties.Concelho;
+            getObjectValue(regionNamePath, feature);
 
             return {
                 featureId: feature._id,

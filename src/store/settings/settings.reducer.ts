@@ -1,4 +1,4 @@
-import { setSelectAreaMode, setSelectedWeatherField, fetchWeatherFieldsSuccess, fetchWeatherFieldsFailed, setSelectedDateId, fetchWeatherDatesFailed, fetchWeatherDatesSuccess, setLoading, setIsSidebarOpen, setSuccessMsg, setErrorMsg, setInfoMsg } from "./settings.action";
+import { setSelectAreaMode, setSelectedWeatherField, fetchWeatherFieldsSuccess, fetchWeatherFieldsFailed, setSelectedDateId, fetchWeatherDatesFailed, fetchWeatherDatesSuccess, setLoading, setIsSidebarOpen, setSuccessMsg, setErrorMsg, setInfoMsg, setRegionNamePath } from "./settings.action";
 import { AnyAction } from "redux";
 
 export type SettingsState = {
@@ -11,7 +11,8 @@ export type SettingsState = {
   readonly loading: boolean,
   readonly error: string | null,
   readonly success: string | null,
-  readonly info: string | null
+  readonly info: string | null,
+  readonly regionNamePath: string
 }
 
 const INITIAL_STATE: SettingsState = {
@@ -25,6 +26,7 @@ const INITIAL_STATE: SettingsState = {
     error: null,
     success: null,
     info: null,
+    regionNamePath: ''
 };
 
 export const settingsReducer = (state = INITIAL_STATE, action: AnyAction): SettingsState => {
@@ -109,6 +111,13 @@ export const settingsReducer = (state = INITIAL_STATE, action: AnyAction): Setti
       ...state,
       success: action.payload,
     }; 
+  }
+
+  if (setRegionNamePath.match(action)) {
+    return {
+      ...state,
+      regionNamePath: action.payload
+    }
   }
 
   return state

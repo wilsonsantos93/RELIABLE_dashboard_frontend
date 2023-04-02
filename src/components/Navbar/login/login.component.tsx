@@ -7,28 +7,6 @@ import { loginUser } from '../../../store/user/user.action';
 import UserStore from '../../../stores/UserStore';
 import "./login.styles.css";
 
-const loginUserX = async (credentials: any) => {
-    try {
-        const response = await fetch('http://localhost:8000/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(credentials)
-        });
-       
-        if (!response?.ok) {
-            if (response.status == 401) throw "Credenciais incorretas.";
-            if (response.status > 401) throw "Ocorreu um erro.";
-        }
-    
-        const user = await response.json();
-        return user;
-    } catch (e) {
-        throw e;
-    }
-}
-
 const Login = ({ show, handleClose }: any) => {
     const [email, setEmail] = useState<string>();
     const [password, setPassword] = useState<string>();

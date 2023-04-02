@@ -1,14 +1,16 @@
 import { ListGroup } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { selectSelectedFeature } from "../../../store/map/map.selector";
-import { selectWeatherFields } from "../../../store/settings/settings.selector";
+import { selectRegionNamePath, selectWeatherFields } from "../../../store/settings/settings.selector";
 /* import HoveredFeatureStore from "../../../stores/HoveredFeatureStore"; */
 import "./recommendations.styles.css";
+import { getObjectValue } from "../../../utils/reducer/getObjectValue.utils";
 
 const Recommendations = () => {
     //const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
     const selectedFeature = useSelector(selectSelectedFeature);
     const weatherFields = useSelector(selectWeatherFields);
+    const regionNamePath = useSelector(selectRegionNamePath);
 
     const getRecommendations = () => {
         if (!selectedFeature || !selectedFeature.weather) return null;
@@ -35,7 +37,9 @@ const Recommendations = () => {
             <h6><strong>Recomendações</strong>
             { 
                 selectedFeature ? 
-                (!selectedFeature.markerName ? ` ${selectedFeature.properties.Concelho}` : ` ${selectedFeature.markerName} (${selectedFeature?.properties.Concelho})`) :
+                /* (!selectedFeature.markerName ? ` ${selectedFeature.properties.Concelho}` : ` ${selectedFeature.markerName} (${selectedFeature?.properties.Concelho})`) */ 
+                getObjectValue(regionNamePath, selectedFeature)
+                :
                 null
             }
             </h6>

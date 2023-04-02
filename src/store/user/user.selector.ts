@@ -23,3 +23,8 @@ export const selectUserIsLoggedIn = createSelector(
     [selectUserToken],
     (token) => !!token
 ) 
+
+export const selectWeatherAlerts = createSelector(
+    [selectUserReducer],
+    (userSlice: UserState) => userSlice.weatherAlerts
+)

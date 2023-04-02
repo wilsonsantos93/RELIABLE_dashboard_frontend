@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setInfoMsg } from "../../../store/settings/settings.action";
-import { signOutSuccess } from "../../../store/user/user.action";
+import { signOut, signOutSuccess } from "../../../store/user/user.action";
 import { selectUser, selectUserIsLoggedIn } from "../../../store/user/user.selector";
 import UserStore from "../../../stores/UserStore";
 import ChangePassword from "../change-password/change-password.component";
@@ -62,7 +62,7 @@ const NavigationBar = () => {
     const logout = () => {
        /*  setUser(null);
         setToken(null); */
-        dispatch(signOutSuccess());
+        dispatch(signOut());
         dispatch(setInfoMsg("Sessão terminada."));
     }
 

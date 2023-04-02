@@ -10,9 +10,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectAreaMode, selectErrorMsg, selectInfoMsg, selectIsSidebarOpen, selectLoading, selectSuccessMsg } from '../store/settings/settings.selector';
 import { useEffect } from 'react';
 import fetchIntercept from 'fetch-intercept';
-import { signOutSuccess } from '../store/user/user.action';
-import { showErrorMsg, showInfoMsg, showSuccessMsg } from '../store/settings/settings.action';
-import { getWeatherAlerts, selectFeature } from '../store/map/map.action';
+import { getWeatherAlerts, signOut } from '../store/user/user.action';
+import { getRegionPathName, showErrorMsg, showInfoMsg, showSuccessMsg } from '../store/settings/settings.action';
+import { selectFeature } from '../store/map/map.action';
 import { selectSidebarRef } from '../store/refs/refs.selector';
 import { selectUserIsLoggedIn } from '../store/user/user.selector';
 
@@ -36,7 +36,7 @@ function App(): JSX.Element {
         const unregister = fetchIntercept.register({
             response: function (response) {
                 if (!response.ok && response.status === 401) {
-                    dispatch(signOutSuccess());
+                    dispatch(signOut());
                     dispatch(showInfoMsg("Sessão expirada. Entre novamente."));
                     dispatch(selectFeature(null));
                     sidebarRef?.current.close();
@@ -48,6 +48,7 @@ function App(): JSX.Element {
     }, [sidebarRef])
 
     useEffect(() => {
+        dispatch(getRegionPathName());
         if (isLoggedIn) dispatch(getWeatherAlerts());
     }, [])
 

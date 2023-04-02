@@ -1,4 +1,4 @@
-import { setComparedFeatures, setGeoJsonData, setHoveredFeature, setNextLayer, setSelectedFeature, setWeatherAlerts } from "./map.action";
+import { setComparedFeatures, setGeoJsonData, setHoveredFeature, setNextLayer, setSelectedFeature } from "./map.action";
 import { AnyAction } from "redux";
 
 export type MapState = {
@@ -6,7 +6,6 @@ export type MapState = {
   readonly selectedFeature: any;
   readonly hoveredFeature: any;
   readonly geoJsonData: any;
-  readonly weatherAlerts: any[];
   readonly nextLayer: any;
 }
 
@@ -15,7 +14,6 @@ const INITIAL_STATE: MapState = {
   selectedFeature: null,
   hoveredFeature: null,
   geoJsonData: null,
-  weatherAlerts: [],
   nextLayer: null
 };
 
@@ -46,13 +44,6 @@ export const mapReducer = (state = INITIAL_STATE, action: AnyAction): MapState =
     return {
       ...state,
       geoJsonData: action.payload
-    }; 
-  }
-
-  if (setWeatherAlerts.match(action)) {
-    return {
-      ...state,
-      weatherAlerts: action.payload
     }; 
   }
 

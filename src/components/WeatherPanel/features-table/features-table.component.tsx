@@ -11,7 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectComparedFeatures, selectSelectedFeature } from "../../../store/map/map.selector";
 import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
 import { selectFeature, setSelectedFeature, updateComparedFeatures } from "../../../store/map/map.action";
-import { selectWeatherFields } from "../../../store/settings/settings.selector";
+import { selectRegionNamePath, selectWeatherFields } from "../../../store/settings/settings.selector";
+import { getObjectValue } from "../../../utils/reducer/getObjectValue.utils";
 
 const FeaturesTable = () => {
     ////console.time("component")
@@ -28,6 +29,7 @@ const FeaturesTable = () => {
     const comparedFeatures = useSelector(selectComparedFeatures);
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
     const selectedFeature = useSelector(selectSelectedFeature);
+    const regionNamePath = useSelector(selectRegionNamePath);
     
     const hoverFeature = (featureId: string) => {
         if (!geoJsonLayerRef) return;
@@ -92,7 +94,7 @@ const FeaturesTable = () => {
     let columns = [
         {
             name: 'Local',
-            selector: (row: any) => row.Concelho,
+            selector: (row: any) => row.local,
             sortable: true
         }
     ];
@@ -111,20 +113,18 @@ const FeaturesTable = () => {
     });
 
     columns = [...columns, ...weatherColumns];
-    //console.timeEnd("table columns")
 
-    //console.time("table data")
+
     const data = useMemo(() => {
         /* const data = */ return comparedFeatures.map((feature:any) => {
             //const name = <span>{feature.markers && feature.markers.map((m:any)=> <FontAwesomeIcon title={m.name} icon={faLocationDot} /> )} {feature.properties.Concelho}</span>;
             return {
                 id: feature._id,
-                Concelho: feature.properties.Concelho,
+                local: getObjectValue(regionNamePath, feature),
                 ...feature.weather
             }
         });
     }, [comparedFeatures])
-    //console.timeEnd("table data")
 
     const conditionalRowStyles = [
         {
@@ -138,13 +138,10 @@ const FeaturesTable = () => {
     ];
 
     useEffect(() => {
-        //console.time("use effect compared features")
         if (!comparedFeatures.length) {
             setSelectedRows([]);
             setToggleCleared(!toggleCleared);
         }
-        //console.timeEnd("use effect compared features")
-
     }, [comparedFeatures]);
 
     const [selectedRows, setSelectedRows] = useState<any>([]);
@@ -154,7 +151,6 @@ const FeaturesTable = () => {
 		setSelectedRows(state.selectedRows);
 	}, []);
 
-    //console.time("get difference")
     const getDifference = (array1: any[], array2: any[]) => {
         return array1.filter(object1 => {
           return !array2.some(object2 => {

@@ -21,10 +21,11 @@ import { selectUserIsLoggedIn, selectUserLocations } from '../../../store/user/u
 import { addUserLocation } from '../../../store/user/user.action';
 import { setGeoJsonLayer } from '../../../store/refs/refs.action';
 import { selectSidebarRef } from '../../../store/refs/refs.selector';
-import { selectIsSidebarOpen, selectSelectedDateId, selectSelectedWeatherField, selectWeatherFields } from '../../../store/settings/settings.selector';
+import { selectIsSidebarOpen, selectRegionNamePath, selectSelectedDateId, selectSelectedWeatherField, selectWeatherFields } from '../../../store/settings/settings.selector';
 import { selectComparedFeatures, selectGeoJsonData, selectNextLayer, selectSelectedFeature } from '../../../store/map/map.selector';
 import { changeLoading } from '../../../store/settings/settings.action';
 import { addFeatureToComparedFeatures, getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
+import { getObjectValue } from '../../../utils/reducer/getObjectValue.utils';
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -97,6 +98,7 @@ const GeoJsonLayer = (props: any) => {
     const comparedFeatures = useSelector(selectComparedFeatures);
     const selectedFeature = useSelector(selectSelectedFeature);
     const nextLayer = useSelector(selectNextLayer);
+    const regionNamePath = useSelector(selectRegionNamePath);
 
     const dispatch = useDispatch<any>();
 
@@ -305,7 +307,7 @@ const GeoJsonLayer = (props: any) => {
         const div = document.createElement("div");
         div.innerHTML = `
             <div style="margin-bottom:2px">
-                <strong>${layer.feature.properties.Concelho}</strong><br>
+                <strong>${getObjectValue(regionNamePath, layer.feature)}</strong><br>
                 <span>${selectedWeatherField ? selectedWeatherField.displayName+':' : ''}</span>
                 <span>${selectedWeatherField && layer.feature.weather ? layer.feature.weather[selectedWeatherField.name] : ''} ${selectedWeatherField ? selectedWeatherField.unit : ''}</span>
             </div>
@@ -399,6 +401,8 @@ const GeoJsonLayer = (props: any) => {
     // Highlights a feature of the map when hovered over.
     const highlightFeature = (layer: any) => {
         if (!layer) return;
+        if (layer.getPopup().isOpen()) layer.closeTooltip();
+        layer.setTooltipContent(getObjectValue(regionNamePath, layer.feature))
         const isComparedFeature = existsInComparedFeatures(layer.feature._id);
         if (isComparedFeature/*  && comparisonMode */){
             setLayerStyle(layer, layerRedHighlightedStyle);
@@ -492,11 +496,13 @@ const GeoJsonLayer = (props: any) => {
      * The events associated with each feature
      */
     const onEachFeature = (feature: any, layer: CustomLayer, map: LeafletMap | null) => {
-        layer.bindPopup(`<strong>${feature.properties.Concelho}</strong><br/>`);
+        layer.bindPopup(`<strong>${getObjectValue(regionNamePath, feature)}</strong><br/>`);
         
-        layer.getPopup()?.on('remove', (e) => {   
+        layer.getPopup()?.on('remove', () => {   
             newClearFeature();
         })
+
+        if (!window.mobileCheck()) layer.bindTooltip(getObjectValue(regionNamePath, feature))
 
         /* layer.getPopup()?.on('add', (e) => {   
             const popupCloseBtn = document.querySelector(".leaflet-popup-close-button")
@@ -517,14 +523,13 @@ const GeoJsonLayer = (props: any) => {
             click: (event) => {
                 newSetClickedFeatureId(event as LeafletMouseEvent & {marker: any, markerRef: any; }, layer);
                 layer.setPopupContent(newUpdatePopupContent(layer, event));
+                layer.closeTooltip();
                 setLayerStyle(layer, layerRedHighlightedStyle);
                
                 const e = event as any;
                   
-                if (!e.markerRef) { console.log("OPENING POPUP"); layer.openPopup(e.latlng); }
-                else {
-                    e.markerRef.openPopup();
-                }
+                if (!e.markerRef) layer.openPopup(e.latlng);
+                else e.markerRef.openPopup();
 
                 //setMarkerPosition(event.latlng);
                 //zoomToFeature(event);
@@ -536,8 +541,6 @@ const GeoJsonLayer = (props: any) => {
         layer._leaflet_id = feature._id;
         layer.markers = [];
     }
-
-    console.log("rerender")
 
     return (
         <LayerGroup>

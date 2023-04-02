@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { setDateId } from "../../../store/settings/settings.action";
-import { selectWeatherAlerts } from "../../../store/map/map.selector";
+import { selectWeatherAlerts } from "../../../store/user/user.selector";
 import "./weather-alerts.styles.css";
 import { selectMainWeatherField, selectSelectedDateId } from "../../../store/settings/settings.selector";
 import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
@@ -55,18 +55,22 @@ const WeatherAlerts = () => {
         </Dropdown.Toggle>
 
         <Dropdown.Menu className="alerts-dropdown" align="end">
-        <div style={{textAlign: 'center'}}><span>Alertas para os próximos {weatherAlerts.numDaysAhead} dias:</span></div>
+        <div style={{textAlign: 'center'}}>
         { 
-        weatherAlerts && weatherAlerts.alerts && weatherAlerts.alerts.length ? weatherAlerts.alerts.map((a:any, i:any) => 
-            <div key={`alert_divider_${i}`}>
-            <Dropdown.Divider />
-            <Dropdown.Item className="alerts-item" style={{ marginLeft: '5px', borderLeft: `5px solid ${getAlertColor(a.weather[mainWeatherField?.name])}`}} onClick={() => onAlertClick(a.date[0]._id, a.regionBorderFeatureObjectId)} key={`alert_${i}`} href="#">
-                <strong>{a.regionName}</strong> com {mainWeatherField?.displayName} de <strong>{a.weather[mainWeatherField?.name]}</strong> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)} {/* {dayjs(a.date[0].date).tz(tz).from(dayjs(), true)} */}
-            </Dropdown.Item>
+          (weatherAlerts && weatherAlerts.alerts && weatherAlerts.alerts.length) ? <>
+          <span>Alertas para os próximos {weatherAlerts.numDaysAhead} dias:</span>
+          {weatherAlerts.alerts.map((a:any, i:any) => 
+            <div style={{textAlign: 'left'}} key={`alert_divider_${i}`}>
+              <Dropdown.Divider />
+              <Dropdown.Item className="alerts-item" style={{ marginLeft: '5px', borderLeft: `5px solid ${getAlertColor(a.weather[mainWeatherField?.name])}`}} onClick={() => onAlertClick(a.date[0]._id, a.regionBorderFeatureObjectId)} key={`alert_${i}`} href="#">
+                  <strong>{a.regionName}</strong> com {mainWeatherField?.displayName} de <strong>{a.weather[mainWeatherField?.name]}</strong> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)} {/* {dayjs(a.date[0].date).tz(tz).from(dayjs(), true)} */}
+              </Dropdown.Item>
             </div>
-          ) :
+          )} </>
+          :
           <span>Não há alertas para os próximos dias.</span>
         }
+        </div>
         </Dropdown.Menu>
       </Dropdown>
     </>
