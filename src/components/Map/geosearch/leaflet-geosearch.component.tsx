@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import 'leaflet-geosearch/dist/geosearch.css';
 import L from 'leaflet';
-import WeatherPanelStore from '../../../stores/WeatherPanelStore';
 import { useSelector } from 'react-redux';
 import { selectGeoJsonLayerRef } from '../../../store/refs/refs.selector';
 declare function require(name:string):any;

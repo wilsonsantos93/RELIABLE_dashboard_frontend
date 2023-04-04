@@ -4,15 +4,11 @@ import { Icon, LatLng } from "leaflet";
 import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
-import UserMarkerStore from "../../../stores/UserMarkerStore";
 import "./user-marker.styles.css";
-import WeatherPanelStore from "../../../stores/WeatherPanelStore";
 import L from "leaflet";
-import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 import { faEdit, faEyeSlash, faTrash, faUpDownLeftRight } from "@fortawesome/free-solid-svg-icons";
-import UserStore from "../../../stores/UserStore";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUserLocation, updateUserLocation } from "../../../store/user/user.action";
 import { selectUserLocations } from "../../../store/user/user.selector";
@@ -20,7 +16,6 @@ import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
 import { selectSelectedWeatherField } from "../../../store/settings/settings.selector";
 import { selectComparedFeatures } from "../../../store/map/map.selector";
 import { removeFromComparedFeatures, selectFeature } from "../../../store/map/map.action";
-import { setErrorMsg, setSuccessMsg } from "../../../store/settings/settings.action";
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -48,14 +43,6 @@ const UserMarker = (props: any) => {
     const selectedWeatherField = useSelector(selectSelectedWeatherField);
     const comparedFeatures = useSelector(selectComparedFeatures);
 
-   /*  const removeUserMarker = UserStore(state => state.removeUserMarker);
-    const updateUserMarker = UserStore(state => state.updateUserMarker); 
-    const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
-    const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
-    const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
-    const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
-    const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);*/
-
     const findLayerByLatLng = (latlngPoint: LatLng) => {
         const { lat, lng } = latlngPoint;
         const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef?.current, true);
@@ -76,7 +63,6 @@ const UserMarker = (props: any) => {
                 marker: props.data || { _id: null }, 
                 markerRef: markerRef.current
             }
-            //setFeatureProperties(feature)
             dispatch(selectFeature(feature));
         });
     }
@@ -86,7 +72,6 @@ const UserMarker = (props: any) => {
             async dragend() {
                 const marker: any = markerRef.current;
                 if (marker != null) {
-                    //await updateUserMarker(props.data._id, undefined, marker.getLatLng());
                     const loc = { _id: props.data._id, name: props.data.name, position: marker.getLatLng() };
                     dispatch(updateUserLocation(userLocations, loc)).then(() => {
                         toggleDraggable();
@@ -102,7 +87,6 @@ const UserMarker = (props: any) => {
                 const marker: any = markerRef.current;
                 if (marker == null) return;
                 const { lat, lng } = marker.getLatLng();
-                //const { lat, lng } = props.data.position;
                 const latlngPoint = new L.LatLng(lat, lng);
                 findLayerByLatLng(latlngPoint);
             },
@@ -110,26 +94,10 @@ const UserMarker = (props: any) => {
         [geoJsonLayerRef, comparedFeatures]
     );
 
-    /* useEffect(() => {
-        if (!geoJsonLayerRef) return;
-        const latlngPoint = new L.LatLng(props.data.lat, props.data.lng);
-        const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef.current, true);
-        results.forEach((layer: any) => {
-            setLayer(layer);
-            const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
-            console.log("Found layer for marker");
-            l.markers.push(markerRef.current);
-        });
-    }, [geoJsonLayerRef]) */
+
     
     useEffect(() => {
         const marker: any = markerRef.current;
-        /* marker.feature = { 
-            type: 'Point', 
-            properties: { ...props.data }, 
-            geometry: undefined 
-        }; */
-        //marker._leaflet_id = props.data._id;
         marker.getPopup().on('remove', function() {
             setEditable(false);
         });
@@ -161,7 +129,6 @@ const UserMarker = (props: any) => {
     const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             const target = e.target as any;
-            //await updateUserMarker(props.data._id, target.value);
             dispatch(updateUserLocation(userLocations, { _id: props.data._id, name: target.value, position: props.data.position }));
             toggleEditable();
         }
@@ -171,32 +138,18 @@ const UserMarker = (props: any) => {
         if (!geoJsonLayerRef) return;
         const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
         if (!l) return;
-        //l.markers = l.markers.filter((m:any) => m._id != props.data._id)
-        //removeUserMarker(props.data._id);
         dispatch(removeUserLocation(userLocations, props.data._id));
-        //onRemoveFeature();
-
-/*         // update comparedFeatures list
-        console.log("UPDATED MARKERS", l.markers);
-        const compFeatures = [...comparedFeatures];
-        const ix = compFeatures.findIndex((f:any) => f._id == layer.feature._id)
-        compFeatures[ix].markers = l.markers;
-        console.log(compFeatures[ix]);
-        setComparedFeatures(compFeatures); */
     }
 
     const onRemoveFeature = () => {
         if (!layer || !geoJsonLayerRef) return;
-        /* const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
-        setComparedFeatures(filteredFeatures); */
-        dispatch(removeFromComparedFeatures(comparedFeatures, layer.feature._id));
 
+        dispatch(removeFromComparedFeatures(comparedFeatures, layer.feature._id));
         const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
         l.closePopup();
         const marker: any = markerRef.current;
         marker.closePopup();
         dispatch(selectFeature(null));
-        //setFeatureProperties(null);
     }
   
     return (

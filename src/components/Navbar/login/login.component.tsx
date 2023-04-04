@@ -4,26 +4,25 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useDispatch } from 'react-redux';
 import { loginUser } from '../../../store/user/user.action';
-import UserStore from '../../../stores/UserStore';
 import "./login.styles.css";
 
-const Login = ({ show, handleClose }: any) => {
+type LoginProps = {
+    show: boolean,
+    handleClose: () => void
+}
+
+const Login = ({ show, handleClose }: LoginProps) => {
     const [email, setEmail] = useState<string>();
     const [password, setPassword] = useState<string>();
     const [error, setError] = useState<string>();
-    /* const setUser = UserStore(state => state.setUser);
-    const setToken = UserStore(state => state.setToken);
-    const setMarkers = UserStore(state => state.setMarkers); */
+
     const dispatch = useDispatch<any>();
 
     const handleSubmit = async (event: any) => {
         event.preventDefault();
         try {
+            if (!email || !password) throw "Campos em falta.";
             const credentials = { username: email, password };
-            /*const data = await loginUserX(credentials);
-             setUser(data.user);
-            setToken(data.jwt);
-            setMarkers(data.user.locations) */
             dispatch(loginUser(credentials)).then(() =>  { 
                 handleClose();
             })

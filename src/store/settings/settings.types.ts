@@ -13,3 +13,29 @@ export enum SETTINGS_ACTION_TYPES {
     SET_SUCCESS_MESSAGE = "settings/SET_SUCCESS_MESSAGE",
     SET_REGION_NAME_PATH = "settings/SET_REGION_NAME_PATH"
 };
+
+export type WeatherDate = {
+    _id: string,
+    date: string | Date,
+    format: string
+}
+
+export type WeatherField = {
+    _id: string,
+    name: string,
+    active: boolean,
+    main: boolean,
+    unit: string,
+    description: string,
+    displayName: string,
+    ranges: WeatherFieldRange[]
+
+}
+
+export type WeatherFieldRange = {
+    min: number,
+    max: number,
+    alert: boolean,
+    color: string,
+    recommendations: string[]
+}

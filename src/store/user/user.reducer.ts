@@ -1,12 +1,13 @@
 import { signInFailed, signInSuccess, signOutFailed, signUpFailed, signOutSuccess, setUserLocationsFailed, setUserLocationsSuccess, setWeatherAlerts } from "./user.action";
 import { AnyAction } from "redux";
+import { User, UserLocation, WeatherAlertObject } from "./user.types";
 
 export type UserState = {
-  readonly currentUser: any | null,
+  readonly currentUser: User | null,
   readonly token: string | null,
-  readonly locations: any[],
+  readonly locations: UserLocation[],
   readonly error: Error | null,
-  readonly weatherAlerts: any
+  readonly weatherAlerts: WeatherAlertObject | null
 }
 
 const INITIAL_STATE: UserState = {
@@ -18,7 +19,6 @@ const INITIAL_STATE: UserState = {
 };
 
 export const userReducer = (state = INITIAL_STATE, action: AnyAction): UserState => {
- /*  const { type, payload } = action; */
 
   if (signInSuccess.match(action)) {
     return {

@@ -21,7 +21,7 @@ export const selectWeatherFields = createSelector(
 
 export const selectMainWeatherField = createSelector(
     [selectWeatherFields],
-    (weatherFields: any[]) => weatherFields.find(f => f.main)
+    (weatherFields) => weatherFields.find(f => f.main)
 )
 
 export const selectSelectedDateId = createSelector(

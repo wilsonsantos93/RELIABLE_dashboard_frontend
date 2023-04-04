@@ -2,12 +2,8 @@ import authHeader from "../../utils/reducer/authHeader.utils";
 import { createAction, withMatcher, Action, ActionWithPayload } from "../../utils/reducer/reducer.utils";
 import { showErrorMsg, showSuccessMsg } from "../settings/settings.action";
 import { AppThunk } from "../store";
-import { USER_ACTION_TYPES } from "./user.types";
-
-export type EmailSignIn = {
-    email: string, 
-    password: string
-}
+import { ChangePassword, EmailSignIn, EmailSignUp, USER_ACTION_TYPES, UserLocation } from "./user.types";
+const base_url = process.env.REACT_APP_API_BASE_URL;
 
 export type SignInSuccess = ActionWithPayload<USER_ACTION_TYPES.SIGN_IN_SUCCESS, any>
 export type SignInFailed = ActionWithPayload<USER_ACTION_TYPES.SIGN_IN_FAILED, Error>
@@ -42,10 +38,10 @@ export const signOut = (): AppThunk => {
     }
 }
 
-export const loginUser = (credentials: any): AppThunk => {
+export const loginUser = (credentials: EmailSignIn): AppThunk => {
     return async (dispatch) => {
         try {
-            const response = await fetch('http://localhost:8000/api/login', {
+            const response = await fetch(`${base_url}/api/login`, {
                 method: 'POST',
                 headers: authHeader(),
                 body: JSON.stringify(credentials)
@@ -63,15 +59,16 @@ export const loginUser = (credentials: any): AppThunk => {
             dispatch(getWeatherAlerts());
         } catch (error) {
             dispatch(signInFailed(error as Error));
+            console.error(error);
             throw error;
         }
     }
 }
 
-export const signUpUser = (data: any): AppThunk => {
+export const signUpUser = (data: EmailSignUp): AppThunk => {
     return async (dispatch) => {
         try {
-            const response = await fetch('http://localhost:8000/api/register', {
+            const response = await fetch(`${base_url}/api/register`, {
                 method: 'POST',
                 headers: authHeader(),
                 body: JSON.stringify(data)
@@ -95,15 +92,16 @@ export const signUpUser = (data: any): AppThunk => {
             dispatch(showSuccessMsg("Utilizador registado com sucesso. Sessão iniciada."));
         } catch (error) {
             dispatch(signUpFailed(error as Error));
+            console.error(error);
             throw error;
         }
     }
 }
 
-export const changePassword = (data: any): AppThunk => {
+export const changePassword = (data: ChangePassword): AppThunk => {
     return async (dispatch) => {
         try {
-            const response = await fetch('http://localhost:8000/api/user/updatePassword', {
+            const response = await fetch(`${base_url}/api/user/updatePassword`, {
                 method: 'POST',
                 headers: authHeader(),
                 body: JSON.stringify(data)
@@ -131,6 +129,7 @@ export const changePassword = (data: any): AppThunk => {
     
             dispatch(showSuccessMsg("Palavra-passe alterada com sucesso!"));
         } catch (error) {
+            console.error(error);
             throw error;
         }
     }
@@ -146,12 +145,12 @@ export const setUserLocationsFailed = withMatcher(
 )
 
 
-export const addUserLocation = (userLocations: any[], position: any): AppThunk  => {
+export const addUserLocation = (userLocations: UserLocation[], position: { lat: number, lng: number }): AppThunk  => {
     return async (dispatch) => {
         try {
             if (!position) throw "Coordinates not specified";
 
-            const response = await fetch(`http://localhost:8000/api/user/location`, {
+            const response = await fetch(`${base_url}/api/user/location`, {
                 method: 'POST',
                 headers: authHeader(),
                 body: JSON.stringify({ name: null, position: position })
@@ -167,14 +166,15 @@ export const addUserLocation = (userLocations: any[], position: any): AppThunk  
         } catch (error) {
             dispatch(setUserLocationsFailed(error as Error));
             dispatch(showErrorMsg(error as string));
+            console.error(error);
         }
     }
 };
 
-export const updateUserLocation = (userLocations: any[], item: any): AppThunk => {
+export const updateUserLocation = (userLocations: UserLocation[], item: UserLocation): AppThunk => {
     return async (dispatch) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/user/location/${item._id}/update`, {
+            const response = await fetch(`${base_url}/api/user/location/${item._id}/update`, {
                 method: 'POST',
                 headers: authHeader(),
                 body: JSON.stringify(item)
@@ -190,14 +190,15 @@ export const updateUserLocation = (userLocations: any[], item: any): AppThunk =>
         } catch (error) {
             dispatch(setUserLocationsFailed(error as Error));
             dispatch(showErrorMsg(error as string));
+            console.error(error);
         }
     }
 };
   
-export const removeUserLocation = (userLocations: any[], id: string): AppThunk => {
+export const removeUserLocation = (userLocations: UserLocation[], id: string): AppThunk => {
     return async (dispatch) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/user/location/${id}/delete`, {
+            const response = await fetch(`${base_url}/api/user/location/${id}/delete`, {
                 method: 'POST',
                 headers: authHeader(),
             });
@@ -210,6 +211,7 @@ export const removeUserLocation = (userLocations: any[], id: string): AppThunk =
         } catch (error) {
             dispatch(setUserLocationsFailed(error as Error));
             dispatch(showErrorMsg(error as string));
+            console.error(error);
         }
     }
 };
@@ -224,7 +226,7 @@ export const getWeatherAlerts = (): AppThunk => {
         try {
             const token = getState().user.token;
             const headers = token ? { "Authorization": `Bearer ${token}` } : authHeader();
-            const response = await fetch(`http://localhost:8000/api/user/alerts`, {
+            const response = await fetch(`${base_url}/api/user/alerts`, {
                 method: 'GET',
                 headers: headers
             });
@@ -233,6 +235,7 @@ export const getWeatherAlerts = (): AppThunk => {
             const data = await response.json();
             dispatch(setWeatherAlerts(data));
         } catch (error) {
+            console.error(error);
             dispatch(showErrorMsg(error as string));
         }
     }

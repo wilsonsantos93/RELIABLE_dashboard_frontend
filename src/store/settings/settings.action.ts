@@ -4,7 +4,7 @@ import { AppThunk } from "../store";
 import { fetchWeatherFields } from "../../data/fetchWeatherFields";
 import { fetchWeatherDates } from "../../data/fetchWeatherDates";
 import authHeader from "../../utils/reducer/authHeader.utils";
-
+const base_url = process.env.REACT_APP_API_BASE_URL;
 
 // Set "Select Area" mode
 export const setSelectAreaMode = withMatcher(
@@ -41,7 +41,7 @@ export const getWeatherFields = (): AppThunk => {
             let data = await fetchWeatherFields();
             data = data.filter((d:any) => d.active);
             dispatch(fetchWeatherFieldsSuccess(data));
-            const mainField = data.find((f:any) => f.main == true);
+            const mainField = data.find((f:any) => f.main === true);
             if (mainField) dispatch(setWeatherField(mainField));
             else dispatch(setWeatherField(data[0]));
         } catch (error) {
@@ -136,12 +136,12 @@ export const showSuccessMsg = (msg: string | null) => {
 export const getRegionPathName = (): AppThunk => {
     return async (dispatch) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/metadata`, {
+            const response = await fetch(`${base_url}/api/metadata`, {
                 method: 'GET',
                 headers: authHeader(),
             });
 
-            if (!response.ok) throw "";
+            if (!response.ok) throw "Não foi possível obter os metadados.";
 
             const data = await response.json();
             const path = data.DB_REGION_NAME_FIELD;

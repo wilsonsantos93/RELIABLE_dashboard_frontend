@@ -23,17 +23,17 @@ const WeatherAlerts = () => {
 
     const dispatch = useDispatch<any>();
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
-    const weatherAlerts: any = useSelector(selectWeatherAlerts); 
-    const mainWeatherField: any = useSelector(selectMainWeatherField);
+    const weatherAlerts = useSelector(selectWeatherAlerts); 
+    const mainWeatherField = useSelector(selectMainWeatherField);
     const currentDateId = useSelector(selectSelectedDateId);
 
     const onAlertClick = (dateId: string, regionBorderFeatureObjectId: string) => {
-        const layer = geoJsonLayerRef?.current.getLayer(regionBorderFeatureObjectId);
-        if (dateId == currentDateId) layer.fire("click");
-        else { 
-            dispatch(setDateId(dateId));
-            dispatch(updateNextLayer(layer.feature._id));
-        }
+      const layer = geoJsonLayerRef?.current.getLayer(regionBorderFeatureObjectId);
+      if (dateId == currentDateId) layer.fire("click");
+      else { 
+          dispatch(setDateId(dateId));
+          dispatch(updateNextLayer(layer.feature._id));
+      }
     }
 
     const getAlertColor = (value: any) => {
@@ -57,13 +57,13 @@ const WeatherAlerts = () => {
         <Dropdown.Menu className="alerts-dropdown" align="end">
         <div style={{textAlign: 'center'}}>
         { 
-          (weatherAlerts && weatherAlerts.alerts && weatherAlerts.alerts.length) ? <>
+          (weatherAlerts && weatherAlerts.alerts && weatherAlerts.alerts.length && mainWeatherField) ? <>
           <span>Alertas para os próximos {weatherAlerts.numDaysAhead} dias:</span>
           {weatherAlerts.alerts.map((a:any, i:any) => 
             <div style={{textAlign: 'left'}} key={`alert_divider_${i}`}>
               <Dropdown.Divider />
               <Dropdown.Item className="alerts-item" style={{ marginLeft: '5px', borderLeft: `5px solid ${getAlertColor(a.weather[mainWeatherField?.name])}`}} onClick={() => onAlertClick(a.date[0]._id, a.regionBorderFeatureObjectId)} key={`alert_${i}`} href="#">
-                  <strong>{a.regionName}</strong> com {mainWeatherField?.displayName} de <strong>{a.weather[mainWeatherField?.name]}</strong> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)} {/* {dayjs(a.date[0].date).tz(tz).from(dayjs(), true)} */}
+                  <strong>{a.regionName}</strong> com {mainWeatherField?.displayName} de <strong>{a.weather[mainWeatherField?.name]}</strong> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)} 
               </Dropdown.Item>
             </div>
           )} </>

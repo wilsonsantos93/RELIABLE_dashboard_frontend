@@ -1,21 +1,20 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectSelectedWeatherField } from "../../../store/settings/settings.selector";
-/* import WeatherPanelStore from "../../../stores/WeatherPanelStore"; */
+import { WeatherFieldRange } from "../../../store/settings/settings.types";
 import "./map-legend.styles.css";
 
 const MapLegend = () => {
-    //const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
     const selectedWeatherField = useSelector(selectSelectedWeatherField);
-    const [data, setData] = useState([]);
+    const [data, setData] = useState<WeatherFieldRange[] | []>([]);
 
     useEffect(() => {
         if (!selectedWeatherField) {
             setData([]);
             return;
         }
-        const colors = selectedWeatherField.ranges.sort((a:any, b:any) => b.min - a.min);
-        setData(colors);
+        const ranges = selectedWeatherField.ranges.sort((a, b) => b.min - a.min);
+        setData(ranges);
     }, [selectedWeatherField])
 
     const POSITION_CLASSES = {

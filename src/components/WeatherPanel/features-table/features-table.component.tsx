@@ -1,10 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faLocationDot } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Button, Table } from "react-bootstrap";
-import { useMap } from "react-leaflet";
-import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
-import WeatherPanelStore from "../../../stores/WeatherPanelStore";
+import { Button } from "react-bootstrap";
 import "./features-table.styles.css";
 import DataTable from 'react-data-table-component';
 import { useDispatch, useSelector } from "react-redux";
@@ -15,15 +12,6 @@ import { selectRegionNamePath, selectWeatherFields } from "../../../store/settin
 import { getObjectValue } from "../../../utils/reducer/getObjectValue.utils";
 
 const FeaturesTable = () => {
-    ////console.time("component")
-    /* const weatherFields = WeatherPanelStore(state => state.weatherFields);
-    const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
-    const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
-    const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
-    const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);
-    const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef); */
-    //const map = useMap();
-
     const dispatch = useDispatch<any>();
     const weatherFields = useSelector(selectWeatherFields);
     const comparedFeatures = useSelector(selectComparedFeatures);
@@ -33,30 +21,13 @@ const FeaturesTable = () => {
     
     const hoverFeature = (featureId: string) => {
         if (!geoJsonLayerRef) return;
-        ////console.time("hoverFeature")
-        //if (hoveredFeature && hoveredFeature._id == featureId) return;
+
         if (selectedFeature && selectedFeature._id == featureId) return;
-
         const feature = comparedFeatures.find((f:any) => f._id === featureId);
-        /* setFeatureProperties({
-            _id: feature._id, 
-            properties: feature.properties, 
-            weather: feature.weather, 
-            marker: feature.marker || { _id: null },
-            markerRef: feature.markerRef
-        }); */
         dispatch(selectFeature(feature));
-
-        /* if (feature.markerRef) feature.markerRef.fire("click");
-        else {        
-            const layer = geoJsonLayerRef.current.getLayer(feature._id);
-            layer.fireEvent("click");
-        } */
         const layer = geoJsonLayerRef.current.getLayer(feature._id);
         layer.fireEvent("click");
-        //console.timeEnd("hoverFeature")
     }
-    
 
     /* useEffect(() => {
         if (!hoveredFeature) return;
@@ -68,15 +39,6 @@ const FeaturesTable = () => {
         } 
     }, [hoveredFeature]) */
 
-    /* const removeFeature = (e: any, featureId: string) => {
-        e.stopPropagation();
-        e.preventDefault();
-        const filteredFeatures = comparedFeatures.filter((f:any) => f._id !== featureId);
-        setComparedFeatures(filteredFeatures);
-        map.closePopup();
-    } */
-
-    //console.time("getColor")
     const getColor = (value: number, fieldName: string) => {
         const field = weatherFields.find(field => field.name === fieldName);
         if (field) {
@@ -116,8 +78,7 @@ const FeaturesTable = () => {
 
 
     const data = useMemo(() => {
-        /* const data = */ return comparedFeatures.map((feature:any) => {
-            //const name = <span>{feature.markers && feature.markers.map((m:any)=> <FontAwesomeIcon title={m.name} icon={faLocationDot} /> )} {feature.properties.Concelho}</span>;
+       return comparedFeatures.map((feature:any) => {
             return {
                 id: feature._id,
                 local: getObjectValue(regionNamePath, feature),
@@ -129,11 +90,11 @@ const FeaturesTable = () => {
     const conditionalRowStyles = [
         {
             when: (row: any) => row.id === selectedFeature?._id,
-            style: (row: any) => ({ fontWeight: 'bold', border: '3px solid red' }),
+            style: () => ({ fontWeight: 'bold', border: '3px solid red' }),
         }, 
         {
             when: (row: any) => row.id !== selectedFeature?._id || (!selectedFeature),
-            style: (row: any) => ({ fontWeight: 'normal', border: '1px solid black' }),
+            style: () => ({ fontWeight: 'normal', border: '1px solid black' }),
         }
     ];
 
@@ -164,7 +125,6 @@ const FeaturesTable = () => {
         setToggleCleared(!toggleCleared);
         setSelectedRows([]);
         const diff = getDifference(comparedFeatures, selectedRows);
-        //setComparedFeatures(diff);
         dispatch(updateComparedFeatures(diff));
         if (!selectedFeature) return;
         const feature = comparedFeatures.find((f:any) => f._id === selectedFeature._id);
@@ -201,60 +161,6 @@ const FeaturesTable = () => {
             noDataComponent="Sem localidades na lista"
             selectableRowsHighlight
         />
-        
-        {/* <Table size="sm" responsive striped bordered hover>
-            <thead>
-                <tr>
-                    { 
-                        <th key="remove_th"></th>
-                    }
-                        <th key="local_th">Local</th>
-                    { 
-                        weatherFields.map(field => 
-                            <th key={field._id+"_th"}>{field.displayName}</th>
-                        )
-                    }
-                </tr>
-            </thead>
-            <tbody>
-            {
-                comparedFeatures.map((feature:any) => 
-                    <tr 
-                        id={"row_"+feature._id} 
-                        style={ hoveredFeature && hoveredFeature._id == feature._id ? { fontWeight: 'bold', border: '3px solid red' } : { fontWeight: 'normal', border: '1px solid black' }} 
-                        onClick={() => hoverFeature(feature)}
-                        className="comparisonTblRow" 
-                        key={"tr_"+feature._id}
-                    >
-                        
-                        <td key="remove_td">
-                        { 
-                            <button onClick={(e) => removeFeature(e, feature._id)} className="btn btn-sm btn-danger">
-                                <FontAwesomeIcon icon={faTrash} />
-                            </button>
-                        }
-                        </td>
-
-                        <td id={"td_local_"+feature._id} key="local_td">
-                            { 
-                                feature.markers?.length ? 
-                                `${feature.properties.Concelho} (${feature.markers.map((m:any) => m.name).join()})` :
-                                feature.properties.Concelho
-                            }
-                        </td>
-                        {
-                            weatherFields.map(field => {
-                                if (!feature?.weather) return <td key="none_td_key"></td>
-                                return <td style={{backgroundColor: getColor(feature?.weather[field.name], field.name)}} key={field._id+"_td"}>
-                                    {feature?.weather[field.name]}
-                                </td>
-                            })
-                        }
-                    </tr>
-                )
-            }
-            </tbody>
-        </Table> */}
         </>
     );
 }

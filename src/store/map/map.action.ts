@@ -70,6 +70,7 @@ export const getGeoJsonData = (dateId: string): AppThunk => {
             const data = await fetchWeatherGeoJSON(dateId);
             return data;
         } catch (error) {
+            console.error(error);
             dispatch(showErrorMsg(error as string));
         }
     }

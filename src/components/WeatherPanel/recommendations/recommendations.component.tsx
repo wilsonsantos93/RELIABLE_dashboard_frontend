@@ -2,19 +2,17 @@ import { ListGroup } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { selectSelectedFeature } from "../../../store/map/map.selector";
 import { selectRegionNamePath, selectWeatherFields } from "../../../store/settings/settings.selector";
-/* import HoveredFeatureStore from "../../../stores/HoveredFeatureStore"; */
-import "./recommendations.styles.css";
 import { getObjectValue } from "../../../utils/reducer/getObjectValue.utils";
+import "./recommendations.styles.css";
 
 const Recommendations = () => {
-    //const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
     const selectedFeature = useSelector(selectSelectedFeature);
     const weatherFields = useSelector(selectWeatherFields);
     const regionNamePath = useSelector(selectRegionNamePath);
 
     const getRecommendations = () => {
         if (!selectedFeature || !selectedFeature.weather) return null;
-        let recommendations: any[] = [];
+        let recommendations: string[] = [];
         for (const field of weatherFields) {
             const value = selectedFeature.weather[field.name];
             if (!value) continue;

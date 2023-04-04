@@ -3,11 +3,10 @@ import "leaflet-sidebar-v2";
 import "leaflet/dist/leaflet.css";
 import "leaflet-sidebar-v2/css/leaflet-sidebar.min.css";
 import { useMap } from "react-leaflet";
-import { useEffect, useRef, /* useState */ } from "react";
+import { useEffect, useRef } from "react";
 import WeatherDateSelector from "../weather-date-selector/weather-date-selector.component";
 import WeatherInfoSelector from "../weather-info-selector/weather-info-selector.component";
-/* import WeatherPanelStore from "../../../stores/WeatherPanelStore"; */
-import { /* Badge, */ Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import ParallelCoordinatesChart from "../parallel-coordinates-chart/paralell-coordinates-chart.component.";
 import "./sidebar.styles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -21,14 +20,6 @@ import { openSidebar } from "../../../store/settings/settings.action";
 
 
 const Sidebar = () => {
-
-    //const setIsTabOpen = WeatherPanelStore(state => state.setIsTabOpen);
-    //const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
-    //const [sidebar, setSidebar] = useState<L.Control.Sidebar|null>(null);
-    //const setSidebar = WeatherPanelStore(state => state.setSidebar);
-    //const sidebar = WeatherPanelStore(state => state.sidebar);
-
-    //const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
     const map = useMap();
     const dispatch = useDispatch<any>();
 
@@ -43,28 +34,18 @@ const Sidebar = () => {
 
     useEffect(() => {
         sidebar.on("opening", () => {
-            //setIsTabOpen(true);
             dispatch(openSidebar(true));
         });
 
         sidebar.on("closing", () => {
-            //setIsTabOpen(false);
             dispatch(openSidebar(false));
         });
 
         map.addControl(sidebar);
 
-        //setSidebar(sidebar);
         dispatch(setSidebar(sidebarRef));
         return () => { map.removeControl(sidebar) };
     }, [])
-
-
-    /* useEffect(() => {
-        if (comparedFeatures.length && !isTabOpen) sidebar?.open("tab1");
-        else if (!comparedFeatures.length) sidebar?.close();
-    }, [comparedFeatures]) */
-
 
     return (
         <div id="sidebar" className="leaflet-sidebar collapsed">

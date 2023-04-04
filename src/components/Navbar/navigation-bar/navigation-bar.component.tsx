@@ -4,9 +4,8 @@ import { useState } from "react";
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setInfoMsg } from "../../../store/settings/settings.action";
-import { signOut, signOutSuccess } from "../../../store/user/user.action";
+import { signOut } from "../../../store/user/user.action";
 import { selectUser, selectUserIsLoggedIn } from "../../../store/user/user.selector";
-import UserStore from "../../../stores/UserStore";
 import ChangePassword from "../change-password/change-password.component";
 import Contacts from "../contacts/contacts.component";
 import Login from "../login/login.component";
@@ -18,11 +17,7 @@ const NavigationBar = () => {
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
     const [showUpdatePassword, setShowUpdatePassword] = useState(false);
-    /*const isLoggedIn = UserStore(state => state.isLoggedIn());
-     const user = UserStore(state => state.user);
-    const setUser = UserStore(state => state.setUser); 
-    const setToken = UserStore(state => state.setToken);*/
-    
+
     const user = useSelector(selectUser);
     const isLoggedIn = useSelector(selectUserIsLoggedIn);
     const dispatch = useDispatch<any>();
@@ -60,8 +55,6 @@ const NavigationBar = () => {
     }
 
     const logout = () => {
-       /*  setUser(null);
-        setToken(null); */
         dispatch(signOut());
         dispatch(setInfoMsg("Sessão terminada."));
     }

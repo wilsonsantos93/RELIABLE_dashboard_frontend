@@ -1,12 +1,10 @@
 import "./parallel-coordinates-chart.styles.css";
 import { useState, useEffect, useRef } from 'react';
 import HighchartsReact from 'highcharts-react-official';
-import Highcharts, { Chart, Series } from 'highcharts';
+import Highcharts, { Series } from 'highcharts';
 import HighchartsParallelCoordinates from 'highcharts/modules/parallel-coordinates';
-import WeatherPanelStore from "../../../stores/WeatherPanelStore";
-import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
 import HC_exporting from 'highcharts/modules/exporting'
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectIsSidebarOpen, selectRegionNamePath, selectWeatherFields } from "../../../store/settings/settings.selector";
 import { selectComparedFeatures, selectSelectedFeature } from "../../../store/map/map.selector";
 import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
@@ -85,12 +83,6 @@ const ParallelCoordinatesChart = () => {
     const chartRef = useRef<any>();
     const [chartOptions, setChartOptions] = useState<any>(chartConfig);
     const [previousSeries, setPreviousSeries] = useState<CustomSeries | undefined>();
-
-    /* const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
-    const weatherFields = WeatherPanelStore(state => state.weatherFields);
-    const hoveredFeature = HoveredFeatureStore(state => state.featureProperties);
-    const geoJsonLayerRef = WeatherPanelStore(state => state.geoJsonLayerRef);
-    const isTabOpen = WeatherPanelStore(state => state.isTabOpen); */
 
     const weatherFields = useSelector(selectWeatherFields);
     const comparedFeatures = useSelector(selectComparedFeatures);

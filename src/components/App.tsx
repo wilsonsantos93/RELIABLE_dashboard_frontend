@@ -1,11 +1,9 @@
 import 'leaflet/dist/leaflet.css';
 import {Col, Container, Row, Spinner, Toast, ToastContainer} from "react-bootstrap";
 import Map from "./Map/map/map.component";
-import WeatherPanelStore from '../stores/WeatherPanelStore';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faObjectGroup, faHandPointer, faCircleInfo, faXmark, faCheck } from '@fortawesome/free-solid-svg-icons'
 import NavigationBar from './Navbar/navigation-bar/navigation-bar.component';
-import "../styles/Index.css";
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAreaMode, selectErrorMsg, selectInfoMsg, selectIsSidebarOpen, selectLoading, selectSuccessMsg } from '../store/settings/settings.selector';
 import { useEffect } from 'react';
@@ -15,15 +13,11 @@ import { getRegionPathName, showErrorMsg, showInfoMsg, showSuccessMsg } from '..
 import { selectFeature } from '../store/map/map.action';
 import { selectSidebarRef } from '../store/refs/refs.selector';
 import { selectUserIsLoggedIn } from '../store/user/user.selector';
+import "./App.css";
 
 function App(): JSX.Element {
-    //const loading = WeatherPanelStore(state => state.loading);
     const loading = useSelector(selectLoading);
-    //const comparisonMode = WeatherPanelStore(state => state.comparisonMode);
-    const selectMode = WeatherPanelStore(state => state.selectMode);
-    //const selectAreaMode = WeatherPanelStore(state => state.selectAreaMode);
     const areaMode = useSelector(selectAreaMode);
-    //const isTabOpen = WeatherPanelStore(state => state.isTabOpen);
     const isSidebarOpen = useSelector(selectIsSidebarOpen);
     const infoMsg = useSelector(selectInfoMsg);
     const successMsg = useSelector(selectSuccessMsg);
@@ -62,7 +56,7 @@ function App(): JSX.Element {
                 </Col>
             </Row>
 
-            <ToastContainer style={{textAlign: "center", zIndex:9999}} position="top-center">
+            <ToastContainer className="toast-container" position="top-center">
                 <Toast onClose={() => dispatch(showInfoMsg(null))} bg="primary" show={Boolean(infoMsg)} animation={true} delay={2000} autohide>
                     <Toast.Body className='text-white'>
                         <FontAwesomeIcon icon={faCircleInfo} ></FontAwesomeIcon> { infoMsg }
@@ -80,27 +74,21 @@ function App(): JSX.Element {
                 </Toast>
             </ToastContainer>
 
-            <ToastContainer style={{textAlign: "center", zIndex:999}} id="toastContainer" className={isSidebarOpen ? 'start-33' : ''} position="bottom-center">
+            <ToastContainer style={{textAlign: "center", zIndex:999}} className={`${isSidebarOpen ? 'start-33' : ''} toast-container`} position="bottom-center">
                 <Toast bg="dark" show={loading} animation={true}>
                     <Toast.Body className='text-white'>
                         <Spinner size="sm" animation="border" role="status" /> A carregar...
                     </Toast.Body>
                 </Toast> 
+    
                 
-
-                {/* <Toast bg="dark" show={comparisonMode} animation={true}>
-                    <Toast.Body className='text-white'>Clique nas localidades para adicionar à lista</Toast.Body>
-                </Toast>  */}
-                
-                <Toast bg="dark" show={(selectMode && !loading) ? true : false} animation={true}>
+                <Toast bg="dark" show={(!loading) ? true : false} animation={true}>
                     <Toast.Body className='text-white'> 
                     {
-                        //selectMode === 'area' && 
                         areaMode &&
                         <span><FontAwesomeIcon icon={faObjectGroup} />  Clique e arraste para selecionar uma área</span>
                     } 
                     {
-                        //selectMode === 'individual' && 
                         !areaMode &&
                         <span>
                             <FontAwesomeIcon icon={faHandPointer} />  Clique nas localidades para adicionar à lista

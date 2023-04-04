@@ -1,10 +1,7 @@
-import {ChangeEvent, useEffect, /* useState */} from 'react';
+import {ChangeEvent, useEffect } from 'react';
 import Form from 'react-bootstrap/Form'
 import 'bootstrap/dist/css/bootstrap.min.css';
-/* import '../../../styles/WeatherPanel.css'; */
 import {Col, Row} from "react-bootstrap";
-/* import WeatherPanelStore from "../../../stores/WeatherPanelStore";
-import {fetchWeatherDates} from "../../../data/fetchWeatherDates"; */
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -16,33 +13,15 @@ dayjs.extend(timezone);
 const tz = "Europe/Lisbon";
 
 function WeatherDateSelector(): JSX.Element {
-    /* type WeatherDate = {
-        date: Date,
-        _id: string
-    }[] | undefined; */
-
-    /* const setSelectedDateDatabaseId = WeatherPanelStore(state => state.setSelectedDateDatabaseId);
-    const selectedDateDatabaseId = WeatherPanelStore(state => state.selectedDateDatabaseId); */
     const selectedDateDatabaseId = useSelector(selectSelectedDateId);
+    const weatherDates = useSelector(selectWeatherDates);
     const dispatch = useDispatch<any>();
 
-    //const [weatherDates, setWeatherDates] = useState<WeatherDate>();
-    const weatherDates = useSelector(selectWeatherDates);
-
     useEffect(() => {
-        /* if (!weatherDates) {
-            (async () => {
-                const dates = await fetchWeatherDates();
-                setWeatherDates(dates);
-                const firstDate = dates.find(d => d.date.valueOf() <= new Date().valueOf())
-                if (firstDate) setSelectedDateDatabaseId(firstDate?._id);
-            })()
-        } */
         dispatch(getWeatherDates());
     }, []);
 
     const onSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        //setSelectedDateDatabaseId(event.target.value as string | undefined);
         dispatch(setDateId(event.target.value))
     }
 
@@ -57,7 +36,7 @@ function WeatherDateSelector(): JSX.Element {
                 { 
                     weatherDates?.map(date => 
                     <option key={date._id} value={date._id}>
-                        {dayjs(date.date.toISOString()).tz(tz).format(date.format)}
+                        {dayjs((date.date as Date).toISOString()).tz(tz).format(date.format)}
                     </option>)
                 }
             </Form.Select>

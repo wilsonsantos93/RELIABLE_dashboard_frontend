@@ -1,58 +1,52 @@
-import { useEffect, useMemo, useRef, useState} from 'react';
-import { GeoJSON, LayerGroup, Marker, Popup, useMap } from 'react-leaflet';
+import { useEffect, useRef, useState} from 'react';
+import { GeoJSON, LayerGroup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L, { popup } from 'leaflet';
 import { GeoJsonObject} from "geojson";
-import { GeoJSON as GJSON, LatLng, Layer, LeafletMouseEvent, Map as LeafletMap, PathOptions } from "leaflet";
-import {MapFeatureStyle} from "../../../types/MapFeatureStyle";
-import WeatherPanelStore from "../../../stores/WeatherPanelStore";
-import HoveredFeatureStore from "../../../stores/HoveredFeatureStore";
-import {fetchWeatherGeoJSON} from "../../../data/fetchWeatherGeoJSON";
+import { GeoJSON as GJSON, Layer, LeafletMouseEvent, Map as LeafletMap, PathOptions } from "leaflet";
 import "@mapbox/leaflet-pip";
 import { useStableCallback } from '../../../hooks/UseStableCallback';
 import UserMarker from '../user-marker/user-marker.component';
 import "./geojson-layer.styles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEyeSlash, faLocationDot, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEyeSlash, faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import ReactDOMServer from 'react-dom/server';
-import UserStore from '../../../stores/UserStore';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUserIsLoggedIn, selectUserLocations } from '../../../store/user/user.selector';
 import { addUserLocation } from '../../../store/user/user.action';
 import { setGeoJsonLayer } from '../../../store/refs/refs.action';
 import { selectSidebarRef } from '../../../store/refs/refs.selector';
 import { selectIsSidebarOpen, selectRegionNamePath, selectSelectedDateId, selectSelectedWeatherField, selectWeatherFields } from '../../../store/settings/settings.selector';
-import { selectComparedFeatures, selectGeoJsonData, selectNextLayer, selectSelectedFeature } from '../../../store/map/map.selector';
+import { selectComparedFeatures, selectNextLayer, selectSelectedFeature } from '../../../store/map/map.selector';
 import { changeLoading } from '../../../store/settings/settings.action';
 import { addFeatureToComparedFeatures, getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
 import { getObjectValue } from '../../../utils/reducer/getObjectValue.utils';
-declare function require(name:string):any;
+/* declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
+ */
+type CustomLayer = { feature: any, _leaflet_id: string, markers: any[] } & Layer;
 
-type CustomLayer = { addedToList: boolean, feature: any, _leaflet_id: string, markers: any[] } & Layer;
-
-const layerHighlightedStyle: MapFeatureStyle = {
+const layerHighlightedStyle = {
     color: "black",
     fillOpacity: 0.5,
     weight: 2
 }
 
-const layerRedHighlightedStyle: MapFeatureStyle = {
+const layerRedHighlightedStyle = {
     ...layerHighlightedStyle,
     color: "red",
 }
 
-const layerNormalStyle: MapFeatureStyle = {
+const layerNormalStyle = {
     color: "#a2a2a2",
     fillOpacity: 0.5,
     weight: 1
 }
 
-const layerNormalHoverStyle: MapFeatureStyle = {
+/* const layerNormalHoverStyle = {
     color: "#a2a2a2",
     fillOpacity: 0.5,
     weight: 2
-}
+} */
 
 let clickedFeatureId: string | null = null;
 
@@ -65,29 +59,7 @@ const GeoJsonLayer = (props: any) => {
     const geoJsonLayerRef = useRef<GJSON>();
     const [geoJsonData, setGeoJsonData] = useState<GeoJsonObject | null>(null);
     const [previousLayer, setPreviousLayer] = useState<any>(null);
-    //const map = useMap();
 
-    /* const weatherFields = WeatherPanelStore(state => state.weatherFields);
-    const selectedWeatherField = WeatherPanelStore(state => state.selectedInformation);
-    const selectedDateId = WeatherPanelStore(state => state.selectedDateDatabaseId); */
-
-    /* const setFeatureProperties = HoveredFeatureStore(state => state.setFeatureProperties);
-    const hoveredFeature = HoveredFeatureStore(state => state.featureProperties); */
-
-    //const setComparedFeatures = WeatherPanelStore(state => state.setComparedFeatures);
-    //const comparedFeatures = WeatherPanelStore(state => state.comparedFeatures);
-    //const comparisonMode = WeatherPanelStore(state => state.comparisonMode);
-
-    //const setLoading = WeatherPanelStore(state => state.setLoading);
-
-    //const selectMode = WeatherPanelStore(state => state.selectMode);
-    //const setGeoJsonLayerRef = WeatherPanelStore(state => state.setGeoJsonLayerRef);
-
-    /* const userMarkers = UserMarkerStore(state => state.userMarkers);
-    const addUserMarker = UserMarkerStore(state => state.addUserMarker); */
-
-    /* const sidebar = WeatherPanelStore(state => state.sidebar);
-    const isTabOpen = WeatherPanelStore(state => state.isTabOpen); */
     const weatherFields = useSelector(selectWeatherFields);
     const selectedWeatherField = useSelector(selectSelectedWeatherField);
     const selectedDateId = useSelector(selectSelectedDateId);
@@ -103,7 +75,6 @@ const GeoJsonLayer = (props: any) => {
     const dispatch = useDispatch<any>();
 
     useEffect(() => {
-        //setGeoJsonLayerRef(geoJsonLayerRef);
         dispatch(setGeoJsonLayer(geoJsonLayerRef));
     }, [geoJsonLayerRef])
 
@@ -111,7 +82,6 @@ const GeoJsonLayer = (props: any) => {
     /* useEffect(() => {
         if (!geoJsonLayerRef || !geoJsonLayerRef.current || !userMarkers) return;
 
-        console.log("userMarkers", userMarkers)
         const compFeatures = [...comparedFeatures];
         if (!userMarkers.length) {
             map.eachLayer((layer: any) => {
@@ -150,7 +120,7 @@ const GeoJsonLayer = (props: any) => {
 
     // Get color for depending on value
     const getColor = (value: number) => {
-        const field = weatherFields.find((field:any) => field.name === selectedWeatherField.name);
+        const field = weatherFields.find((field:any) => field.name === selectedWeatherField?.name);
         if (field) {
             for (let r of field.ranges) {
                 const min = r.min != null ? r.min : -Infinity; 
@@ -169,11 +139,11 @@ const GeoJsonLayer = (props: any) => {
             featureColor = getColor(feature.weather[selectedWeatherField.name]);
         }
 
-        let mapFeatureNotHoveredStyle: MapFeatureStyle = {
+        let mapFeatureNotHoveredStyle = {
+            ...layerNormalStyle,
             fillColor: featureColor,
             opacity: 1,
             fillOpacity: 0.5,
-            ...layerNormalStyle
         };
 
         if (comparedFeatures.find((f:any) => f._id == feature._id)) {
@@ -197,10 +167,6 @@ const GeoJsonLayer = (props: any) => {
     useEffect(() => {
         (async () => {
             if (selectedDateId) {
-                //setLoading(true);
-                /* dispatch(changeLoading(true));
-                const data = await fetchWeatherGeoJSON(selectedDateId);
-                setGeoJSON(data); */
                 dispatch(changeLoading(true));
                 dispatch(getGeoJsonData(selectedDateId)).then((data: GeoJsonObject) => {
                     setGeoJsonData(data);
@@ -244,22 +210,8 @@ const GeoJsonLayer = (props: any) => {
             return;
         }
 
-        //if (previousLayer && previousLayer.feature._id != hoveredFeature._id) previousLayer.closePopup();
         const layer = getLayer(selectedFeature._id);
-        //const isOnComparisonList = existsInComparedFeatures(hoveredFeature._id);
-    
-        //if (comparedFeatures.length > 1 && (hoveredFeature.rowHover || isOnComparisonList)) {
-        /* if (isOnComparisonList) {
-            map.fitBounds(layer.getBounds(), {
-                maxZoom: map.getZoom()
-            });
-            console.log("useEffect hoveredFeature - Setting RED color");
-            setLayerStyle(layer, layerRedHighlightedStyle);
-        } 
-        else {
-            console.log("useEffect hoveredFeature - Setting BLACK color");
-            setLayerStyle(layer, layerHighlightedStyle);
-        }  */
+
         highlightFeature(layer);
         setPreviousLayer(layer);
     }, [selectedFeature])
@@ -271,7 +223,7 @@ const GeoJsonLayer = (props: any) => {
     }
 
     // Set layer style
-    const setLayerStyle = (layer: any, style: MapFeatureStyle) => {
+    const setLayerStyle = (layer: any, style: any) => {
         if (!layer) return;
         sleep(10).then(_ => {
             layer.setStyle(style);
@@ -418,24 +370,16 @@ const GeoJsonLayer = (props: any) => {
             return;
         }
 
-    
         let feature = { ...event.target.feature, markers: event.target.markers, marker: event.marker || { _id: null }, markerRef: event.markerRef };
         clickedFeatureId = feature._id;
 
         const { _id, weather, properties } = feature;
-
-        /* if ((previousLayer && previousLayer.feature._id !== _id) || !previousLayer) {
-            setFeatureProperties({ _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef });
-        } */
-
-        //setFeatureProperties({ _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef });
         
         const obj = { _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef };
         dispatch(selectFeature(obj));
 
         const table = document.querySelector(".featuresTable > div");
         if (!existsInComparedFeatures(_id) && feature.weather) {
-            //setComparedFeatures([feature, ...comparedFeatures]);
             dispatch(addFeatureToComparedFeatures(comparedFeatures, feature));
             if (table) table.scrollTop = 0;
         } else {
@@ -444,45 +388,21 @@ const GeoJsonLayer = (props: any) => {
             if (table) table.scrollTop = topPos - 35;
         }
 
-       /*  if (sidebar && !isTabOpen && !window.mobileCheck()) {
-            sidebar.open("tab1");
-        } */
-
         if (sidebarRef?.current && !isSidebarOpen && !window.mobileCheck()) {
             sidebarRef.current.open("tab1");
         }
-
 
         /* const offset = map.getSize().x * 0.25;
         const coordinates = layer.getPopup()?.getLatLng();
         if (coordinates) {
             map.panTo(coordinates, {animate: false})//.panBy(new L.Point(offset, 0), {animate: false});
         } */
-
-
-        //if (!existsInComparedFeatures(_id)) setComparedFeatures([feature, ...comparedFeatures])
-        //if (!comparisonMode && comparedFeatures.length <= 1) setComparedFeatures([feature]);
     }
 
     // Clear the layer
     const clearFeature = () => {
-        //setFeatureProperties(null);
         dispatch(selectFeature(null));
-
-        /* if (comparisonMode) {
-            const exists = existsInComparedFeatures(layer.feature._id);
-            if (!exists) {
-                console.log("clearFeature - Setting NORMAL style.");
-                setLayerStyle(layer, layerNormalStyle);
-                setFeatureProperties({});
-                clickedFeatureId = null;
-            } else {
-                console.log("clearFeature - exists");
-                setLayerStyle(layer, layerHighlightedStyle);
-            }
-        } */
     }
-
 
     const newSetClickedFeatureId = useStableCallback(setClickedFeatureId);
     const newResetHighlightFeature = useStableCallback(resetHighlightFeature);
@@ -504,20 +424,11 @@ const GeoJsonLayer = (props: any) => {
 
         if (!window.mobileCheck()) layer.bindTooltip(getObjectValue(regionNamePath, feature))
 
-        /* layer.getPopup()?.on('add', (e) => {   
-            const popupCloseBtn = document.querySelector(".leaflet-popup-close-button")
-            if (popupCloseBtn) popupCloseBtn.addEventListener("click", () => {
-                newClearFeature();
-            })
-        }) */
-
-        //layer.off('click');
-
         layer.on({
             mouseover: () => {
                 newHighlightFeature(layer);
             },
-            mouseout: (event) => {
+            mouseout: () => {
                 newResetHighlightFeature(layer);
             },
             click: (event) => {
@@ -530,11 +441,6 @@ const GeoJsonLayer = (props: any) => {
                   
                 if (!e.markerRef) layer.openPopup(e.latlng);
                 else e.markerRef.openPopup();
-
-                //setMarkerPosition(event.latlng);
-                //zoomToFeature(event);
-                /* const row = document.getElementById("row_"+event.target.feature._id);  
-                if (row) row.scrollIntoView(true);  */
             },
         });
 

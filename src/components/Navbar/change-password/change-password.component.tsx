@@ -29,8 +29,9 @@ const ChangePassword = ({ show, handleClose }: ChangePasswordProps) => {
     }
     setValidated(true);
 
-    const data = { password, confirmPassword };
     try {
+        if (!password || !confirmPassword) throw "Campos em falta.";
+        const data = { password, confirmPassword };
         dispatch(changePassword(data)).then(() =>  { 
             handleClose();
         }).catch((error: string) => {
@@ -82,7 +83,7 @@ const ChangePassword = ({ show, handleClose }: ChangePasswordProps) => {
                     </Form.Control.Feedback>
                 </Form.Group>
 
-                <Button className="signup-form-btn" disabled={!password || !confirmPassword} type="submit">Alterar</Button>
+                <Button className="signup-form-btn" disabled={!password || !confirmPassword || !password.length || !confirmPassword.length} type="submit">Alterar</Button>
             </Form>
         </Modal.Body>
     </Modal>

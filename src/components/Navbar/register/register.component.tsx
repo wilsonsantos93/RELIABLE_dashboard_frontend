@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { Alert, Modal } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
-import Row from 'react-bootstrap/Row';
 import { useDispatch } from 'react-redux';
 import { signUpUser } from '../../../store/user/user.action';
 import "./register.styles.css";
@@ -32,10 +30,9 @@ const Register = ({ show, handleClose }: RegisterProps) => {
     }
     setValidated(true);
 
-    const data = { username: email, password, confirmPassword };
     try {
-        /* const user = await registerUser(data);
-        handleClose(); */
+        if (!email || !password || !confirmPassword) throw "Campos em falta.";
+        const data = { username: email, password, confirmPassword };
         dispatch(signUpUser(data)).then(() =>  { 
             handleClose();
         })

@@ -6,7 +6,6 @@ const base_url = process.env.REACT_APP_API_BASE_URL;
 export async function fetchWeatherDates() {
     console.log("Started fetching the weather dates from the backend.");
     let url = `${base_url}/api/weather/dates`;
-    console.log(url);
 
     const weatherDatesResponse = await fetch(url);
 
