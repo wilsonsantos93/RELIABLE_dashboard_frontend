@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectAreaMode } from '../../../store/settings/settings.selector';
 import { setAreaMode } from '../../../store/settings/settings.action';
 import DateIndicator from '../date-indicator/date-indicator.component';
+import L from 'leaflet';
 
 function Map() {
 
@@ -59,7 +60,7 @@ function Map() {
                 <LeafletGeoSearch />
 
                 <Control position='topleft'>
-                    <div style={{cursor: 'pointer'}} className="leaflet-bar">
+                    <div style={{cursor: 'pointer'}} className="leaflet-bar leaflet-select-control">
                         <a style={{backgroundColor: areaMode ? '#0d6efd' : ''}} title="Selecionar área" onClick={() => onSelectAreaMode()}>
                             <FontAwesomeIcon icon={faObjectGroup} />
                         </a>

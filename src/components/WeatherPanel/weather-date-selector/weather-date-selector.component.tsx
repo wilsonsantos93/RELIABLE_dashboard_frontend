@@ -7,7 +7,7 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSelectedDateId, selectWeatherDates } from '../../../store/settings/settings.selector';
-import { getWeatherDates, setDateId } from '../../../store/settings/settings.action';
+import { getRegionPathName, getWeatherDates, setDateId } from '../../../store/settings/settings.action';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 const tz = "Europe/Lisbon";

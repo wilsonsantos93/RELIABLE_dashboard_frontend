@@ -166,7 +166,7 @@ const GeoJsonLayer = (props: any) => {
 
     useEffect(() => {
         (async () => {
-            if (selectedDateId) {
+            if (selectedDateId && regionNamePath) {
                 dispatch(changeLoading(true));
                 dispatch(getGeoJsonData(selectedDateId)).then((data: GeoJsonObject) => {
                     setGeoJsonData(data);
@@ -194,7 +194,7 @@ const GeoJsonLayer = (props: any) => {
                 }).catch(() => dispatch(changeLoading(false)));
             }
         })()
-    }, [selectedDateId]);
+    }, [selectedDateId, regionNamePath]);
 
     useEffect(() => {
         if (!selectedFeature) return;
@@ -356,7 +356,7 @@ const GeoJsonLayer = (props: any) => {
         if (layer.getPopup().isOpen()) layer.closeTooltip();
         layer.setTooltipContent(getObjectValue(regionNamePath, layer.feature))
         const isComparedFeature = existsInComparedFeatures(layer.feature._id);
-        if (isComparedFeature/*  && comparisonMode */){
+        if (isComparedFeature){
             setLayerStyle(layer, layerRedHighlightedStyle);
         }
         else {

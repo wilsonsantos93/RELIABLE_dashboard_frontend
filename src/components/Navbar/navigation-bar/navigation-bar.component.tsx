@@ -69,7 +69,7 @@ const NavigationBar = () => {
             <Container fluid>
                 <Navbar.Brand href="#home">RELIABLE</Navbar.Brand>
                 <Nav className="me-auto">
-                    <Nav.Link onClick={() => handleShowContacts()} href="#">Contactos</Nav.Link>
+                    <Nav.Link onClick={() => handleShowContacts()} href="#">Contacto</Nav.Link>
                 </Nav>
               
                 {  !isLoggedIn ?  

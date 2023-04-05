@@ -98,7 +98,11 @@ const Register = ({ show, handleClose }: RegisterProps) => {
                     </Form.Control.Feedback>
                 </Form.Group>
 
-                <Button className="signup-form-btn" disabled={!password || !confirmPassword || !email} type="submit">Registar</Button>
+                <div className="d-grid gap-2">
+                    <Button className="signup-form-btn" disabled={!password || !confirmPassword || !email} type="submit">
+                        Registar
+                    </Button>
+                </div>
             </Form>
         </Modal.Body>
     </Modal>

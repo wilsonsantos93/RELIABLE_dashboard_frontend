@@ -43,7 +43,8 @@ const AreaSelect = () => {
 
     useEffect(() => {
         if (areaMode){
-            map.selectArea?.setControlKey(false); 
+            map.selectArea.setControlKey(false); 
+            map.selectArea.setShiftKey(false);
             map.selectArea.enable();
         }
         else map.selectArea.disable();
@@ -55,7 +56,6 @@ const AreaSelect = () => {
   
       map.on("areaselected", (e: any) => {
         getFeaturesInView(e.bounds);
-        map.selectArea.disable();
         dispatch(setAreaMode(false));
       });
   
