@@ -69,25 +69,25 @@ const NavigationBar = () => {
             <Container fluid>
                 <Navbar.Brand href="#home">RELIABLE</Navbar.Brand>
                 <Nav className="me-auto">
-                    <Nav.Link onClick={() => handleShowContacts()} href="#">Contacto</Nav.Link>
+                    <Nav.Link id="contactsBtn" onClick={() => handleShowContacts()} href="#">Contactos</Nav.Link>
                 </Nav>
               
                 {  !isLoggedIn ?  
                     <>
                         <Nav>
-                            <Nav.Link onClick={() => handleShowRegister()} href="#">Registar</Nav.Link>
+                            <Nav.Link id="signUpBtn" onClick={() => handleShowRegister()} href="#">Registar</Nav.Link>
                         </Nav>
                         <Nav>
-                            <Nav.Link onClick={() => handleShowLogin()} href="#">Entrar</Nav.Link>
+                            <Nav.Link id="signInBtn" onClick={() => handleShowLogin()} href="#">Entrar</Nav.Link>
                         </Nav>
                     </> 
                     : 
                     <>
                         <WeatherAlerts />
                         <NavDropdown align="end" title={titleComponent} id="basic-nav-dropdown">
-                            <NavDropdown.Item onClick={() => handleShowUpdatePassword()} href="#">Alterar palavra-passe</NavDropdown.Item>
+                            <NavDropdown.Item id="updatePasswordBtn" onClick={() => handleShowUpdatePassword()} href="#">Alterar palavra-passe</NavDropdown.Item>
                             <NavDropdown.Divider />
-                            <NavDropdown.Item onClick={logout} href="#">
+                            <NavDropdown.Item id="signOutBtn" onClick={logout} href="#">
                             Sair
                             </NavDropdown.Item>
                         </NavDropdown>

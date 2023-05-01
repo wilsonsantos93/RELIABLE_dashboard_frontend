@@ -26,7 +26,7 @@ const FeaturesTable = () => {
         const feature = comparedFeatures.find((f:any) => f._id === featureId);
         dispatch(selectFeature(feature));
         const layer = geoJsonLayerRef.current.getLayer(feature._id);
-        layer.fireEvent("click");
+        if (layer) layer.fireEvent("click");
     }
 
     /* useEffect(() => {
@@ -130,7 +130,7 @@ const FeaturesTable = () => {
         const feature = comparedFeatures.find((f:any) => f._id === selectedFeature._id);
         if (selectedRows.find((r:any) => r.id === feature._id)) {
             const layer = geoJsonLayerRef.current.getLayer(feature._id);
-            layer.closePopup();
+            if (layer) layer.closePopup();
             dispatch(setSelectedFeature(null));
         }
     };

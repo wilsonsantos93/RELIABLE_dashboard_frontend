@@ -75,14 +75,14 @@ function App(): JSX.Element {
             </ToastContainer>
 
             <ToastContainer style={{textAlign: "center", zIndex:999}} className={`${isSidebarOpen ? 'start-33' : ''} toast-container`} position="bottom-center">
-                <Toast bg="dark" show={loading} animation={true}>
+                <Toast id="loadingToast" bg="dark" show={loading} animation={true}>
                     <Toast.Body className='text-white'>
                         <Spinner size="sm" animation="border" role="status" /> A carregar...
                     </Toast.Body>
                 </Toast> 
     
                 
-                <Toast bg="dark" show={(!loading) ? true : false} animation={true}>
+                <Toast id="tipToast" bg="dark" show={(!loading) ? true : false} animation={true}>
                     <Toast.Body className='text-white'> 
                     {
                         areaMode &&

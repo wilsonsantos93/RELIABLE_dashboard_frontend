@@ -32,7 +32,7 @@ const Recommendations = () => {
     return (
         <div className="text-left pt-3">
         
-            <h6><strong>Recomendações</strong>
+            <h6><strong>Recomendações </strong>
             { 
                 selectedFeature ? 
                 /* (!selectedFeature.markerName ? ` ${selectedFeature.properties.Concelho}` : ` ${selectedFeature.markerName} (${selectedFeature?.properties.Concelho})`) */ 

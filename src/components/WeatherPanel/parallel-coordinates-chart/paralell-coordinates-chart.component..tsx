@@ -133,7 +133,7 @@ const ParallelCoordinatesChart = () => {
                             click: function(event: any) {
                                 const featureId = event.point.series.options.featureId;
                                 const layer = geoJsonLayerRef.current.getLayer(featureId);
-                                layer.fireEvent("click");
+                                if (layer) layer.fireEvent("click");
                             }
                         }
                     }
