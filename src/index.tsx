@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 
 declare global {
-    interface Window { mobileCheck: any; opera: any }
+    interface Window { mobileCheck: any; opera: any, store: any }
 }
 
 const container = document.getElementById('root');
@@ -26,6 +26,10 @@ if (container !== null) {
         </Provider>
         //</React.StrictMode>,
     )
+
+    if ((window as any).Cypress) {
+        window.store = store;
+    }
 }
 
 // If you want to start measuring performance in your app, pass a function
