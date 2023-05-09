@@ -19,9 +19,14 @@ const Recommendations = () => {
             for (let r of field.ranges) {
                 const min = r.min != null ? r.min : -Infinity; 
                 const max = r.max != null ? r.max : Infinity;
-                if (min <= value && value < max && r.recommendations) recommendations.push(...r.recommendations);
+                if ((min <= value) && (value < max) && r.recommendations) {
+                    for (const rec of r.recommendations) {
+                        if (!recommendations.includes(rec)) recommendations.push(rec);
+                    }
+                }
             }
         }
+
         return recommendations.length ? 
         <ListGroup variant="flush">
             { recommendations.map((r,i) => <ListGroup.Item key={`recommendation_${i}`}>{r}</ListGroup.Item>) }
@@ -46,7 +51,12 @@ const Recommendations = () => {
                 :
                 getRecommendations()
             }
-            
+            <hr></hr>
+            <div>
+                Em caso de dúvida ou necessidade ligar para o SNS 24 (808 24 24 24)<br></br>
+                Em caso de emergência ligue para o 112<br></br>
+                Para informações mais detalhadas consulte o <a target="_blank" href="https://www.dgs.pt/">site da DGS</a>
+            </div>
         </div>
     );
 }

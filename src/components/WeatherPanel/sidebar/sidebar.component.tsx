@@ -17,6 +17,7 @@ import FeaturesTable from "../features-table/features-table.component";
 import { useDispatch } from "react-redux";
 import { setSidebar } from "../../../store/refs/refs.action";
 import { openSidebar } from "../../../store/settings/settings.action";
+import TableFeatures from "../table-features/table-features.component";
 
 
 const Sidebar = () => {
@@ -67,7 +68,8 @@ const Sidebar = () => {
                         <SidebarTabHead />
                 
                         <div className="featuresTable">
-                            <FeaturesTable />
+                            {/* <FeaturesTable /> */}
+                            <TableFeatures />
                         </div>
 
                         <div className="recommendations">

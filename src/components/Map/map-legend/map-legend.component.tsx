@@ -7,6 +7,9 @@ import "./map-legend.styles.css";
 const MapLegend = () => {
     const selectedWeatherField = useSelector(selectSelectedWeatherField);
     const [data, setData] = useState<WeatherFieldRange[] | []>([]);
+    const [colors, setColors] = useState<any>();
+    const [domain, setDomain] = useState<any>();
+    const [tickValues, setTickValues] = useState<any>();
 
     useEffect(() => {
         if (!selectedWeatherField) {
@@ -15,6 +18,15 @@ const MapLegend = () => {
         }
         const ranges = selectedWeatherField.ranges.sort((a, b) => b.min - a.min);
         setData(ranges);
+
+        setColors(`[${ranges.map(r => `"${r.color}"`).reverse()}]`);
+
+        const domain = ranges.map(r => r.min).reverse();
+        domain.push(ranges[0].max);
+        setDomain(`[${domain}]`);
+
+        setTickValues(`[${ranges.length && ranges.slice(-1)[0].min}, ${ranges.length && ranges[0].max}]`);
+
     }, [selectedWeatherField])
 
     const POSITION_CLASSES = {
@@ -25,8 +37,8 @@ const MapLegend = () => {
     };
 
     return (
-        <div className={`${POSITION_CLASSES["bottomleft"]}`}>
-            <div className="leaflet-control leaflet-bar MapFeatureInformation">
+        <div id="mapLegend" className={`${POSITION_CLASSES["bottomleft"]}`}>
+            {/* <div className="leaflet-control leaflet-bar MapFeatureInformation">
                 <span>{selectedWeatherField?.displayName}</span>
                 {
                     data && data.map((d:any) => 
@@ -41,8 +53,25 @@ const MapLegend = () => {
                         </div>
                     )
                 }
-            </div>
+            </div> */}
+
+            { selectedWeatherField && colors && domain ? 
+            
+                <color-legend 
+                    class="styled"
+                    width="210"
+                    tickValues={tickValues}
+                    domain={domain}
+                    range={colors}
+                    titleText={`${selectedWeatherField?.displayName} ${selectedWeatherField.unit && `(${selectedWeatherField.unit})`}`}
+                    scaletype="threshold"
+                    tickFormat=".1f"
+                >
+                </color-legend>
+            : null 
+            }
         </div>
+
     )
 }
 

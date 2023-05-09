@@ -24,6 +24,6 @@
   "include": [
     "src",
     "cypress/support/*.ts",
-    "cypress/e2e/*.ts"
+    //"cypress/e2e/*.ts"
   ]
 }

@@ -2,3 +2,13 @@ tbody tr.comparisonTblRow {
     border: 1px solid black;
     cursor: pointer;
 }
+
+.rdt_TableCol_Sortable > div {
+    overflow: unset;
+    white-space: unset;
+    /* font-size: 10px; */
+}
+
+.rdt_TableCell[data-column-id="1"], .rdt_TableCol[data-column-id="1"] {
+    max-width: 100%;
+}

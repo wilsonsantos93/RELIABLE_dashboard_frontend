@@ -45,7 +45,7 @@ const FeaturesTable = () => {
             for (let r of field.ranges) {
                 const min = (r.min != null || !isNaN(r.min)) ? r.min : -Infinity; 
                 const max = (r.max != null || !isNaN(r.max)) ? r.max : Infinity;
-                if (min <= value && value < max) {
+                if (min <= value && value <= max) {
                     return r.color
                 }
             }

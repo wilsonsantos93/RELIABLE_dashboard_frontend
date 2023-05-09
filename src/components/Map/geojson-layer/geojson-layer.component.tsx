@@ -20,6 +20,7 @@ import { selectComparedFeatures, selectNextLayer, selectSelectedFeature } from '
 import { changeLoading } from '../../../store/settings/settings.action';
 import { addFeatureToComparedFeatures, getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
 import { getObjectValue } from '../../../utils/reducer/getObjectValue.utils';
+import { Button } from 'react-bootstrap';
 /* declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
  */
@@ -284,6 +285,7 @@ const GeoJsonLayer = (props: any) => {
         const removeBtn = document.createElement("button");
         removeBtn.className = "btn btn-sm btn-outline-danger";
         removeBtn.title = "Remover da lista";
+        //removeBtn.innerHTML = "Remover da lista";
         removeBtn.innerHTML = ReactDOMServer.renderToStaticMarkup(<FontAwesomeIcon icon={faEyeSlash} />);
         removeBtn.onclick = function() {
             newRemoveFeatureFromList(layer);
@@ -384,8 +386,10 @@ const GeoJsonLayer = (props: any) => {
             if (table) table.scrollTop = 0;
         } else {
             const el = document.querySelector(`div#row-${event.target.feature._id}`);
-            const topPos = (el as HTMLElement).offsetTop;
-            if (table) table.scrollTop = topPos - 35;
+            if (el) {
+                const topPos = (el as HTMLElement).offsetTop;
+                if (table) table.scrollTop = topPos - 35;
+            }
         }
 
         if (sidebarRef?.current && !isSidebarOpen && !window.mobileCheck()) {

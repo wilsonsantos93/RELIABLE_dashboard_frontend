@@ -36,3 +36,15 @@
         bottom: 55px;
     }
 }
+
+#mapLegend {
+    padding: 6px 8px;
+}
+
+color-legend.styled {
+    text-align: center;
+    --cle-background: #333333b3;
+    --cle-letter-spacing-title: 0.5px;
+    --cle-color: white;
+    --cle-padding: 0.25rem 0.25rem 0.75rem;
+}
