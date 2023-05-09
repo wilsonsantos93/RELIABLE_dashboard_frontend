@@ -1,0 +1,17 @@
+.border-row {
+    border: 3px solid red;
+    font-weight: 700;
+}
+
+tbody tr {
+    cursor: pointer;
+}
+
+tbody tr:hover {
+    border: 2px solid black;
+}
+
+.tableLegend {
+    --cle-background: #f8f9fa;
+    --cle-font-size: 11px;
+}
