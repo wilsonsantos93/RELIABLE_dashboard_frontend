@@ -6,6 +6,9 @@ import { selectSidebarRef } from '../../../store/refs/refs.selector';
 import { selectComparedFeatures } from '../../../store/map/map.selector';
 import { updateComparedFeatures } from '../../../store/map/map.action';
 import "./sidebar-tab-head.styles.css";
+import { selectTableSelectedFeatures } from '../../../store/settings/settings.selector';
+import { updateTableSelectedFeatures } from '../../../store/settings/settings.action';
+import getArrayDifference from '../../../utils/reducer/getArrayDifference.utils';
 
 const SidebarTabHead = () => {
     const map = useMap();
@@ -13,6 +16,7 @@ const SidebarTabHead = () => {
 
     const sidebarRef = useSelector(selectSidebarRef);
     const comparedFeatures = useSelector(selectComparedFeatures);
+    const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
     
     const clearAll = () => {
         map.closePopup(); 
@@ -20,11 +24,26 @@ const SidebarTabHead = () => {
         dispatch(updateComparedFeatures([]));
     }
 
+    const clearSelected = () => {
+        if (!tableSelectedFeatures) return;
+        map.closePopup(); 
+        const features = getArrayDifference(comparedFeatures, tableSelectedFeatures);
+        dispatch(updateComparedFeatures(features));
+        dispatch(updateTableSelectedFeatures([]));
+    }
+
     return (
         <div className="tabHead">
             <span><FontAwesomeIcon icon={faEye} /> {comparedFeatures.length} localidades na lista</span>
-            <a href="#" onClick={clearAll}>
-                <FontAwesomeIcon icon={faTrash} /> Limpar tudo
+
+            { tableSelectedFeatures && tableSelectedFeatures.length ?
+                <a href="#" id="clearSelected" onClick={clearSelected}>
+                    <FontAwesomeIcon icon={faTrash} /> Remover selecionados
+                </a> : null
+            }
+
+            <a href="#" id="clearAll" onClick={clearAll}>
+                <FontAwesomeIcon icon={faTrash} /> Remover tudo
             </a>
         </div>
     );

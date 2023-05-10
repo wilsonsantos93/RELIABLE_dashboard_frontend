@@ -10,7 +10,12 @@ div.tabHead > span {
     text-align: left;
 }
 
-div.tabHead > a { 
+div.tabHead a#clearSelected { 
+    flex: 1; 
+    text-align: center; 
+}
+
+div.tabHead a#clearAll { 
     flex: 1; 
     text-align: right; 
 }
