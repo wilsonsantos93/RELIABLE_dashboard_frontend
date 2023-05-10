@@ -10,6 +10,7 @@ import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
 import { selectFeature, setSelectedFeature, updateComparedFeatures } from "../../../store/map/map.action";
 import { selectRegionNamePath, selectWeatherFields } from "../../../store/settings/settings.selector";
 import { getObjectValue } from "../../../utils/reducer/getObjectValue.utils";
+import getArrayDifference from "../../../utils/reducer/getArrayDifference.utils";
 
 const FeaturesTable = () => {
     const dispatch = useDispatch<any>();
@@ -112,19 +113,12 @@ const FeaturesTable = () => {
 		setSelectedRows(state.selectedRows);
 	}, []);
 
-    const getDifference = (array1: any[], array2: any[]) => {
-        return array1.filter(object1 => {
-          return !array2.some(object2 => {
-            return object1._id === object2.id;
-          });
-        });
-    };
 
     const handleDelete = () => {
         if (!geoJsonLayerRef) return;
         setToggleCleared(!toggleCleared);
         setSelectedRows([]);
-        const diff = getDifference(comparedFeatures, selectedRows);
+        const diff = getArrayDifference(comparedFeatures, selectedRows);
         dispatch(updateComparedFeatures(diff));
         if (!selectedFeature) return;
         const feature = comparedFeatures.find((f:any) => f._id === selectedFeature._id);
