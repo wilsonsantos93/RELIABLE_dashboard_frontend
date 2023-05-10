@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { selectSelectedWeatherField } from "../../../store/settings/settings.selector";
-import { WeatherFieldRange } from "../../../store/settings/settings.types";
+import { selectSelectedWeatherField, selectWeatherFields } from "../../../store/settings/settings.selector";
+/* import { WeatherFieldRange } from "../../../store/settings/settings.types"; */
 import "./map-legend.styles.css";
+import { Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { useDispatch } from "react-redux";
+import { setWeatherField } from "../../../store/settings/settings.action";
 
 const MapLegend = () => {
     const selectedWeatherField = useSelector(selectSelectedWeatherField);
-    const [data, setData] = useState<WeatherFieldRange[] | []>([]);
+    const weatherFields = useSelector(selectWeatherFields);
+    const dispatch = useDispatch<any>();
+    //const [data, setData] = useState<WeatherFieldRange[] | []>([]);
     const [colors, setColors] = useState<any>();
     const [domain, setDomain] = useState<any>();
     const [tickFormat, setTickFormat] = useState<any>(".0f");
@@ -14,11 +21,11 @@ const MapLegend = () => {
 
     useEffect(() => {
         if (!selectedWeatherField) {
-            setData([]);
+            //setData([]);
             return;
         }
         const ranges = selectedWeatherField.ranges.sort((a, b) => b.min - a.min);
-        setData(ranges);
+        //setData(ranges);
 
         setColors(`[${ranges.map(r => `"${r.color}"`).reverse()}]`);
 
@@ -34,10 +41,29 @@ const MapLegend = () => {
         
         let tickFormat = ".0f";
         if (decimalPlaces) {
-            setTickFormat(`.${decimalPlaces.length}f`);
-        }
+            tickFormat = `.${decimalPlaces.length}f`;
+        } 
+        setTickFormat(tickFormat);
 
     }, [selectedWeatherField])
+
+    const prev = () => {
+        let previousIx: number;
+        const ix = weatherFields.findIndex(f => f._id == selectedWeatherField?._id);
+        if (ix < 0) return;
+        if (ix == 0) previousIx = weatherFields.length-1;
+        else previousIx = ix - 1;
+        dispatch(setWeatherField(weatherFields[previousIx]));
+    }
+
+    const next = () => {
+        let nextIx: number;
+        const ix = weatherFields.findIndex(f => f._id == selectedWeatherField?._id);
+        if (ix < 0) return;
+        if (ix == weatherFields.length-1) nextIx = 0;
+        else nextIx = ix + 1;
+        dispatch(setWeatherField(weatherFields[nextIx]));
+    }
 
     const POSITION_CLASSES = {
         bottomleft: 'leaflet-bottom leaflet-left',
@@ -65,11 +91,16 @@ const MapLegend = () => {
                 }
             </div> */}
 
-            { selectedWeatherField && colors && domain ? 
+            <div className="leaflet-control" id="mapLegendArrows">   
+                <Button variant="secondary" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
+                <Button variant="secondary" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
+            </div>
             
+            { selectedWeatherField && colors && domain ? 
+            <div style={{display:"block"}}>
                 <color-legend 
                     class="styled"
-                    width="210"
+                    width="170"
                     tickValues={tickValues}
                     domain={domain}
                     range={colors}
@@ -78,6 +109,7 @@ const MapLegend = () => {
                     tickFormat={tickFormat}
                 >
                 </color-legend>
+            </div>
             : null 
             }
         </div>
