@@ -155,3 +155,13 @@ export const getRegionPathName = (): AppThunk => {
 export const setRegionNamePath = withMatcher(
     (path: string) => createAction(SETTINGS_ACTION_TYPES.SET_REGION_NAME_PATH, path)
 )
+
+
+// set table selected features
+export const setTableSelectedFeatures = withMatcher(
+    (features: any[] | null) => createAction(SETTINGS_ACTION_TYPES.SET_TABLE_SELECTED_FEATURES, features)
+)
+
+export const updateTableSelectedFeatures = (features: any[] | null) => {
+    return setTableSelectedFeatures(features);
+}

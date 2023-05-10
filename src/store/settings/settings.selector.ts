@@ -63,3 +63,8 @@ export const selectRegionNamePath = createSelector(
     [selectSettingsReducer],
     (settingsSlice: SettingsState) => settingsSlice.regionNamePath
 )
+
+export const selectTableSelectedFeatures = createSelector(
+    [selectSettingsReducer],
+    (settingsSlice: SettingsState) => settingsSlice.tableSelectedFeatures
+)

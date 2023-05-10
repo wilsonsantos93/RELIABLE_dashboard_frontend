@@ -1,4 +1,4 @@
-import { setSelectAreaMode, setSelectedWeatherField, fetchWeatherFieldsSuccess, fetchWeatherFieldsFailed, setSelectedDateId, fetchWeatherDatesFailed, fetchWeatherDatesSuccess, setLoading, setIsSidebarOpen, setSuccessMsg, setErrorMsg, setInfoMsg, setRegionNamePath } from "./settings.action";
+import { setSelectAreaMode, setSelectedWeatherField, fetchWeatherFieldsSuccess, fetchWeatherFieldsFailed, setSelectedDateId, fetchWeatherDatesFailed, fetchWeatherDatesSuccess, setLoading, setIsSidebarOpen, setSuccessMsg, setErrorMsg, setInfoMsg, setRegionNamePath, setTableSelectedFeatures } from "./settings.action";
 import { AnyAction } from "redux";
 import { WeatherDate, WeatherField } from "./settings.types";
 
@@ -13,7 +13,8 @@ export type SettingsState = {
   readonly error: string | null,
   readonly success: string | null,
   readonly info: string | null,
-  readonly regionNamePath: string
+  readonly regionNamePath: string,
+  readonly tableSelectedFeatures: any[] | null
 }
 
 const INITIAL_STATE: SettingsState = {
@@ -27,7 +28,8 @@ const INITIAL_STATE: SettingsState = {
     error: null,
     success: null,
     info: null,
-    regionNamePath: ''
+    regionNamePath: '',
+    tableSelectedFeatures: null,
 };
 
 export const settingsReducer = (state = INITIAL_STATE, action: AnyAction): SettingsState => {
@@ -118,6 +120,13 @@ export const settingsReducer = (state = INITIAL_STATE, action: AnyAction): Setti
     return {
       ...state,
       regionNamePath: action.payload
+    }
+  }
+
+  if (setTableSelectedFeatures.match(action)) {
+    return {
+      ...state,
+      tableSelectedFeatures: action.payload
     }
   }
 
