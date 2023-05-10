@@ -17,7 +17,8 @@ code {
 }
 
 .toast-container.start-33 {
-    left: 30%!important;
+    left: 25%!important;
+    max-width: 35vw;
 }
 
 @media (max-width: 440px)  {
