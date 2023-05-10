@@ -15,3 +15,13 @@ tbody tr:hover {
     --cle-background: #f8f9fa;
     --cle-font-size: 11px;
 }
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus
+{
+    box-shadow: unset;
+    border-color: #ced4da;
+}
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus:hover {
+    border-color: #6366F1
+}

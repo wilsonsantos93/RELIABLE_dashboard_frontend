@@ -2,7 +2,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Row } from 'primereact/row';
 import { ColumnGroup } from 'primereact/columngroup';
-import { selectRegionNamePath, selectWeatherFields } from '../../../store/settings/settings.selector';
+import { selectRegionNamePath, selectTableSelectedFeatures, selectWeatherFields } from '../../../store/settings/settings.selector';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMemo } from 'react';
 import { getObjectValue } from '../../../utils/reducer/getObjectValue.utils';
@@ -11,16 +11,22 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "./table-features.styles.css";
 import { selectGeoJsonLayerRef } from '../../../store/refs/refs.selector';
-import { selectFeature } from '../../../store/map/map.action';
+import { selectFeature, setSelectedFeature } from '../../../store/map/map.action';
 import { WeatherField } from '../../../store/settings/settings.types';
+import { useMap } from 'react-leaflet';
+import { updateTableSelectedFeatures } from '../../../store/settings/settings.action';
 
 const TableFeatures = () => {
     const dispatch = useDispatch<any>();
+    const map = useMap();
     const weatherFields = useSelector(selectWeatherFields);
     const comparedFeatures = useSelector(selectComparedFeatures);
     const regionNamePath = useSelector(selectRegionNamePath);
     const selectedFeature = useSelector(selectSelectedFeature);
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
+    const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
+    
+    ///const [selectedProducts, setSelectedProducts] = useState(null);
     
     const getColor = (value: number, fieldName: string) => {
         const field = weatherFields.find(field => field.name === fieldName);
@@ -96,10 +102,18 @@ const TableFeatures = () => {
         };
     };
 
+    const onSetSelectedFeatures = (e: any) => {
+        console.log(e.value);
+        dispatch(setSelectedFeature(null));
+        map.closePopup();
+        dispatch(updateTableSelectedFeatures(e.value));
+    }
 
     const onRowClicked = (e: any) => {
         if (!geoJsonLayerRef) return;
 
+        if (e.originalEvent.target.matches(".p-checkbox-icon, .p-selection-column")) return;
+        
         const featureId = e.data._id;
         if (selectedFeature && selectedFeature._id == featureId) return;
         const feature = comparedFeatures.find((f:any) => f._id === featureId);
@@ -130,26 +144,30 @@ const TableFeatures = () => {
             tickFormat = `.${decimalPlaces.length}f`;
         }
 
-        return <color-legend 
+        return <div style={{ maxWidth: "100%"}}>
+            <color-legend 
                     class="tableLegend"
-                    width="90"
+                    width="100"
                     tickValues={ticks}
                     domain={domains}
                     range={colors}
                     scaletype="threshold"
                     titleText=""
                     tickFormat={tickFormat}
-                ></color-legend>
+            ></color-legend>
+            </div>
     }
 
     const headerGroup = (
         <ColumnGroup>
             <Row>
+                <Column selectionMode="multiple" headerStyle={{ width: '1rem' }} key="selectCol" rowSpan={2}></Column>
                 <Column header="Local" key="local" field="local" sortable rowSpan={2} />
                 {   weatherColumns.map((col, i) => (
                         <Column 
                             key={`col_legend_${i}`} 
                             header={() => setLegend(col.name)}
+                            headerStyle={{ textAlign: 'center' }}
                         />
                     ))
                 }
@@ -168,7 +186,8 @@ const TableFeatures = () => {
     );
 
     return (
-        <DataTable value={data} showGridlines headerColumnGroup={headerGroup} onRowClick={onRowClicked} rowClassName={rowClass} size='small' cellClassName={cellClassName} scrollable scrollHeight="44vh" tableStyle={{ fontSize: '12px', maxWidth: '98%' }}>
+        <DataTable value={data} selectionMode={'checkbox'} selection={tableSelectedFeatures} onSelectionChange={(e) => onSetSelectedFeatures(e)} emptyMessage="Sem localidades na lista" showGridlines headerColumnGroup={headerGroup} onRowClick={onRowClicked} rowClassName={rowClass} size='small' cellClassName={cellClassName} scrollable scrollHeight="44vh" tableStyle={{ fontSize: '12px', maxWidth: '99%' }}>
+            <Column selectionMode="multiple"></Column>
             { 
                 columns.map((col, i) => (
                     <Column 
