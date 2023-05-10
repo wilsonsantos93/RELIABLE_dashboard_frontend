@@ -132,7 +132,7 @@ const TableFeatures = () => {
 
         return <color-legend 
                     class="tableLegend"
-                    width="85"
+                    width="90"
                     tickValues={ticks}
                     domain={domains}
                     range={colors}
@@ -150,7 +150,6 @@ const TableFeatures = () => {
                         <Column 
                             key={`col_legend_${i}`} 
                             header={() => setLegend(col.name)}
-                            body={(row, options) => cellTemplate(row, options, col.field)}
                         />
                     ))
                 }
@@ -160,9 +159,7 @@ const TableFeatures = () => {
                         <Column 
                             sortable 
                             key={col.field} 
-                            field={col.field} 
-                            header={col.header} 
-                            body={(row, options) => cellTemplate(row, options, col.field)}
+                            header={col.header}
                         />
                     ))
                 }
@@ -171,7 +168,7 @@ const TableFeatures = () => {
     );
 
     return (
-        <DataTable value={data} headerColumnGroup={headerGroup} onRowClick={onRowClicked} rowClassName={rowClass} size='small' cellClassName={cellClassName} scrollable scrollHeight="44vh" tableStyle={{ fontSize: '12px', maxWidth: '98%' }}>
+        <DataTable value={data} showGridlines headerColumnGroup={headerGroup} onRowClick={onRowClicked} rowClassName={rowClass} size='small' cellClassName={cellClassName} scrollable scrollHeight="44vh" tableStyle={{ fontSize: '12px', maxWidth: '98%' }}>
             { 
                 columns.map((col, i) => (
                     <Column 
@@ -179,7 +176,7 @@ const TableFeatures = () => {
                         //frozen={col.field === 'local'} 
                         key={col.field} 
                         field={col.field} 
-                        header={col.header} 
+                        bodyStyle={{ textAlign: 'center' }}
                         body={(row, options) => cellTemplate(row, options, col.field)}
                     />
                 ))

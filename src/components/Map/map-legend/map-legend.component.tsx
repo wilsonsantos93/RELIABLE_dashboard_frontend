@@ -9,6 +9,7 @@ const MapLegend = () => {
     const [data, setData] = useState<WeatherFieldRange[] | []>([]);
     const [colors, setColors] = useState<any>();
     const [domain, setDomain] = useState<any>();
+    const [tickFormat, setTickFormat] = useState<any>(".0f");
     const [tickValues, setTickValues] = useState<any>();
 
     useEffect(() => {
@@ -26,6 +27,15 @@ const MapLegend = () => {
         setDomain(`[${domain}]`);
 
         setTickValues(`[${ranges.length && ranges.slice(-1)[0].min}, ${ranges.length && ranges[0].max}]`);
+
+        const sumTicks = ranges.reduce((acc, i) => acc+=i.min, 0);
+        const sumTicksStr = sumTicks.toString();
+        const decimalPlaces = sumTicksStr.split(".")[1];
+        
+        let tickFormat = ".0f";
+        if (decimalPlaces) {
+            setTickFormat(`.${decimalPlaces.length}f`);
+        }
 
     }, [selectedWeatherField])
 
@@ -65,7 +75,7 @@ const MapLegend = () => {
                     range={colors}
                     titleText={`${selectedWeatherField?.displayName} ${selectedWeatherField.unit && `(${selectedWeatherField.unit})`}`}
                     scaletype="threshold"
-                    tickFormat=".1f"
+                    tickFormat={tickFormat}
                 >
                 </color-legend>
             : null 

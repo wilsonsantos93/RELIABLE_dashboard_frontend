@@ -20,8 +20,8 @@ tbody tr.comparisonTblRow {
 
 @media (min-width: 720px) {
     .leaflet-sidebar {
-        width: 50vw;
-        max-width: 50vw;
+        width: 55vw;
+        max-width: 55vw;
     }
 }
 

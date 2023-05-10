@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react";
 import WeatherDateSelector from "../weather-date-selector/weather-date-selector.component";
 import WeatherInfoSelector from "../weather-info-selector/weather-info-selector.component";
 import { Form } from "react-bootstrap";
-import ParallelCoordinatesChart from "../parallel-coordinates-chart/paralell-coordinates-chart.component.";
+import ParallelCoordinatesChart from "../parallel-coordinates-chart/paralell-coordinates-chart.component";
 import "./sidebar.styles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTable, faChartLine, faCog, faWindowClose } from '@fortawesome/free-solid-svg-icons'

@@ -366,6 +366,7 @@ const GeoJsonLayer = (props: any) => {
         }
     }
 
+
     // Set clicked feature id
     const setClickedFeatureId = (event: LeafletMouseEvent & {marker: any, markerRef: any}, layer: any) => {
         if (!event.target) {
@@ -380,15 +381,26 @@ const GeoJsonLayer = (props: any) => {
         const obj = { _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef };
         dispatch(selectFeature(obj));
 
-        const table = document.querySelector(".featuresTable > div");
+        // Scroll table
+        const tblSelector = ".featuresTable .p-datatable-wrapper" //".featureTable > div"
+        const table = document.querySelector(tblSelector);
+
         if (!existsInComparedFeatures(_id) && feature.weather) {
             dispatch(addFeatureToComparedFeatures(comparedFeatures, feature));
-            if (table) table.scrollTop = 0;
+            if (table) {
+                table.scrollTop = 0;
+            }
         } else {
-            const el = document.querySelector(`div#row-${event.target.feature._id}`);
+            const elSelector = `tr.row-${event.target.feature._id}` //`div#row-${event.target.feature._id}`
+            const el = document.querySelector(elSelector);
             if (el) {
+                /* const offset = 35;
                 const topPos = (el as HTMLElement).offsetTop;
-                if (table) table.scrollTop = topPos - 35;
+                if (table) table.scrollTop = topPos - offset; */
+                el.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
             }
         }
 
