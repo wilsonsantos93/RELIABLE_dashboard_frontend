@@ -25,8 +25,7 @@ const TableFeatures = () => {
     const selectedFeature = useSelector(selectSelectedFeature);
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
     const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
-    
-    ///const [selectedProducts, setSelectedProducts] = useState(null);
+
     
     const getColor = (value: number, fieldName: string) => {
         const field = weatherFields.find(field => field.name === fieldName);
@@ -103,7 +102,6 @@ const TableFeatures = () => {
     };
 
     const onSetSelectedFeatures = (e: any) => {
-        console.log(e.value);
         dispatch(setSelectedFeature(null));
         map.closePopup();
         dispatch(updateTableSelectedFeatures(e.value));
@@ -144,7 +142,7 @@ const TableFeatures = () => {
             tickFormat = `.${decimalPlaces.length}f`;
         }
 
-        return <div style={{ maxWidth: "100%"}}>
+        return <div>
             <color-legend 
                     class="tableLegend"
                     width="100"

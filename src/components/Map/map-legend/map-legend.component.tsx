@@ -92,8 +92,8 @@ const MapLegend = () => {
             </div> */}
 
             <div className="leaflet-control" id="mapLegendArrows">   
-                <Button variant="secondary" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
-                <Button variant="secondary" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
+                <Button title="Informação anterior" variant="secondary" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
+                <Button title="Informação seguinte" variant="secondary" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
             </div>
             
             { selectedWeatherField && colors && domain ? 

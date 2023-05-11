@@ -59,7 +59,6 @@ export const loginUser = (credentials: EmailSignIn): AppThunk => {
             dispatch(getWeatherAlerts());
         } catch (error) {
             dispatch(signInFailed(error as Error));
-            console.error(new Date().toJSON(), error);
             throw error;
         }
     }
@@ -92,7 +91,6 @@ export const signUpUser = (data: EmailSignUp): AppThunk => {
             dispatch(showSuccessMsg("Utilizador registado com sucesso. Sessão iniciada."));
         } catch (error) {
             dispatch(signUpFailed(error as Error));
-            console.error(new Date().toJSON(), error);
             throw error;
         }
     }
@@ -129,7 +127,6 @@ export const changePassword = (data: ChangePassword): AppThunk => {
     
             dispatch(showSuccessMsg("Palavra-passe alterada com sucesso!"));
         } catch (error) {
-            console.error(new Date().toJSON(), error);
             throw error;
         }
     }
@@ -163,10 +160,10 @@ export const addUserLocation = (userLocations: UserLocation[], position: { lat: 
 
             dispatch(setUserLocationsSuccess(locations));
             dispatch(showSuccessMsg("Marcador adicionado com sucesso!"));
+            dispatch(getWeatherAlerts());
         } catch (error) {
             dispatch(setUserLocationsFailed(error as Error));
             dispatch(showErrorMsg(error as string));
-            console.error(new Date().toJSON(), error);
         }
     }
 };
@@ -185,12 +182,13 @@ export const updateUserLocation = (userLocations: UserLocation[], item: UserLoca
             const locations = [...userLocations];
             const ix = locations.findIndex(location => location._id === item._id);
             locations[ix] = item;
+            console.log(locations);
             dispatch(setUserLocationsSuccess(locations));
             dispatch(showSuccessMsg("Marcador atualizado com sucesso!"));
+            dispatch(getWeatherAlerts());
         } catch (error) {
             dispatch(setUserLocationsFailed(error as Error));
             dispatch(showErrorMsg(error as string));
-            console.error(new Date().toJSON(), error);
         }
     }
 };
@@ -208,10 +206,10 @@ export const removeUserLocation = (userLocations: UserLocation[], id: string): A
             const locations = userLocations.filter(location => location._id !== id);
             dispatch(setUserLocationsSuccess(locations));
             dispatch(showSuccessMsg("Marcador removido com sucesso!"));
+            dispatch(getWeatherAlerts());
         } catch (error) {
             dispatch(setUserLocationsFailed(error as Error));
             dispatch(showErrorMsg(error as string));
-            console.error(new Date().toJSON(), error);
         }
     }
 };
@@ -235,7 +233,6 @@ export const getWeatherAlerts = (): AppThunk => {
             const data = await response.json();
             dispatch(setWeatherAlerts(data));
         } catch (error) {
-            console.error(new Date().toJSON(), error);
             dispatch(showErrorMsg(error as string));
         }
     }

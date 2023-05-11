@@ -262,7 +262,7 @@ const GeoJsonLayer = (props: any) => {
             <div style="margin-bottom:2px">
                 <strong>${getObjectValue(regionNamePath, layer.feature)}</strong><br>
                 <span>${selectedWeatherField ? selectedWeatherField.displayName+':' : ''}</span>
-                <span>${selectedWeatherField && layer.feature.weather ? layer.feature.weather[selectedWeatherField.name] : ''} ${selectedWeatherField ? selectedWeatherField.unit : ''}</span>
+                <span>${(selectedWeatherField && layer.feature.weather) && layer.feature.weather.hasOwnProperty(selectedWeatherField.name) ? layer.feature.weather[selectedWeatherField.name] : 'n/a'} ${selectedWeatherField ? selectedWeatherField.unit : ''}</span>
             </div>
         `;
 

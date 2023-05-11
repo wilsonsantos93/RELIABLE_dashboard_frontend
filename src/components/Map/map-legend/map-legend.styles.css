@@ -31,7 +31,7 @@
     padding-left: 15px;
 }
 
-@media (max-width: 630px)  {
+@media (max-width: 720px)  {
     .MapFeatureInformation, #mapLegend {
         bottom: 55px;
     }

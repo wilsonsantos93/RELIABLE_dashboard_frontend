@@ -91,7 +91,7 @@ const UserMarker = (props: any) => {
                 findLayerByLatLng(latlngPoint);
             },
         }), 
-        [geoJsonLayerRef, comparedFeatures]
+        [geoJsonLayerRef, comparedFeatures, userLocations]
     );
 
 

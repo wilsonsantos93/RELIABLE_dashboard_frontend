@@ -47,6 +47,17 @@ const WeatherAlerts = () => {
         return "#808080";
     }
 
+    const addMarkerNames = (a: any) => {
+      if (a.locations && a.locations.length) {
+        let names: string[] = [];
+        a.locations.forEach((l:any) => {
+          if (l.name) names.push(l.name);
+        })
+        if (names.length) return `(${names.join()})`;
+        return 
+      }
+    }
+
     return (
     <>
       <Dropdown className="d-inline mx-2">
@@ -63,7 +74,7 @@ const WeatherAlerts = () => {
             <div style={{textAlign: 'left'}} key={`alert_divider_${i}`}>
               <Dropdown.Divider />
               <Dropdown.Item className="alerts-item" style={{ marginLeft: '5px', borderLeft: `5px solid ${getAlertColor(a.weather[mainWeatherField?.name])}`}} onClick={() => onAlertClick(a.date[0]._id, a.regionBorderFeatureObjectId)} key={`alert_${i}`} href="#">
-                  <strong>{a.regionName}</strong> com {mainWeatherField?.displayName} de <strong>{a.weather[mainWeatherField?.name]}</strong> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)} 
+                  <strong>{a.regionName} {addMarkerNames(a)}</strong> com {mainWeatherField?.displayName} de <strong>{a.weather[mainWeatherField?.name]}</strong> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)} 
               </Dropdown.Item>
             </div>
           )} </>

@@ -68,13 +68,13 @@ const NavigationBar = () => {
         <Navbar bg="dark" fixed="top" variant="dark" style={{zIndex:2200}}>
             <Container fluid>
                 <Navbar.Brand href="#home">RELIABLE</Navbar.Brand>
-                <Nav className="me-auto">
+                {/* <Nav className="me-auto">
                     <Nav.Link id="contactsBtn" onClick={() => handleShowContacts()} href="#">Contactos</Nav.Link>
-                </Nav>
+                </Nav> */}
               
                 {  !isLoggedIn ?  
                     <>
-                        <Nav>
+                        <Nav className="ms-auto">
                             <Nav.Link id="signUpBtn" onClick={() => handleShowRegister()} href="#">Registar</Nav.Link>
                         </Nav>
                         <Nav>
@@ -83,7 +83,7 @@ const NavigationBar = () => {
                     </> 
                     : 
                     <>
-                        <WeatherAlerts />
+                        <Nav className="ms-auto"><WeatherAlerts /></Nav>
                         <NavDropdown align="end" title={titleComponent} id="basic-nav-dropdown">
                             <NavDropdown.Item id="updatePasswordBtn" onClick={() => handleShowUpdatePassword()} href="#">Alterar palavra-passe</NavDropdown.Item>
                             <NavDropdown.Divider />
@@ -97,7 +97,7 @@ const NavigationBar = () => {
             </Container>
         </Navbar>
 
-        <Contacts show={showContacts} handleClose={() => closeContacts()} />
+        {/* <Contacts show={showContacts} handleClose={() => closeContacts()} /> */}
         { showLogin && <Login show={showLogin} handleClose={() => closeLogin()} /> }
         { showRegister && <Register show={showRegister} handleClose={() => closeRegister()} /> }
         { showUpdatePassword && <ChangePassword show={showUpdatePassword} handleClose={() => closeUpdatePassword()} /> }
