@@ -20,15 +20,12 @@ import { selectComparedFeatures, selectNextLayer, selectSelectedFeature } from '
 import { changeLoading } from '../../../store/settings/settings.action';
 import { addFeatureToComparedFeatures, getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
 import { getObjectValue } from '../../../utils/reducer/getObjectValue.utils';
-import { Button } from 'react-bootstrap';
-/* declare function require(name:string):any;
-const leafletPip = require('@mapbox/leaflet-pip');
- */
+
 type CustomLayer = { feature: any, _leaflet_id: string, markers: any[] } & Layer;
 
 const layerHighlightedStyle = {
     color: "black",
-    fillOpacity: 0.5,
+    fillOpacity: 0.6,
     weight: 2
 }
 
@@ -39,7 +36,7 @@ const layerRedHighlightedStyle = {
 
 const layerNormalStyle = {
     color: "#a2a2a2",
-    fillOpacity: 0.5,
+    fillOpacity: 0.6,
     weight: 1
 }
 
@@ -144,7 +141,7 @@ const GeoJsonLayer = (props: any) => {
             ...layerNormalStyle,
             fillColor: featureColor,
             opacity: 1,
-            fillOpacity: 0.5,
+            fillOpacity: 0.6,
         };
 
         if (comparedFeatures.find((f:any) => f._id == feature._id)) {
@@ -381,28 +378,25 @@ const GeoJsonLayer = (props: any) => {
         const obj = { _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef };
         dispatch(selectFeature(obj));
 
+        const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
         // Scroll table
         const tblSelector = ".featuresTable .p-datatable-wrapper" //".featureTable > div"
         const table = document.querySelector(tblSelector);
 
         if (!existsInComparedFeatures(_id) && feature.weather) {
             dispatch(addFeatureToComparedFeatures(comparedFeatures, feature));
-            if (table) {
-                table.scrollTop = 0;
-            }
-        } else {
+        }
+        
+        sleep(10).then(() => {
             const elSelector = `tr.row-${event.target.feature._id}` //`div#row-${event.target.feature._id}`
             const el = document.querySelector(elSelector);
             if (el) {
-                /* const offset = 35;
+                const offset = 120 //35;
                 const topPos = (el as HTMLElement).offsetTop;
-                if (table) table.scrollTop = topPos - offset; */
-                el.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
+                if (table) table.scrollTop = topPos - offset;
             }
-        }
+        })
 
         if (sidebarRef?.current && !isSidebarOpen && !window.mobileCheck()) {
             sidebarRef.current.open("tab1");

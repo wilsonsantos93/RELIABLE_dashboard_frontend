@@ -173,9 +173,10 @@ const TableFeatures = () => {
             <Row>
                 {   weatherColumns.map((col, i) => (
                         <Column 
-                            sortable 
+                            sortable
                             key={col.field} 
                             header={col.header}
+                            field={col.field} 
                         />
                     ))
                 }
@@ -184,7 +185,7 @@ const TableFeatures = () => {
     );
 
     return (
-        <DataTable value={data} selectionMode={'checkbox'} selection={tableSelectedFeatures} onSelectionChange={(e) => onSetSelectedFeatures(e)} emptyMessage="Sem localidades na lista" showGridlines headerColumnGroup={headerGroup} onRowClick={onRowClicked} rowClassName={rowClass} size='small' cellClassName={cellClassName} scrollable scrollHeight="44vh" tableStyle={{ fontSize: '12px', maxWidth: '99%' }}>
+        <DataTable value={data} removableSort selectionMode={'checkbox'} selection={tableSelectedFeatures} onSelectionChange={(e) => onSetSelectedFeatures(e)} emptyMessage="Sem localidades na lista" showGridlines headerColumnGroup={headerGroup} onRowClick={onRowClicked} rowClassName={rowClass} size='small' cellClassName={cellClassName} scrollable scrollHeight="44vh" tableStyle={{ fontSize: '12px', maxWidth: '99%' }}>
             <Column selectionMode="multiple"></Column>
             { 
                 columns.map((col, i) => (

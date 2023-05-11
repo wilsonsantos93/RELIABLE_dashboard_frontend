@@ -1,4 +1,4 @@
-import { SETTINGS_ACTION_TYPES } from "./settings.types";
+import { SETTINGS_ACTION_TYPES, WeatherField } from "./settings.types";
 import { createAction, withMatcher } from "../../utils/reducer/reducer.utils";
 import { AppThunk } from "../store";
 import { fetchWeatherFields } from "../../data/fetchWeatherFields";
@@ -40,6 +40,7 @@ export const getWeatherFields = (): AppThunk => {
         try {
             let data = await fetchWeatherFields();
             data = data.filter((d:any) => d.active);
+            data.sort((a: WeatherField, b: WeatherField) => Number(b.main) - Number(a.main));
             dispatch(fetchWeatherFieldsSuccess(data));
             const mainField = data.find((f:any) => f.main === true);
             if (mainField) dispatch(setWeatherField(mainField));
