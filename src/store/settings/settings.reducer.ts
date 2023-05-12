@@ -14,7 +14,7 @@ export type SettingsState = {
   readonly success: string | null,
   readonly info: string | null,
   readonly regionNamePath: string,
-  readonly tableSelectedFeatures: any[] | null
+  readonly tableSelectedFeatures: any[]
 }
 
 const INITIAL_STATE: SettingsState = {
@@ -29,7 +29,7 @@ const INITIAL_STATE: SettingsState = {
     success: null,
     info: null,
     regionNamePath: '',
-    tableSelectedFeatures: null,
+    tableSelectedFeatures: [],
 };
 
 export const settingsReducer = (state = INITIAL_STATE, action: AnyAction): SettingsState => {

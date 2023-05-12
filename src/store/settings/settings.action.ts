@@ -160,9 +160,9 @@ export const setRegionNamePath = withMatcher(
 
 // set table selected features
 export const setTableSelectedFeatures = withMatcher(
-    (features: any[] | null) => createAction(SETTINGS_ACTION_TYPES.SET_TABLE_SELECTED_FEATURES, features)
+    (features: any[]) => createAction(SETTINGS_ACTION_TYPES.SET_TABLE_SELECTED_FEATURES, features)
 )
 
-export const updateTableSelectedFeatures = (features: any[] | null) => {
+export const updateTableSelectedFeatures = (features: any[]) => {
     return setTableSelectedFeatures(features);
 }
