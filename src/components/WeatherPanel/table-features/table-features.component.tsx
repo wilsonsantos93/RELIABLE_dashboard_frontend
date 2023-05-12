@@ -221,9 +221,6 @@ const TableFeatures = () => {
     const onRowUnselect = (e: any) => {
         const ix = data.findIndex((f:any) => f._id == e.data._id)
         data[ix].checked = false;
-       /* const dtRef = dt.current as any;
-       const ix = dtRef.getVirtualScroller().props.items.findIndex((d:any) => d.local == "SINTRA");
-       if (dtRef) dtRef.getVirtualScroller().scrollToIndex(ix); */
     };
 
     const headerGroup = (
@@ -269,7 +266,8 @@ const TableFeatures = () => {
     return (
         <DataTable 
             ref={dt}
-            /* onRowSelect={onRowSelect} */
+            onRowSelect={onRowSelect}
+            onRowUnselect={onRowUnselect}
             value={data} 
             filters={filters} 
             globalFilterFields={['local']} 
