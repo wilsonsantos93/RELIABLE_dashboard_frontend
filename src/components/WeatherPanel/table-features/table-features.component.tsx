@@ -4,7 +4,7 @@ import { Row } from 'primereact/row';
 import { ColumnGroup } from 'primereact/columngroup';
 import { selectRegionNamePath, selectTableSelectedFeatures, selectWeatherFields } from '../../../store/settings/settings.selector';
 import { useDispatch, useSelector } from 'react-redux';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { getObjectValue } from '../../../utils/reducer/getObjectValue.utils';
 import { selectComparedFeatures, selectSelectedFeature } from '../../../store/map/map.selector';
 import "primereact/resources/themes/lara-light-indigo/theme.css"; 
@@ -15,6 +15,11 @@ import { selectFeature, setSelectedFeature } from '../../../store/map/map.action
 import { WeatherField } from '../../../store/settings/settings.types';
 import { useMap } from 'react-leaflet';
 import { updateTableSelectedFeatures } from '../../../store/settings/settings.action';
+import { FilterMatchMode } from 'primereact/api';
+import { InputText } from 'primereact/inputtext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { InputSwitch } from 'primereact/inputswitch';
 
 const TableFeatures = () => {
     const dispatch = useDispatch<any>();
@@ -25,8 +30,46 @@ const TableFeatures = () => {
     const selectedFeature = useSelector(selectSelectedFeature);
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
     const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
+    const dt = useRef(null);
+    const [metaKey, setMetaKey] = useState(false);
 
-    
+
+    useEffect( () => {
+        if (!selectedFeature) return;
+
+        const row: any = document.querySelector(`tr.row-${selectedFeature._id}`);
+        if (row) row.click();
+        
+    }, [selectedFeature]);
+
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        checked: { value: [false, true], matchMode: FilterMatchMode.IN }
+    });
+
+    const [globalFilterValue, setGlobalFilterValue] = useState('');
+
+    const onGlobalFilterChange = (e: any) => {
+        const value = e.target.value;
+        let _filters = { ...filters };
+
+        _filters['global'].value = value;
+
+        setFilters(_filters);
+        setGlobalFilterValue(value);
+    };
+
+    const onCheckFilterChange = (e: any) => {
+        const value = e.value;
+        let _filters = { ...filters };
+
+        if (e.value == true) _filters['checked'].value = [true];
+        else _filters['checked'].value = [false, true];
+
+        setFilters(_filters);
+        setMetaKey(!metaKey);
+    }
+
     const getColor = (value: number, fieldName: string) => {
         const field = weatherFields.find(field => field.name === fieldName);
         if (field) {
@@ -62,11 +105,13 @@ const TableFeatures = () => {
         return comparedFeatures.map((feature:any) => {
              return {
                  _id: feature._id,
+                 checked: false,
                  local: getObjectValue(regionNamePath, feature),
                  ...feature.weather
              }
          });
     }, [comparedFeatures])
+
 
     const cellTemplate = (row: any, options: any, colName:any) => {
         if (colName !== 'local') {
@@ -110,8 +155,16 @@ const TableFeatures = () => {
     const onRowClicked = (e: any) => {
         if (!geoJsonLayerRef) return;
 
-        if (e.originalEvent.target.matches(".p-checkbox-icon, .p-selection-column")) return;
+        if (!tableSelectedFeatures.find((f:any) => f._id == e.data._id)) {
+            const checkedFeatures = [...tableSelectedFeatures, e.data];
+            dispatch(updateTableSelectedFeatures(checkedFeatures));
+
+            const ix = data.findIndex((f:any) => f._id == e.data._id)
+            data[ix].checked = true;
+        }
         
+        if (e.originalEvent.target.matches("path, .p-checkbox-icon, .p-selection-column, .p-checkbox.p-component")) return;
+
         const featureId = e.data._id;
         if (selectedFeature && selectedFeature._id == featureId) return;
         const feature = comparedFeatures.find((f:any) => f._id === featureId);
@@ -119,6 +172,7 @@ const TableFeatures = () => {
         const layer = geoJsonLayerRef.current.getLayer(feature._id);
         if (layer) layer.fireEvent("click");
     }
+
 
     const setLegend = (colName: string) => {
         const field = weatherFields.find((f: WeatherField) => f.name === colName);
@@ -144,17 +198,33 @@ const TableFeatures = () => {
 
         return <div>
             <color-legend 
-                    class="tableLegend"
-                    width="100"
-                    tickValues={ticks}
-                    domain={domains}
-                    range={colors}
-                    scaletype="threshold"
-                    titleText=""
-                    tickFormat={tickFormat}
+                class="tableLegend"
+                width="100"
+                tickValues={ticks}
+                domain={domains}
+                range={colors}
+                scaletype="threshold"
+                titleText=""
+                tickFormat={tickFormat}
             ></color-legend>
             </div>
     }
+
+    const onRowSelect = (e: any) => {
+        const ix = data.findIndex((f:any) => f._id == e.data._id)
+        data[ix].checked = true;
+       /* const dtRef = dt.current as any;
+       const ix = dtRef.getVirtualScroller().props.items.findIndex((d:any) => d.local == "SINTRA");
+       if (dtRef) dtRef.getVirtualScroller().scrollToIndex(ix); */
+    };
+
+    const onRowUnselect = (e: any) => {
+        const ix = data.findIndex((f:any) => f._id == e.data._id)
+        data[ix].checked = false;
+       /* const dtRef = dt.current as any;
+       const ix = dtRef.getVirtualScroller().props.items.findIndex((d:any) => d.local == "SINTRA");
+       if (dtRef) dtRef.getVirtualScroller().scrollToIndex(ix); */
+    };
 
     const headerGroup = (
         <ColumnGroup>
@@ -184,14 +254,51 @@ const TableFeatures = () => {
         </ColumnGroup>
     );
 
+    const searchHeader = () => {
+        return (
+            <div className="flex justify-content-end">
+                <span className="p-input-icon-left">
+                    <FontAwesomeIcon icon={faSearch} />
+                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Pesquisar local" />
+                    <InputSwitch inputId="input-metakey" checked={metaKey} onChange={onCheckFilterChange} />
+                </span>
+            </div>
+        ); 
+    }
+
     return (
-        <DataTable value={data} removableSort selectionMode={'checkbox'} selection={tableSelectedFeatures} onSelectionChange={(e) => onSetSelectedFeatures(e)} emptyMessage="Sem localidades na lista" showGridlines headerColumnGroup={headerGroup} onRowClick={onRowClicked} rowClassName={rowClass} size='small' cellClassName={cellClassName} scrollable scrollHeight="44vh" tableStyle={{ fontSize: '12px', maxWidth: '99%' }}>
+        <DataTable 
+            ref={dt}
+            /* onRowSelect={onRowSelect} */
+            value={data} 
+            filters={filters} 
+            globalFilterFields={['local']} 
+            removableSort 
+            selectionMode={'checkbox'}
+            selection={tableSelectedFeatures} 
+            onSelectionChange={(e) => onSetSelectedFeatures(e)} 
+            emptyMessage="Sem localidades na lista" 
+            showGridlines
+            header={searchHeader}
+            headerColumnGroup={headerGroup} 
+            onRowClick={onRowClicked} 
+            rowClassName={rowClass} 
+            size='small' 
+            cellClassName={cellClassName} 
+            scrollable 
+            scrollHeight="40vh" 
+            tableStyle={{ fontSize: '12px', maxWidth: '99%' }}
+            /* virtualScrollerOptions={{ className:"ola" }} */
+            sortField="local"
+            sortOrder={1}
+            /* onValueChange={(e) => console.log(e)} */
+        >
             <Column selectionMode="multiple"></Column>
+            <Column hidden filter key={"checked"} field={"checked"}></Column>
             { 
                 columns.map((col, i) => (
                     <Column 
                         sortable 
-                        //frozen={col.field === 'local'} 
                         key={col.field} 
                         field={col.field} 
                         bodyStyle={{ textAlign: 'center' }}

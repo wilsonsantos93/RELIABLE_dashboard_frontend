@@ -1,5 +1,5 @@
 .border-row {
-    border: 3px solid red;
+    border: 3px solid #4338ca;
     font-weight: 700;
 }
 
@@ -24,4 +24,8 @@ tbody tr:hover {
 
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus:hover {
     border-color: #6366F1
+}
+
+.p-inputtext {
+    padding: unset;
 }
