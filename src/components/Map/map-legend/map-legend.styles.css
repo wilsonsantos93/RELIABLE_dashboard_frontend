@@ -42,7 +42,7 @@
 }
 
 #mapLegend #mapLegendArrows {
-    left: 50px;
+    left: 55px;
     display: "block";
 }
 
@@ -54,10 +54,14 @@
     font-size: 0.675rem;
 }
 
+#mapLegendArrows.leaflet-control {
+    margin-bottom: 5px;
+}
+
 color-legend.styled {
     text-align: center;
     --cle-font-size-title: 9pt;
-    --cle-background: #333333b3;
+    --cle-background: unset;/* #333333b3; */
     --cle-letter-spacing-title: 0.5px;
     --cle-color: white;
     --cle-padding: 0.25rem 0.25rem 0.75rem;

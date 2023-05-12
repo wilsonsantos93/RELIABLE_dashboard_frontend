@@ -91,27 +91,31 @@ const MapLegend = () => {
                 }
             </div> */}
 
-            <div className="leaflet-control" id="mapLegendArrows">   
-                <Button title="Informação anterior" variant="secondary" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
-                <Button title="Informação seguinte" variant="secondary" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
+            {/* <div className="leaflet-control" id="mapLegendArrows">   
+                <Button title="Informação anterior" variant="light" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
+                <Button title="Informação seguinte" variant="light" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
+            </div> */}
+            
+
+            <div className="leaflet-control" style={{display:"block", background: "#333333b3"}}>
+                <Button style={{ margin: "5px", fontSize: "0.575rem"}} title="Informação anterior" variant="light" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
+                <Button style={{ float: "right", margin: "5px", fontSize: "0.575rem"}} title="Informação seguinte" variant="light" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
+                { selectedWeatherField && colors && domain ? 
+                    <color-legend 
+                        class="styled"
+                        width="170"
+                        tickValues={tickValues}
+                        domain={domain}
+                        range={colors}
+                        titleText={`${selectedWeatherField?.displayName} ${selectedWeatherField.unit && `(${selectedWeatherField.unit})`}`}
+                        scaletype="threshold"
+                        tickFormat={tickFormat}
+                    >
+                    </color-legend>
+                    : null 
+                }
             </div>
             
-            { selectedWeatherField && colors && domain ? 
-            <div style={{display:"block"}}>
-                <color-legend 
-                    class="styled"
-                    width="170"
-                    tickValues={tickValues}
-                    domain={domain}
-                    range={colors}
-                    titleText={`${selectedWeatherField?.displayName} ${selectedWeatherField.unit && `(${selectedWeatherField.unit})`}`}
-                    scaletype="threshold"
-                    tickFormat={tickFormat}
-                >
-                </color-legend>
-            </div>
-            : null 
-            }
         </div>
 
     )

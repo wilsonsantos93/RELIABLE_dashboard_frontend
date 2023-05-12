@@ -1,10 +1,18 @@
 .date-indicator { 
     position: absolute;
-    background-color: #333;
-    opacity: 0.7;
+    background-color: #333333b3;
     color: white; 
     margin-left: 10px; 
     top: 10px; 
     z-index: 999;
     padding: 5px;
+}
+
+.date-indicator button {
+    font-size: 0.475rem;
+}
+
+.date-indicator > span {
+    margin-left: 5px;
+    margin-right: 5px;
 }
