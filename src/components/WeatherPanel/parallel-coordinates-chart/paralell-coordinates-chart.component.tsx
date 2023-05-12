@@ -113,7 +113,7 @@ const ParallelCoordinatesChart = () => {
         const series: any = chartRef?.current?.chart?.series?.find((s:CustomSeries) => s.userOptions.featureId == featureId);
         if (!series) return;
         setPreviousSeries({ ...series });
-        const options = { color: "red", lineWidth: 6, zIndex: 10 };
+        const options = { color: "#6366f1", lineWidth: 7, zIndex: 10 };
         series.update(options);
     }
 
