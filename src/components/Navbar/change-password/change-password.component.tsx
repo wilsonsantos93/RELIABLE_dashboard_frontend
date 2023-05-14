@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { Alert, Modal } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
 import { useDispatch } from 'react-redux';
-import { changePassword, signUpUser } from '../../../store/user/user.action';
+import { changePassword } from '../../../store/user/user.action';
 import "./change-password.styles.css";
 
 type ChangePasswordProps = {
@@ -61,7 +60,7 @@ const ChangePassword = ({ show, handleClose }: ChangePasswordProps) => {
 
                 <Form.Group className="mb-3" controlId="validationCustomPassword">
                     <Form.Label className="signup-form-label">Nova palavra-passe</Form.Label>
-                    <Form.Control onChange={e => setPassword(e.target.value)} minLength={6} type="password" placeholder="Insira a palavra-passe" required />
+                    <Form.Control onChange={(e:any) => setPassword(e.target.value)} minLength={6} type="password" placeholder="Insira a palavra-passe" required />
                     <Form.Control.Feedback type="invalid">
                         Palavra-passe deve ter pelo menos 6 caracteres.
                     </Form.Control.Feedback> 
@@ -70,7 +69,7 @@ const ChangePassword = ({ show, handleClose }: ChangePasswordProps) => {
                 <Form.Group className="mb-3" controlId="validationCustomPasswordConfirm">
                     <Form.Label className="signup-form-label">Confirmar nova palavra-passe</Form.Label>
                     <Form.Control 
-                        onChange={e => setConfirmPassword(e.target.value)} 
+                        onChange={(e:any) => setConfirmPassword(e.target.value)} 
                         /* isInvalid={(confirmPassword as string != password as string)}  */
                         type="password" 
                         minLength={6}
