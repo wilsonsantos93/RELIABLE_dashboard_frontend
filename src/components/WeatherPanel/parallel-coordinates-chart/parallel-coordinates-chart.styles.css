@@ -45,3 +45,7 @@
     /* stroke: rgb(255 66 66); */
     stroke-width: 6px;
 }
+
+.featuresChart .p-inputtext {
+    padding: 2px;
+}
