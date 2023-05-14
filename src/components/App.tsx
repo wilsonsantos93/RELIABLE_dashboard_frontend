@@ -13,6 +13,7 @@ import { getRegionPathName, showErrorMsg, showInfoMsg, showSuccessMsg } from '..
 import { selectFeature } from '../store/map/map.action';
 import { selectSidebarRef } from '../store/refs/refs.selector';
 import { selectUserIsLoggedIn } from '../store/user/user.selector';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import "./App.css";
 
 function App(): JSX.Element {
@@ -83,7 +84,7 @@ function App(): JSX.Element {
                     </Toast> 
         
                     
-                    <Toast id="tipToast" bg="dark" show={(!loading) ? true : false} animation={true}>
+                    {/* <Toast id="tipToast" bg="dark" show={(!loading) ? true : false} animation={true}>
                         <Toast.Body className='text-white'> 
                         {
                             areaMode &&
@@ -92,11 +93,11 @@ function App(): JSX.Element {
                         {
                             !areaMode &&
                             <span>
-                                <FontAwesomeIcon icon={faHandPointer} /> Clique nas localidades para adicionar à tabela
+                                <FontAwesomeIcon icon={faHandPointer} /> Clique nas localidades para adicionar à lista
                             </span>
                         }  
                         </Toast.Body>
-                    </Toast>
+                    </Toast> */}
                 </ToastContainer> : null
             }
         </Container>
