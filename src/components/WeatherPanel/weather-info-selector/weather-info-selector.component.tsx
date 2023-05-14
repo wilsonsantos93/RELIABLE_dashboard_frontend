@@ -1,6 +1,5 @@
 import { ChangeEvent, useEffect } from 'react';
 import Form from 'react-bootstrap/Form'
-import 'bootstrap/dist/css/bootstrap.min.css';
 import {Col, Row} from "react-bootstrap";
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSelectedWeatherField, selectWeatherFields } from '../../../store/settings/settings.selector';
