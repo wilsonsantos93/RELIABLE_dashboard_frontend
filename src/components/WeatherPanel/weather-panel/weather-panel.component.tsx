@@ -1,7 +1,6 @@
 import { Stack } from "react-bootstrap";
 import WeatherInfoSelector from "../weather-info-selector/weather-info-selector.component";
 import WeatherDateSelector from "../weather-date-selector/weather-date-selector.component";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './weather-panel.styles.css';
 
 const WeatherPanel = () => {
