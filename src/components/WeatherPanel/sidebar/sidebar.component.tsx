@@ -65,7 +65,7 @@ const Sidebar = () => {
                         <div className="leaflet-sidebar-close"><FontAwesomeIcon icon={faWindowClose} /></div>
                     </h1>
                     <div className="containerDiv">
-                        <SidebarTabHead />
+                        {/* <SidebarTabHead /> */}
                 
                         <div className="featuresTable">
                             {/* <FeaturesTable /> */}
@@ -84,7 +84,7 @@ const Sidebar = () => {
                         <div className="leaflet-sidebar-close"><FontAwesomeIcon icon={faWindowClose} /></div>
                     </h1>
                     <div className="containerDiv">
-                        <SidebarTabHead />
+                        {/* <SidebarTabHead /> */}
                 
                         <div className="featuresChart">
                             <ParallelCoordinatesChart />
@@ -96,7 +96,7 @@ const Sidebar = () => {
                     </div>
                 </div>
     
-                {/* TAB 3 */}
+                
                 <div className="leaflet-sidebar-pane" id="tab3">
                     <h1 className="leaflet-sidebar-header">Configurar
                         <div className="leaflet-sidebar-close"><FontAwesomeIcon icon={faWindowClose} /></div>
