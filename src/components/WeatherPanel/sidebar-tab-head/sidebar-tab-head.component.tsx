@@ -34,7 +34,7 @@ const SidebarTabHead = () => {
 
     return (
         <div className="tabHead">
-            <span><FontAwesomeIcon icon={faEye} /> {comparedFeatures.length} localidades na lista</span>
+            <span><FontAwesomeIcon icon={faEye} /> {comparedFeatures.length} localidades total</span>
 
             { tableSelectedFeatures && tableSelectedFeatures.length ?
                 <a href="#" id="clearSelected" onClick={clearSelected}>
