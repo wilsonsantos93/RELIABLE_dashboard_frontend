@@ -15,10 +15,10 @@ import { selectUserIsLoggedIn, selectUserLocations } from '../../../store/user/u
 import { addUserLocation } from '../../../store/user/user.action';
 import { setGeoJsonLayer } from '../../../store/refs/refs.action';
 import { selectSidebarRef } from '../../../store/refs/refs.selector';
-import { selectIsSidebarOpen, selectRegionNamePath, selectSelectedDateId, selectSelectedWeatherField, selectTableSelectedFeatures, selectWeatherFields } from '../../../store/settings/settings.selector';
+import { selectIsSidebarOpen, selectRegionNamePath, selectSelectedDateId, selectSelectedWeatherField, selectWeatherFields } from '../../../store/settings/settings.selector';
 import { selectComparedFeatures, selectNextLayer, selectSelectedFeature } from '../../../store/map/map.selector';
 import { changeLoading } from '../../../store/settings/settings.action';
-import { getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
+import { addFeatureToComparedFeatures, getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
 import { getObjectValue } from '../../../utils/reducer/getObjectValue.utils';
 
 type CustomLayer = { feature: any, _leaflet_id: string, markers: any[] } & Layer;
@@ -26,13 +26,12 @@ type CustomLayer = { feature: any, _leaflet_id: string, markers: any[] } & Layer
 const layerHighlightedStyle = {
     color: "black",
     fillOpacity: 0.6,
-    weight: 1.5
+    weight: 2
 }
 
 const layerRedHighlightedStyle = {
-    color: "#4338ca",
-    fillOpacity: 0.6,
-    weight: 3
+    ...layerHighlightedStyle,
+    color: "red",
 }
 
 const layerNormalStyle = {
@@ -41,6 +40,11 @@ const layerNormalStyle = {
     weight: 1
 }
 
+/* const layerNormalHoverStyle = {
+    color: "#a2a2a2",
+    fillOpacity: 0.5,
+    weight: 2
+} */
 
 let clickedFeatureId: string | null = null;
 
@@ -65,13 +69,52 @@ const GeoJsonLayer = (props: any) => {
     const selectedFeature = useSelector(selectSelectedFeature);
     const nextLayer = useSelector(selectNextLayer);
     const regionNamePath = useSelector(selectRegionNamePath);
-    const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
 
     const dispatch = useDispatch<any>();
 
     useEffect(() => {
         dispatch(setGeoJsonLayer(geoJsonLayerRef));
     }, [geoJsonLayerRef])
+
+
+    /* useEffect(() => {
+        if (!geoJsonLayerRef || !geoJsonLayerRef.current || !userMarkers) return;
+
+        const compFeatures = [...comparedFeatures];
+        if (!userMarkers.length) {
+            map.eachLayer((layer: any) => {
+                layer.markers = [];
+                const ix = compFeatures.findIndex((f:any) => f._id == layer._leaflet_id);
+                if (ix >= 0) compFeatures[ix].markers = [];
+            });
+            //setComparedFeatures(compFeatures);
+            dispatch(updateComparedFeatures(compFeatures));
+            return;
+        }
+
+        const data: any = {};
+        userMarkers.forEach((marker:any) => {
+            const latlngPoint = new L.LatLng(marker.position.lat, marker.position.lng);
+            const results = leafletPip.pointInLayer(latlngPoint, geoJsonLayerRef.current, true);
+            results.forEach((layer: any) => {
+                if (!data.hasOwnProperty(layer.feature._id)) data[layer.feature._id] = [];
+                data[layer.feature._id].push(marker);
+            });
+        })
+
+        for (let key in data) {
+            const layer: any = geoJsonLayerRef.current.getLayer(key as any);
+            if (layer) layer.markers = data[key];
+            const ix = compFeatures.findIndex((f:any) => f._id == layer.feature._id);
+            if (ix >= 0) { 
+                compFeatures[ix].markers = layer.markers;
+            }
+        }
+
+        //setComparedFeatures(compFeatures);
+        dispatch(updateComparedFeatures(compFeatures));
+
+    }, [userMarkers, geoJsonLayerRef]) */
 
     // Get color for depending on value
     const getColor = (value: number) => {
@@ -98,9 +141,10 @@ const GeoJsonLayer = (props: any) => {
             ...layerNormalStyle,
             fillColor: featureColor,
             opacity: 1,
+            fillOpacity: 0.6,
         };
 
-        if (tableSelectedFeatures && tableSelectedFeatures.find((f:any) => f._id == feature._id)) {
+        if (comparedFeatures.find((f:any) => f._id == feature._id)) {
 
             if (selectedFeature && selectedFeature._id == feature._id) {
                 mapFeatureNotHoveredStyle = { 
@@ -126,15 +170,17 @@ const GeoJsonLayer = (props: any) => {
                     setGeoJsonData(data);
                     if (geoJsonLayerRef.current) {
                         geoJsonLayerRef.current.clearLayers().addData(data);
-                        //set comparedFeatures
-                        const updatedFeatures = []
-                        for (const featureCollection of data as any) {
-                            for (const f of featureCollection.features) {
-                                const { _id, properties, weather } = f;
-                                updatedFeatures.push({ _id, properties, weather });
+                        //update comparedFeatures
+                        if (comparedFeatures.length) {
+                            const updatedFeatures = []
+                            for (const f of comparedFeatures) {
+                                const layer = geoJsonLayerRef.current.getLayer(f._id) as CustomLayer;
+                                if (!layer) continue;
+                                const feature = { ...f, weather: layer?.feature?.weather }
+                                updatedFeatures.push(feature);
                             }
+                            if (updatedFeatures.length) dispatch(updateComparedFeatures(updatedFeatures));
                         }
-                        if (updatedFeatures.length) dispatch(updateComparedFeatures(updatedFeatures));
 
                         if (nextLayer) {
                             const layer = geoJsonLayerRef.current.getLayer(nextLayer);
@@ -184,12 +230,26 @@ const GeoJsonLayer = (props: any) => {
         return;
     }
 
+    // Zooms to the feature clicked
+    /* const zoomToFeature = (event: LeafletMouseEvent) => {
+        if (map !== null) {
+            //map.fitBounds(event.target.getBounds());
+            const currentZoom = map.getZoom();
+            let zoom = 9;
+            if (currentZoom >= zoom) {
+                zoom = currentZoom;
+            }
+            map.setView(event.latlng, zoom);
+        }
+    } */
 
     const existsInComparedFeatures = (featureId: string) => {
-        return tableSelectedFeatures.find((f: any) => f._id === featureId);
+        return comparedFeatures.find((f: any) => f._id === featureId);
     }
 
     const removeFeatureFromList = (layer: CustomLayer) => {
+        /* const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
+        setComparedFeatures(filteredFeatures); */
         dispatch(removeFromComparedFeatures(comparedFeatures, layer.feature._id));
     }
 
@@ -210,12 +270,67 @@ const GeoJsonLayer = (props: any) => {
             markerBtn.title = "Adicionar marcador";
             markerBtn.innerHTML = ReactDOMServer.renderToStaticMarkup(<FontAwesomeIcon icon={faLocationDot} />);
             markerBtn.onclick = function() {
+                //addUserMarker(event.latlng);
                 dispatch(addUserLocation(userMarkers, { ...event.latlng }));
                 layer.closePopup();
             }
             div.appendChild(markerBtn);
         }
-       
+
+
+        // Remove button
+        const removeBtn = document.createElement("button");
+        removeBtn.className = "btn btn-sm btn-outline-danger";
+        removeBtn.title = "Remover da lista";
+        //removeBtn.innerHTML = "Remover da lista";
+        removeBtn.innerHTML = ReactDOMServer.renderToStaticMarkup(<FontAwesomeIcon icon={faEyeSlash} />);
+        removeBtn.onclick = function() {
+            newRemoveFeatureFromList(layer);
+            layer.closePopup();
+            setLayerStyle(layer, layerNormalStyle)
+        }
+        div.appendChild(removeBtn);
+
+
+        // Remove link
+        const button = document.createElement("a");
+        button.href = "#";
+
+        //const featureInComparison = existsInComparedFeatures(layer.feature._id);
+        //if (featureInComparison) {
+            button.innerHTML = "Remover da lista";
+            button.onclick = function() {
+                newRemoveFeatureFromList(layer);
+                //layer.closePopup();
+                setLayerStyle(layer, layerNormalStyle)
+            }
+       // }
+
+        /* if (comparisonMode) {
+            const featureInComparison = existsInComparedFeatures(layer.feature._id);
+
+            if (!featureInComparison) {
+                button.innerHTML = "Adicionar à lista";
+                button.onclick = function() {
+                    setComparedFeatures([...comparedFeatures, layer.feature]);
+                    layer.closePopup();
+                    newHighlightFeature(layer);
+                    const tbl = document.querySelector(".featuresTable");
+                    if (tbl) tbl.scrollIntoView({block: "end", inline: "end"});
+                }
+            }
+            else {
+                button.innerHTML = "Remover da lista";
+                button.onclick = function() {
+                    const filteredFeatures = comparedFeatures.filter((f:any) => f._id != layer.feature._id);
+                    setComparedFeatures(filteredFeatures);
+                    layer.closePopup();
+                    setLayerStyle(layer, layerNormalStyle)
+                }
+            }
+        }  */
+
+        //div.appendChild(button);
         return div;
     }
 
@@ -234,20 +349,13 @@ const GeoJsonLayer = (props: any) => {
         else setLayerStyle(layer, layerNormalStyle);
     }
 
-    const getWeatherValueWithUnit = (feature: any) => {
-        if (!selectedWeatherField) return;
-        if (selectedWeatherField.unit) return `(${feature.weather[selectedWeatherField.name]} ${selectedWeatherField.unit})`
-        return `(${feature.weather[selectedWeatherField.name]})`
-    }
-
-    // Highlights a feature of the map when hovered.
+    // Highlights a feature of the map when hovered over.
     const highlightFeature = (layer: any) => {
         if (!layer) return;
         if (layer.getPopup().isOpen()) layer.closeTooltip();
-        layer.setTooltipContent(`${getObjectValue(regionNamePath, layer.feature)} ${getWeatherValueWithUnit(layer.feature)}`)
+        layer.setTooltipContent(getObjectValue(regionNamePath, layer.feature))
         const isComparedFeature = existsInComparedFeatures(layer.feature._id);
-        const isSelectedFeature = selectedFeature?._id == layer.feature._id;
-        if (isComparedFeature || isSelectedFeature){
+        if (isComparedFeature){
             setLayerStyle(layer, layerRedHighlightedStyle);
         }
         else {
@@ -267,12 +375,16 @@ const GeoJsonLayer = (props: any) => {
 
         const { _id, weather, properties } = feature;
         
-        const obj = { _id, weather, properties, markers: event.target.markers, marker: event.marker || { _id: null }, markerRef: event.markerRef };
+        const obj = { _id, weather, properties, markers: event.target.markers, marker: event.marker || {_id: null}, markerRef: event.markerRef };
         dispatch(selectFeature(obj));
 
         // Scroll table
         const tblSelector = ".featuresTable .p-datatable-wrapper" //".featureTable > div"
         const table = document.querySelector(tblSelector);
+
+        if (!existsInComparedFeatures(_id) && feature.weather) {
+            dispatch(addFeatureToComparedFeatures(comparedFeatures, feature));
+        }
         
         sleep(10).then(() => {
             const elSelector = `tr.row-${event.target.feature._id}` //`div#row-${event.target.feature._id}`
@@ -287,6 +399,12 @@ const GeoJsonLayer = (props: any) => {
         if (sidebarRef?.current && !isSidebarOpen && !window.mobileCheck()) {
             sidebarRef.current.open("tab1");
         }
+
+        /* const offset = map.getSize().x * 0.25;
+        const coordinates = layer.getPopup()?.getLatLng();
+        if (coordinates) {
+            map.panTo(coordinates, {animate: false})//.panBy(new L.Point(offset, 0), {animate: false});
+        } */
     }
 
     // Clear the layer
@@ -312,7 +430,7 @@ const GeoJsonLayer = (props: any) => {
             newClearFeature();
         })
 
-        if (!window.mobileCheck()) layer.bindTooltip(getObjectValue(regionNamePath, feature));
+        if (!window.mobileCheck()) layer.bindTooltip(getObjectValue(regionNamePath, feature))
 
         layer.on({
             mouseover: () => {
