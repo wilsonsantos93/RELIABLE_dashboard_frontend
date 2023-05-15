@@ -9,7 +9,7 @@ import { selectAreaMode, selectErrorMsg, selectInfoMsg, selectIsSidebarOpen, sel
 import { useEffect } from 'react';
 import fetchIntercept from 'fetch-intercept';
 import { getWeatherAlerts, signOut } from '../store/user/user.action';
-import { getRegionPathName, showErrorMsg, showInfoMsg, showSuccessMsg } from '../store/settings/settings.action';
+import { getRegionPathName, getWeatherDates, getWeatherFields, showErrorMsg, showInfoMsg, showSuccessMsg } from '../store/settings/settings.action';
 import { selectFeature } from '../store/map/map.action';
 import { selectSidebarRef } from '../store/refs/refs.selector';
 import { selectUserIsLoggedIn } from '../store/user/user.selector';
@@ -44,8 +44,11 @@ function App(): JSX.Element {
 
     useEffect(() => {
         dispatch(getRegionPathName());
+        dispatch(getWeatherDates());
+        dispatch(getWeatherFields());
         if (isLoggedIn) dispatch(getWeatherAlerts());
     }, [])
+
 
     return (
         <Container fluid>
@@ -76,7 +79,7 @@ function App(): JSX.Element {
             </ToastContainer>
 
             { !isSidebarOpen ?
-                <ToastContainer style={{textAlign: "center", zIndex:999}} className={`${isSidebarOpen ? 'start-33' : ''} toast-container`} position="bottom-center">
+                <ToastContainer className={`${isSidebarOpen ? 'start-33' : ''} toast-container`} position="bottom-center">
                     <Toast id="loadingToast" bg="dark" show={loading} animation={true}>
                         <Toast.Body className='text-white'>
                             <Spinner size="sm" animation="border" role="status" /> A carregar...
