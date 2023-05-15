@@ -69,12 +69,19 @@ const WeatherAlerts = () => {
         <div style={{textAlign: 'center'}}>
         { 
           (weatherAlerts && weatherAlerts.alerts && weatherAlerts.alerts.length && mainWeatherField) ? <>
-          <span>Alertas para os próximos {weatherAlerts.numDaysAhead} dias:</span>
-          {weatherAlerts.alerts.map((a:any, i:any) => 
+          <span>Alertas atuais e para os próximos {weatherAlerts.numDaysAhead} dias:</span>
+          {weatherAlerts.alerts.map((a: any, i) => 
             <div style={{textAlign: 'left'}} key={`alert_divider_${i}`}>
               <Dropdown.Divider />
-              <Dropdown.Item className="alerts-item" style={{ marginLeft: '5px', borderLeft: `5px solid ${getAlertColor(a.weather[mainWeatherField?.name])}`}} onClick={() => onAlertClick(a.date[0]._id, a.regionBorderFeatureObjectId)} key={`alert_${i}`} href="#">
-                  <strong>{a.regionName} {addMarkerNames(a)}</strong> com {mainWeatherField?.displayName} de <strong>{a.weather[mainWeatherField?.name]}</strong> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)} 
+              <Dropdown.Item className="alerts-item" style={{ marginLeft: '5px', borderLeft: `5px solid ${getAlertColor(a.weather.value)}`}} onClick={() => onAlertClick(a.date[0]._id, a.regionBorderFeatureObjectId)} key={`alert_${i}`} href="#">
+                  <span>
+                    <strong>{a.regionName} {addMarkerNames(a)}</strong> 
+                    com {mainWeatherField?.displayName} de <strong>{a.weather.value}</strong>
+                    { a.weatherDateObjectId == currentDateId ?
+                      <span> neste momento.</span> :
+                      <span> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)}</span>
+                    }
+                  </span>
               </Dropdown.Item>
             </div>
           )} </>
