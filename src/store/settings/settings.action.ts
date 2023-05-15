@@ -73,9 +73,7 @@ export const getWeatherDates = (): AppThunk => {
                 if (valueA >= valueB) return -1;
                 else return 1;
             });
-            console.log("SORTED", datesSorted)
             const firstDate = datesSorted.find(d => d.date.valueOf() <= new Date().valueOf());
-            console.log("FIRST DATE", firstDate);
             if (firstDate) dispatch(setDateId(firstDate?._id));
         } catch (error) {
             dispatch(showErrorMsg("Não foi possível obter as datas."));
