@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { selectIsSidebarOpen, selectRegionNamePath, selectTableSelectedFeatures, selectWeatherFields } from "../../../store/settings/settings.selector";
 import { selectComparedFeatures, selectSelectedFeature } from "../../../store/map/map.selector";
 import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
-import { getObjectValue } from "../../../utils/reducer/getObjectValue.utils";
+import { getObjectValue } from "../../../utils/getObjectValue.utils";
 import { Dropdown } from 'primereact/dropdown';
 import 'primereact/resources/primereact.min.css';
 
@@ -34,7 +34,7 @@ const ParallelCoordinatesChart = () => {
         },
         legend: {
             enabled: true,
-            maxHeight: 100
+            maxHeight: 70
         },
         xAxis: {
           categories: [] as string[],

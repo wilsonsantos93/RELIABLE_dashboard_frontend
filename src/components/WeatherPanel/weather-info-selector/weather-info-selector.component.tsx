@@ -15,9 +15,9 @@ const WeatherInfoSelector = () => {
         dispatch(setWeatherField(field));
     }
 
-    useEffect( () => {
+    /* useEffect( () => {
         dispatch(getWeatherFields());
-    }, []);
+    }, []); */
 
 
     return (

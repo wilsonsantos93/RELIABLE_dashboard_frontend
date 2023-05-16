@@ -16,9 +16,9 @@ function WeatherDateSelector(): JSX.Element {
     const weatherDates = useSelector(selectWeatherDates);
     const dispatch = useDispatch<any>();
 
-    useEffect(() => {
+    /* useEffect(() => {
         dispatch(getWeatherDates());
-    }, []);
+    }, []); */
 
     const onSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
         dispatch(setDateId(event.target.value))

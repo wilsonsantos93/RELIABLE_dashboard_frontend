@@ -54,7 +54,7 @@ const Sidebar = () => {
                 <ul role="tablist" className="tablist"> 
                     <li key="tab1"><a href="#tab1" role="tab"><FontAwesomeIcon icon={faTable} /></a></li>
                     <li key="tab2"><a href="#tab2" role="tab"><FontAwesomeIcon icon={faChartLine} /></a></li>
-                    <li key="tab3"><a href="#tab3" role="tab"><FontAwesomeIcon icon={faCog} /></a></li>
+                    {/* <li key="tab3"><a href="#tab3" role="tab"><FontAwesomeIcon icon={faCog} /></a></li> */}
                 </ul>
             </div>
     
@@ -97,7 +97,7 @@ const Sidebar = () => {
                 </div>
     
                 
-                <div className="leaflet-sidebar-pane" id="tab3">
+                {/* <div className="leaflet-sidebar-pane" id="tab3">
                     <h1 className="leaflet-sidebar-header">Configurar
                         <div className="leaflet-sidebar-close"><FontAwesomeIcon icon={faWindowClose} /></div>
                     </h1>
@@ -105,7 +105,7 @@ const Sidebar = () => {
                         <WeatherDateSelector/>
                         <WeatherInfoSelector/>
                     </Form>
-                </div>
+                </div> */}
             </div>
         </div>
     );

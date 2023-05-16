@@ -43,9 +43,6 @@ function App(): JSX.Element {
     }, [sidebarRef])
 
     useEffect(() => {
-        dispatch(getRegionPathName());
-        dispatch(getWeatherDates());
-        dispatch(getWeatherFields());
         if (isLoggedIn) dispatch(getWeatherAlerts());
     }, [])
 
@@ -78,7 +75,7 @@ function App(): JSX.Element {
                 </Toast>
             </ToastContainer>
 
-            { !isSidebarOpen ?
+            { 
                 <ToastContainer className={`${isSidebarOpen ? 'start-33' : ''} toast-container`} position="bottom-center">
                     <Toast id="loadingToast" bg="dark" show={loading} animation={true}>
                         <Toast.Body className='text-white'>
@@ -101,7 +98,7 @@ function App(): JSX.Element {
                         }  
                         </Toast.Body>
                     </Toast> */}
-                </ToastContainer> : null
+                </ToastContainer>
             }
         </Container>
     )

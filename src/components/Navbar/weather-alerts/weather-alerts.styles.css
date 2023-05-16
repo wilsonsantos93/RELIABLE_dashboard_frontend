@@ -4,6 +4,9 @@
     width: 60vw;
     overflow-y: auto;
     overflow-x: hidden;
+    -webkit-box-shadow: 1px 0px 18px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 1px 0px 18px 0px rgba(0,0,0,0.75);
+    box-shadow: 1px 0px 18px 0px rgba(0,0,0,0.75);
 }
 
 .alerts-dropdown .alerts-item {
@@ -12,6 +15,15 @@
     white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
     white-space: -pre-wrap; /* Opera 4-6 */    
     white-space: -o-pre-wrap; /* Opera 7 */    
+}
+
+.alerts-dropdown > div {
+    text-align: center;
+}
+
+.check-circle {
+    color: green;
+    height: 40px;
 }
 
 @media (min-width: 768px)  {

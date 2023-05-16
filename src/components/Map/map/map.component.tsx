@@ -54,17 +54,17 @@ function Map() {
 
                 <GeoJsonLayer mapRef={mapRef} /> 
 
-                <AreaSelect/>
+                {/* <AreaSelect/> */}
 
                 <LeafletGeoSearch />
 
-                <Control position='topleft'>
+                {/* <Control position='topleft'>
                     <div style={{cursor: 'pointer'}} className="leaflet-bar leaflet-select-control">
                         <a style={{backgroundColor: areaMode ? '#0d6efd' : ''}} title="Selecionar área" onClick={() => onSelectAreaMode()}>
                             <FontAwesomeIcon icon={faObjectGroup} />
                         </a>
                     </div>
-                </Control>
+                </Control> */}
                 
                 <MapLegend />
                 

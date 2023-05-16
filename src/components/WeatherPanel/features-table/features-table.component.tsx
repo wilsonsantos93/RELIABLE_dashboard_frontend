@@ -9,8 +9,8 @@ import { selectComparedFeatures, selectSelectedFeature } from "../../../store/ma
 import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
 import { selectFeature, setSelectedFeature, updateComparedFeatures } from "../../../store/map/map.action";
 import { selectRegionNamePath, selectWeatherFields } from "../../../store/settings/settings.selector";
-import { getObjectValue } from "../../../utils/reducer/getObjectValue.utils";
-import getArrayDifference from "../../../utils/reducer/getArrayDifference.utils";
+import { getObjectValue } from "../../../utils/getObjectValue.utils";
+import getArrayDifference from "../../../utils/getArrayDifference.utils";
 
 const FeaturesTable = () => {
     const dispatch = useDispatch<any>();

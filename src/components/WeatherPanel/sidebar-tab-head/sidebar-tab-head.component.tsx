@@ -8,7 +8,7 @@ import { updateComparedFeatures } from '../../../store/map/map.action';
 import "./sidebar-tab-head.styles.css";
 import { selectTableSelectedFeatures } from '../../../store/settings/settings.selector';
 import { updateTableSelectedFeatures } from '../../../store/settings/settings.action';
-import getArrayDifference from '../../../utils/reducer/getArrayDifference.utils';
+import getArrayDifference from '../../../utils/getArrayDifference.utils';
 
 const SidebarTabHead = () => {
     const map = useMap();

@@ -5,13 +5,13 @@ import { ColumnGroup } from 'primereact/columngroup';
 import { selectRegionNamePath, selectTableSelectedFeatures, selectWeatherFields } from '../../../store/settings/settings.selector';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getObjectValue } from '../../../utils/reducer/getObjectValue.utils';
+import { getObjectValue } from '../../../utils/getObjectValue.utils';
 import { selectComparedFeatures, selectSelectedFeature } from '../../../store/map/map.selector';
 import "primereact/resources/themes/lara-light-indigo/theme.css"; 
 import "primereact/resources/primereact.min.css";
 import "./table-features.styles.css";
 import { selectGeoJsonLayerRef } from '../../../store/refs/refs.selector';
-import { selectFeature, setSelectedFeature } from '../../../store/map/map.action';
+import { selectFeature } from '../../../store/map/map.action';
 import { WeatherField } from '../../../store/settings/settings.types';
 import { useMap } from 'react-leaflet';
 import { updateTableSelectedFeatures } from '../../../store/settings/settings.action';
@@ -33,13 +33,10 @@ const TableFeatures = () => {
     const dt = useRef(null);
     const [metaKey, setMetaKey] = useState(false);
 
-
     useEffect( () => {
         if (!selectedFeature) return;
 
-        const row: any = document.querySelector(`tr.row-${selectedFeature._id}`);
-        if (row) row.click();
-        
+        clickRow(selectedFeature._id);
     }, [selectedFeature]);
 
     const [filters, setFilters] = useState({
@@ -63,7 +60,7 @@ const TableFeatures = () => {
         const value = e.value;
         let _filters = { ...filters };
 
-        if (e.value == true) _filters['checked'].value = [true];
+        if (value == true) _filters['checked'].value = [true];
         else _filters['checked'].value = [false, true];
 
         setFilters(_filters);
@@ -102,16 +99,27 @@ const TableFeatures = () => {
     columns = [...columns, ...weatherColumns];
 
     const data = useMemo(() => {
+        if (!comparedFeatures) return [];
+
         return comparedFeatures.map((feature:any) => {
              return {
-                 _id: feature._id,
-                 checked: false,
-                 local: getObjectValue(regionNamePath, feature),
-                 ...feature.weather
+                _id: feature._id,
+                checked: feature.checked ? true : false,
+                local: getObjectValue(regionNamePath, feature),
+                ...feature.weather
              }
          });
     }, [comparedFeatures])
 
+    useEffect(() => {
+        if (!data || !data.length) return;
+        dispatch(updateTableSelectedFeatures(data.filter(f => f.checked)));
+    }, [data])
+
+    const clickRow = (id: string) => {
+        const row: any = document.querySelector(`tr.row-${id}`);
+        if (row) row.click();
+    }
 
     const cellTemplate = (row: any, options: any, colName:any) => {
         if (colName !== 'local') {
@@ -147,8 +155,6 @@ const TableFeatures = () => {
     };
 
     const onSetSelectedFeatures = (e: any) => {
-        dispatch(setSelectedFeature(null));
-        map.closePopup();
         dispatch(updateTableSelectedFeatures(e.value));
     }
 
@@ -158,10 +164,10 @@ const TableFeatures = () => {
         if (!tableSelectedFeatures.find((f:any) => f._id == e.data._id)) {
             const checkedFeatures = [...tableSelectedFeatures, e.data];
             dispatch(updateTableSelectedFeatures(checkedFeatures));
-
-            const ix = data.findIndex((f:any) => f._id == e.data._id)
-            data[ix].checked = true;
         }
+
+        const ix = data.findIndex((f:any) => f._id == e.data._id)
+        data[ix].checked = true;
         
         if (e.originalEvent.target.matches("path, .p-checkbox-icon, .p-selection-column, .p-checkbox.p-component")) return;
 
@@ -170,7 +176,7 @@ const TableFeatures = () => {
         const feature = comparedFeatures.find((f:any) => f._id === featureId);
         dispatch(selectFeature(feature));
         const layer = geoJsonLayerRef.current.getLayer(feature._id);
-        if (layer) layer.fireEvent("click");
+        if (layer) layer.fireEvent("click", { tableClicked: true });
     }
 
 
@@ -221,6 +227,19 @@ const TableFeatures = () => {
     const onRowUnselect = (e: any) => {
         const ix = data.findIndex((f:any) => f._id == e.data._id)
         data[ix].checked = false;
+        if (selectedFeature?._id == e.data._id) {
+            dispatch(selectFeature(null))
+            map.closePopup();
+        }
+    };
+
+    const onAllRowsSelect = () => {
+        data.forEach(d => d.checked = true)
+    };
+
+    const onAllRowsUnselect = () => {
+        map.closePopup();
+        data.forEach(d => d.checked = false)
     };
 
     const headerGroup = (
@@ -253,21 +272,46 @@ const TableFeatures = () => {
 
     const searchHeader = () => {
         return (
-            <div className="flex justify-content-end">
-                <span className="p-input-icon-left">
-                    <FontAwesomeIcon icon={faSearch} />
-                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Pesquisar local" />
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <div style={{ display: 'flex', flex: 1, textAlign: 'left' }}>
                     <InputSwitch inputId="input-metakey" checked={metaKey} onChange={onCheckFilterChange} />
-                </span>
+                    <span style={{ marginLeft: "5px", fontSize: '11px'}}> Mostrar selecionados</span>
+                </div>
+
+                <div style={{ display: 'flex', textAlign: 'right' }}>
+                    <span className="p-input-icon-left">
+                        <FontAwesomeIcon icon={faSearch} />
+                        <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Pesquisar local" />
+                    </span>
+                </div>
             </div>
         ); 
     }
 
+    const onRowMouseEnter = (e: any) => {
+        if (!geoJsonLayerRef) return;
+
+        const layer = geoJsonLayerRef.current.getLayer(e.data._id);
+        if (layer) layer.fireEvent("mouseover");
+    }
+
+    const onRowMouseLeave = (e: any) => {
+        if (!geoJsonLayerRef) return;
+
+        const layer = geoJsonLayerRef.current.getLayer(e.data._id);
+        if (layer) layer.fireEvent("mouseout");
+    }
+
+
     return (
         <DataTable 
             ref={dt}
+            onRowMouseEnter={onRowMouseEnter}
+            onRowMouseLeave={onRowMouseLeave}
             onRowSelect={onRowSelect}
             onRowUnselect={onRowUnselect}
+            onAllRowsSelect={onAllRowsSelect}
+            onAllRowsUnselect={onAllRowsUnselect}
             value={data} 
             filters={filters} 
             globalFilterFields={['local']} 
@@ -286,10 +330,8 @@ const TableFeatures = () => {
             scrollable 
             scrollHeight="40vh" 
             tableStyle={{ fontSize: '12px', maxWidth: '99%' }}
-            /* virtualScrollerOptions={{ className:"ola" }} */
             sortField="local"
             sortOrder={1}
-            /* onValueChange={(e) => console.log(e)} */
         >
             <Column selectionMode="multiple"></Column>
             <Column hidden filter key={"checked"} field={"checked"}></Column>

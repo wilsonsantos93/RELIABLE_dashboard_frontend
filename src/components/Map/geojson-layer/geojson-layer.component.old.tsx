@@ -19,7 +19,7 @@ import { selectIsSidebarOpen, selectRegionNamePath, selectSelectedDateId, select
 import { selectComparedFeatures, selectNextLayer, selectSelectedFeature } from '../../../store/map/map.selector';
 import { changeLoading } from '../../../store/settings/settings.action';
 import { addFeatureToComparedFeatures, getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
-import { getObjectValue } from '../../../utils/reducer/getObjectValue.utils';
+import { getObjectValue } from '../../../utils/getObjectValue.utils';
 
 type CustomLayer = { feature: any, _leaflet_id: string, markers: any[] } & Layer;
 

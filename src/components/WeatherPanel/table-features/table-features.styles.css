@@ -23,9 +23,33 @@ tbody tr:hover {
 }
 
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus:hover {
-    border-color: #6366F1
+    border-color: #212529;
 }
 
 .p-inputtext {
     padding: unset;
+}
+
+.p-datatable .p-datatable-tbody > tr.p-highlight:not(.border-row) {
+    color: black;
+}
+
+tr.p-highlight:not(.border-row) .p-checkbox .p-checkbox-box.p-highlight,
+.p-selection-column .p-checkbox .p-checkbox-box.p-highlight,
+.p-column-header-content .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
+    background: #556265;
+    border:#ced4da;
+}
+
+tr.p-highlight.border-row .p-checkbox .p-checkbox-box.p-highlight {
+    background: #6366F1;
+    border:#6366F1;
+}
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+    border-color: #212529;
+}
+
+.p-checkbox .p-checkbox-box.p-highlight:hover {
+    border-color: pink;
 }

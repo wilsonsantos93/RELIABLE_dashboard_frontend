@@ -101,7 +101,7 @@ const MapLegend = () => {
                 <Button style={{ margin: "5px", fontSize: "0.575rem"}} title="Informação anterior" variant="light" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
                 <Button style={{ float: "right", margin: "5px", fontSize: "0.575rem"}} title="Informação seguinte" variant="light" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
                 { selectedWeatherField && colors && domain ? 
-                    <color-legend 
+                    <color-legend
                         class="styled"
                         width="170"
                         tickValues={tickValues}

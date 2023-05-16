@@ -14,7 +14,7 @@
     cursor: url("leaflet/dist/images/marker-icon.png"), auto;
 } */
 
-.leaflet-control-zoom-in {
+/* .leaflet-control-zoom-in {
     background: #333 !important;
     color: white !important;
     opacity: 0.7 !important;
@@ -24,10 +24,11 @@
     background: #333 !important;
     color: white !important;
     opacity: 0.7 !important;
-}
+} */
 
 .leaflet-top {
     top: 40px;
+    z-index: 900;
 }
 
 .customButton {

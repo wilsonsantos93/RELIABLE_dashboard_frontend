@@ -17,11 +17,12 @@ import { setGeoJsonLayer } from '../../../store/refs/refs.action';
 import { selectSidebarRef } from '../../../store/refs/refs.selector';
 import { selectIsSidebarOpen, selectRegionNamePath, selectSelectedDateId, selectSelectedWeatherField, selectTableSelectedFeatures, selectWeatherFields } from '../../../store/settings/settings.selector';
 import { selectComparedFeatures, selectNextLayer, selectSelectedFeature } from '../../../store/map/map.selector';
-import { changeLoading } from '../../../store/settings/settings.action';
+import { changeLoading, getRegionPathName, getWeatherDates, getWeatherFields } from '../../../store/settings/settings.action';
 import { getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
-import { getObjectValue } from '../../../utils/reducer/getObjectValue.utils';
+import { getObjectValue } from '../../../utils/getObjectValue.utils';
 
 type CustomLayer = { feature: any, _leaflet_id: string, markers: any[] } & Layer;
+type CustomLeafletEvent = LeafletMouseEvent & {marker: any, markerRef: any, tableClicked: boolean }
 
 const layerHighlightedStyle = {
     color: "black",
@@ -131,7 +132,9 @@ const GeoJsonLayer = (props: any) => {
                         for (const featureCollection of data as any) {
                             for (const f of featureCollection.features) {
                                 const { _id, properties, weather } = f;
-                                updatedFeatures.push({ _id, properties, weather });
+                                let checked = false;
+                                if (tableSelectedFeatures.find((f: any) => f._id === _id)) checked = true;
+                                updatedFeatures.push({ _id, properties, weather, checked });
                             }
                         }
                         if (updatedFeatures.length) dispatch(updateComparedFeatures(updatedFeatures));
@@ -147,6 +150,12 @@ const GeoJsonLayer = (props: any) => {
             }
         })()
     }, [selectedDateId, regionNamePath]);
+
+    useEffect(() => {
+        dispatch(getRegionPathName());
+        dispatch(getWeatherDates());
+        dispatch(getWeatherFields());
+    }, []);
 
     useEffect(() => {
         if (!selectedFeature) return;
@@ -257,7 +266,7 @@ const GeoJsonLayer = (props: any) => {
 
 
     // Set clicked feature id
-    const setClickedFeatureId = (event: LeafletMouseEvent & {marker: any, markerRef: any}, layer: any) => {
+    const setClickedFeatureId = (event: CustomLeafletEvent, layer: any) => {
         if (!event.target) {
             return;
         }
@@ -271,18 +280,20 @@ const GeoJsonLayer = (props: any) => {
         dispatch(selectFeature(obj));
 
         // Scroll table
-        const tblSelector = ".featuresTable .p-datatable-wrapper" //".featureTable > div"
-        const table = document.querySelector(tblSelector);
-        
-        sleep(10).then(() => {
-            const elSelector = `tr.row-${event.target.feature._id}` //`div#row-${event.target.feature._id}`
-            const el = document.querySelector(elSelector);
-            if (el) {
-                const offset = 120 //35;
-                const topPos = (el as HTMLElement).offsetTop;
-                if (table) table.scrollTop = topPos - offset;
-            }
-        })
+        if (!event.tableClicked) {
+            const tblSelector = ".featuresTable .p-datatable-wrapper" //".featureTable > div"
+            const table = document.querySelector(tblSelector);
+            
+            sleep(10).then(() => {
+                const elSelector = `tr.row-${event.target.feature._id}` //`div#row-${event.target.feature._id}`
+                const el = document.querySelector(elSelector);
+                if (el) {
+                    const offset = 120 //35;
+                    const topPos = (el as HTMLElement).offsetTop;
+                    if (table) table.scrollTop = topPos - offset;
+                }
+            })
+        }
 
         if (sidebarRef?.current && !isSidebarOpen && !window.mobileCheck()) {
             sidebarRef.current.open("tab1");
@@ -322,7 +333,7 @@ const GeoJsonLayer = (props: any) => {
                 newResetHighlightFeature(layer);
             },
             click: (event) => {
-                newSetClickedFeatureId(event as LeafletMouseEvent & {marker: any, markerRef: any; }, layer);
+                newSetClickedFeatureId(event as CustomLeafletEvent, layer);
                 layer.setPopupContent(newUpdatePopupContent(layer, event));
                 layer.closeTooltip();
                 setLayerStyle(layer, layerRedHighlightedStyle);

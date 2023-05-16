@@ -5,14 +5,15 @@ import timezone from 'dayjs/plugin/timezone';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import pt from 'dayjs/locale/pt';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faCheckCircle, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { setDateId } from "../../../store/settings/settings.action";
 import { selectWeatherAlerts } from "../../../store/user/user.selector";
 import "./weather-alerts.styles.css";
-import { selectMainWeatherField, selectSelectedDateId } from "../../../store/settings/settings.selector";
+import { selectMainWeatherField, selectSelectedDateId, selectWeatherDates } from "../../../store/settings/settings.selector";
 import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
 import { updateNextLayer } from "../../../store/map/map.action";
+import getCurrentDate from "../../../utils/getCurrentDate.utils";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(relativeTime);
@@ -25,26 +26,34 @@ const WeatherAlerts = () => {
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
     const weatherAlerts = useSelector(selectWeatherAlerts); 
     const mainWeatherField = useSelector(selectMainWeatherField);
-    const currentDateId = useSelector(selectSelectedDateId);
+    const selectedDateId = useSelector(selectSelectedDateId);
+    const weatherDates = useSelector(selectWeatherDates);
 
     const onAlertClick = (dateId: string, regionBorderFeatureObjectId: string) => {
       const layer = geoJsonLayerRef?.current.getLayer(regionBorderFeatureObjectId);
-      if (dateId == currentDateId) layer.fire("click");
+      if (dateId == selectedDateId) layer.fire("click");
       else { 
           dispatch(setDateId(dateId));
           dispatch(updateNextLayer(layer.feature._id));
       }
     }
 
+    const getCurrentDateId = () => {
+      if (!weatherDates) return null;
+    
+      const date = getCurrentDate(weatherDates);
+      return date?._id;
+    }
+
     const getAlertColor = (value: any) => {
-        if (mainWeatherField) {
-            for (let r of mainWeatherField.ranges) {
-                const min = (r.min != null && !isNaN(r.min)) ? r.min : -Infinity; 
-                const max = (r.max != null && !isNaN(r.max)) ? r.max : Infinity;
-                if (min <= value && value < max) return r.color
-            }
+      if (mainWeatherField) {
+        for (let r of mainWeatherField.ranges) {
+          const min = (r.min != null && !isNaN(r.min)) ? r.min : -Infinity; 
+          const max = (r.max != null && !isNaN(r.max)) ? r.max : Infinity;
+          if (min <= value && value <= max) return r.color
         }
-        return "#808080";
+      }
+      return "#808080";
     }
 
     const addMarkerNames = (a: any) => {
@@ -66,10 +75,10 @@ const WeatherAlerts = () => {
         </Dropdown.Toggle>
 
         <Dropdown.Menu className="alerts-dropdown" align="end">
-        <div style={{textAlign: 'center'}}>
+        <div>
         { 
           (weatherAlerts && weatherAlerts.alerts && weatherAlerts.alerts.length && mainWeatherField) ? <>
-          <span>Alertas atuais e para os próximos {weatherAlerts.numDaysAhead} dias:</span>
+          <span>Alertas atuais e para os próximos dias:</span>
           {weatherAlerts.alerts.map((a: any, i) => 
             <div style={{textAlign: 'left'}} key={`alert_divider_${i}`}>
               <Dropdown.Divider />
@@ -77,7 +86,7 @@ const WeatherAlerts = () => {
                   <span>
                     <strong>{a.regionName} {addMarkerNames(a)}</strong> 
                     com {mainWeatherField?.displayName} de <strong>{a.weather.value}</strong>
-                    { a.weatherDateObjectId == currentDateId ?
+                    { a.weatherDateObjectId == getCurrentDateId() ?
                       <span> neste momento.</span> :
                       <span> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)}</span>
                     }
@@ -86,7 +95,10 @@ const WeatherAlerts = () => {
             </div>
           )} </>
           :
-          <span>Não há alertas para os próximos dias.</span>
+          <div>
+            <FontAwesomeIcon icon={faCheckCircle} className="check-circle"></FontAwesomeIcon>&nbsp;
+            <span style={{display:'block'}}>Não há alertas para os próximos dias.</span>
+          </div>
         }
         </div>
         </Dropdown.Menu>
