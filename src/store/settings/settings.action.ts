@@ -3,7 +3,8 @@ import { createAction, withMatcher } from "../../utils/reducer/reducer.utils";
 import { AppThunk } from "../store";
 import { fetchWeatherFields } from "../../data/fetchWeatherFields";
 import { fetchWeatherDates } from "../../data/fetchWeatherDates";
-import authHeader from "../../utils/reducer/authHeader.utils";
+import authHeader from "../../utils/authHeader.utils";
+import getCurrentDate from "../../utils/getCurrentDate.utils";
 const base_url = process.env.REACT_APP_API_BASE_URL;
 
 // Set "Select Area" mode
@@ -66,14 +67,7 @@ export const getWeatherDates = (): AppThunk => {
         try {
             const dates = await fetchWeatherDates();
             dispatch(fetchWeatherDatesSuccess(dates));
-            const datesSorted = [...dates]; 
-            datesSorted.sort((a,b) => {
-                const valueA = new Date(a.date).valueOf();
-                const valueB = new Date(b.date).valueOf();
-                if (valueA >= valueB) return -1;
-                else return 1;
-            });
-            const firstDate = datesSorted.find(d => d.date.valueOf() <= new Date().valueOf());
+            const firstDate = getCurrentDate(dates);
             if (firstDate) dispatch(setDateId(firstDate?._id));
         } catch (error) {
             dispatch(showErrorMsg("Não foi possível obter as datas."));
