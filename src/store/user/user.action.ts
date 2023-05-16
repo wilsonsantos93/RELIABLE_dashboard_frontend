@@ -1,4 +1,4 @@
-import authHeader from "../../utils/reducer/authHeader.utils";
+import authHeader from "../../utils/authHeader.utils";
 import { createAction, withMatcher, Action, ActionWithPayload } from "../../utils/reducer/reducer.utils";
 import { showErrorMsg, showSuccessMsg } from "../settings/settings.action";
 import { AppThunk } from "../store";
@@ -182,7 +182,6 @@ export const updateUserLocation = (userLocations: UserLocation[], item: UserLoca
             const locations = [...userLocations];
             const ix = locations.findIndex(location => location._id === item._id);
             locations[ix] = item;
-            console.log(locations);
             dispatch(setUserLocationsSuccess(locations));
             dispatch(showSuccessMsg("Marcador atualizado com sucesso!"));
             dispatch(getWeatherAlerts());
