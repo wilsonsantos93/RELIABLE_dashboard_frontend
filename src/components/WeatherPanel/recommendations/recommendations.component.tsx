@@ -1,17 +1,16 @@
 import { Accordion, ListGroup } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { selectSelectedFeature } from "../../../store/map/map.selector";
-import { selectRegionNamePath, selectWeatherFields } from "../../../store/settings/settings.selector";
+import { selectOpenTabId, selectRegionNamePath, selectWeatherFields } from "../../../store/settings/settings.selector";
 import { getObjectValue } from "../../../utils/getObjectValue.utils";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import "./recommendations.styles.css";
 
 const Recommendations = () => {
     const selectedFeature = useSelector(selectSelectedFeature);
     const weatherFields = useSelector(selectWeatherFields);
     const regionNamePath = useSelector(selectRegionNamePath);
-
-    const [isOpen, setIsOpen] = useState(false);
+    const openTabId = useSelector(selectOpenTabId);
 
     const getRecommendations = () => {
         if (!selectedFeature || !selectedFeature.weather) return null;
@@ -31,7 +30,7 @@ const Recommendations = () => {
         }
 
         return recommendations.length ? 
-        <ListGroup variant="flush">
+        <ListGroup key="listgroup" variant="flush">
             { recommendations.map((r,i) => <ListGroup.Item key={`recommendation_${i}`}>{r}</ListGroup.Item>) }
         </ListGroup>
         : <span>Sem recomendações</span>  
@@ -75,7 +74,22 @@ const Recommendations = () => {
         if ((selectedFeature && !isOpen) || (!selectedFeature && isOpen)) {
             el.click();
         }
+
+        /* const accordions: any = document.querySelectorAll(".accordion");
+        if (!accordions || !accordions.length) return;
+        
+        accordions.forEach((accordion: any) => {
+            const btn = accordion.querySelector(".accordion-button");
+            const body = accordion.querySelector("div.accordion-collapse");
+
+            const isOpen = body.classList.contains("show") ? true : false;
+            if ((selectedFeature && !isOpen) || (!selectedFeature && isOpen)) {
+                btn.click();
+            } 
+        }); */
+
     }, [selectedFeature])
+
 
     const getContactRecommendation = () => {
         if (!selectedFeature) return;
@@ -91,19 +105,19 @@ const Recommendations = () => {
         });
         if (!isAlert) return;
 
-        return <>
+        return <div key="divContactRec">
             <hr></hr>
-            <div>
+            <div key={"contactRec"}>
                 Em caso de dúvida ou necessidade ligar para o SNS 24 (808 24 24 24)<br></br>
                 Em caso de emergência ligue para o 112<br></br>
                 Para informações mais detalhadas consulte o <a target="_blank" href="https://www.dgs.pt/">site da DGS</a>
             </div>
-        </>
+        </div>
     }
 
 
     return (
-        <div style={{ width: '95%', position: "absolute", bottom: "2px" }}>
+        <div style={{ width: '100%', position: "absolute", bottom: "2px" }}>
             <Accordion>
                 <Accordion.Item eventKey="0" style={{ overflow: 'auto', maxHeight: '45vh', flexDirection: "column-reverse" }}>
                     <Accordion.Header style={{ fontSize: 'unset', zIndex: 100, fontFamily: 'Segoe UI', top: 0, position: "sticky" }}>
@@ -116,7 +130,7 @@ const Recommendations = () => {
                         }
                         </h6>
                     </Accordion.Header>
-                    <Accordion.Body >
+                    <Accordion.Body>
                     {
                         !selectedFeature ? <span>Sem localidade selecionada</span> : [getRecommendations(), getContactRecommendation()]
                     }
