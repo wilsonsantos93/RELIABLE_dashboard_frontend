@@ -2,7 +2,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Row } from 'primereact/row';
 import { ColumnGroup } from 'primereact/columngroup';
-import { selectRegionNamePath, selectTableSelectedFeatures, selectWeatherFields } from '../../../store/settings/settings.selector';
+import { selectRegionNamePath, selectTableSelectedFeatures, selectToggleDataButtonChecked, selectWeatherFields } from '../../../store/settings/settings.selector';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getObjectValue } from '../../../utils/getObjectValue.utils';
@@ -20,6 +20,7 @@ import { InputText } from 'primereact/inputtext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { InputSwitch } from 'primereact/inputswitch';
+import ToggleDataButton from '../toggle-data-button/toggle-data-button.component';
 
 const TableFeatures = () => {
     const dispatch = useDispatch<any>();
@@ -31,12 +32,25 @@ const TableFeatures = () => {
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
     const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
     const dt = useRef(null);
-    const [metaKey, setMetaKey] = useState(false);
+    /* const [metaKey, setMetaKey] = useState(false); */
+    const toggleDataButtonChecked = useSelector(selectToggleDataButtonChecked);
 
     useEffect( () => {
         if (!selectedFeature) return;
+        //clickRow(selectedFeature._id);
 
-        clickRow(selectedFeature._id);
+        const featureId = selectedFeature._id;
+
+        if (!tableSelectedFeatures.find((f:any) => f._id == featureId)) {
+            const ix = data.findIndex((f:any) => f._id == featureId)
+            data[ix].checked = true;
+            const checkedFeatures = [...tableSelectedFeatures, data[ix]];
+            dispatch(updateTableSelectedFeatures(checkedFeatures));
+        }
+
+        const ix = data.findIndex((f:any) => f._id == featureId)
+        data[ix].checked = true;
+
     }, [selectedFeature]);
 
     const [filters, setFilters] = useState({
@@ -56,7 +70,7 @@ const TableFeatures = () => {
         setGlobalFilterValue(value);
     };
 
-    const onCheckFilterChange = (e: any) => {
+    /* const onCheckFilterChange = (e: any) => {
         const value = e.value;
         let _filters = { ...filters };
 
@@ -65,7 +79,22 @@ const TableFeatures = () => {
 
         setFilters(_filters);
         setMetaKey(!metaKey);
+    } */
+
+    const updateCheckedFilter = () => {
+        let _filters = { ...filters };
+        if (toggleDataButtonChecked) {
+            _filters['checked'].value = [true];
+        }
+        else {
+            _filters['checked'].value = [false, true];
+        }
+        setFilters(_filters);
     }
+
+    useEffect(() => {
+        updateCheckedFilter();
+    }, [toggleDataButtonChecked])
 
     const getColor = (value: number, fieldName: string) => {
         const field = weatherFields.find(field => field.name === fieldName);
@@ -116,10 +145,10 @@ const TableFeatures = () => {
         dispatch(updateTableSelectedFeatures(data.filter(f => f.checked)));
     }, [data])
 
-    const clickRow = (id: string) => {
+    /* const clickRow = (id: string) => {
         const row: any = document.querySelector(`tr.row-${id}`);
         if (row) row.click();
-    }
+    } */
 
     const cellTemplate = (row: any, options: any, colName:any) => {
         if (colName !== 'local') {
@@ -161,20 +190,23 @@ const TableFeatures = () => {
     const onRowClicked = (e: any) => {
         if (!geoJsonLayerRef) return;
 
-        if (!tableSelectedFeatures.find((f:any) => f._id == e.data._id)) {
+        const featureId = e.data._id;
+
+        if (!tableSelectedFeatures.find((f:any) => f._id == featureId)) {
             const checkedFeatures = [...tableSelectedFeatures, e.data];
             dispatch(updateTableSelectedFeatures(checkedFeatures));
         }
 
-        const ix = data.findIndex((f:any) => f._id == e.data._id)
+        const ix = data.findIndex((f:any) => f._id == featureId)
         data[ix].checked = true;
         
         if (e.originalEvent.target.matches("path, .p-checkbox-icon, .p-selection-column, .p-checkbox.p-component")) return;
-
-        const featureId = e.data._id;
+        
         if (selectedFeature && selectedFeature._id == featureId) return;
+
         const feature = comparedFeatures.find((f:any) => f._id === featureId);
         dispatch(selectFeature(feature));
+
         const layer = geoJsonLayerRef.current.getLayer(feature._id);
         if (layer) layer.fireEvent("click", { tableClicked: true });
     }
@@ -219,9 +251,6 @@ const TableFeatures = () => {
     const onRowSelect = (e: any) => {
         const ix = data.findIndex((f:any) => f._id == e.data._id)
         data[ix].checked = true;
-       /* const dtRef = dt.current as any;
-       const ix = dtRef.getVirtualScroller().props.items.findIndex((d:any) => d.local == "SINTRA");
-       if (dtRef) dtRef.getVirtualScroller().scrollToIndex(ix); */
     };
 
     const onRowUnselect = (e: any) => {
@@ -272,11 +301,12 @@ const TableFeatures = () => {
 
     const searchHeader = () => {
         return (
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-                <div style={{ display: 'flex', flex: 1, textAlign: 'left' }}>
+            <div id="searchHeader">
+                {/* <div style={{ display: 'flex', flex: 1, textAlign: 'left' }}>
                     <InputSwitch inputId="input-metakey" checked={metaKey} onChange={onCheckFilterChange} />
                     <span style={{ marginLeft: "5px", fontSize: '11px'}}> Mostrar selecionados</span>
-                </div>
+                </div> */}
+                <ToggleDataButton />
 
                 <div style={{ display: 'flex', textAlign: 'right' }}>
                     <span className="p-input-icon-left">
@@ -328,7 +358,7 @@ const TableFeatures = () => {
             size='small' 
             cellClassName={cellClassName} 
             scrollable 
-            scrollHeight="40vh" 
+            scrollHeight="65vh" 
             tableStyle={{ fontSize: '12px', maxWidth: '99%' }}
             sortField="local"
             sortOrder={1}
