@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { selectSelectedDateId, selectSelectedWeatherField, selectWeatherDates } from "../../../store/settings/settings.selector";
+import { selectLoading, selectSelectedDateId, selectSelectedWeatherField, selectWeatherDates } from "../../../store/settings/settings.selector";
 import "./date-indicator.styles.css";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
@@ -17,6 +17,7 @@ const DateIndicator = () => {
     const weatherDates = useSelector(selectWeatherDates);
     const selectedWeatherField = useSelector(selectSelectedWeatherField);
     const dispatch = useDispatch<any>();
+    const loading = useSelector(selectLoading);
 
     const getFormattedDate = () => {
         if (!selectedDateId || !weatherDates) return null;
@@ -51,9 +52,9 @@ const DateIndicator = () => {
         <>
         { weatherDates && weatherDates.length && selectedDateId ?
             <div className="date-indicator">
-                <Button title="Data anterior" variant="light" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
+                <Button disabled={loading} title="Data anterior" variant="light" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
                 <span>{ selectedWeatherField?.displayName } referente a { getFormattedDate() }</span>
-                <Button title="Data seguinte" variant="light" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
+                <Button disabled={loading} title="Data seguinte" variant="light" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
             </div> : null
         }
         </>
