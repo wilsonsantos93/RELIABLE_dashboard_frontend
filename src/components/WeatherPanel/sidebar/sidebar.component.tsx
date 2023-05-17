@@ -16,7 +16,7 @@ import SidebarTabHead from "../sidebar-tab-head/sidebar-tab-head.component";
 import FeaturesTable from "../features-table/features-table.component";
 import { useDispatch } from "react-redux";
 import { setSidebar } from "../../../store/refs/refs.action";
-import { openSidebar } from "../../../store/settings/settings.action";
+import { openSidebar, updateOpenTabId } from "../../../store/settings/settings.action";
 import TableFeatures from "../table-features/table-features.component";
 
 
@@ -34,7 +34,7 @@ const Sidebar = () => {
     const sidebarRef = useRef(sidebar);
 
     useEffect(() => {
-        sidebar.on("opening", () => {
+        sidebar.on("opening", (e) => {
             dispatch(openSidebar(true));
         });
 
@@ -48,12 +48,16 @@ const Sidebar = () => {
         return () => { map.removeControl(sidebar) };
     }, [])
 
+    const onTabClick = (id: number) => {
+        dispatch(updateOpenTabId(id));
+    }
+
     return (
         <div id="sidebar" className="leaflet-sidebar collapsed">
             <div className="leaflet-sidebar-tabs">
                 <ul role="tablist" className="tablist"> 
-                    <li key="tab1"><a href="#tab1" role="tab"><FontAwesomeIcon icon={faTable} /></a></li>
-                    <li key="tab2"><a href="#tab2" role="tab"><FontAwesomeIcon icon={faChartLine} /></a></li>
+                    <li key="tab1"><a href="#tab1" onClick={() => onTabClick(0)} role="tab"><FontAwesomeIcon icon={faTable} /></a></li>
+                    <li key="tab2"><a href="#tab2" onClick={() => onTabClick(1)} role="tab"><FontAwesomeIcon icon={faChartLine} /></a></li>
                     {/* <li key="tab3"><a href="#tab3" role="tab"><FontAwesomeIcon icon={faCog} /></a></li> */}
                 </ul>
             </div>
@@ -72,9 +76,9 @@ const Sidebar = () => {
                             <TableFeatures />
                         </div>
 
-                        <div className="recommendations">
+                        {/* <div className="recommendations">
                             <Recommendations />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 
@@ -90,9 +94,9 @@ const Sidebar = () => {
                             <ParallelCoordinatesChart />
                         </div>
 
-                        <div className="recommendations">
+                        {/* <div className="recommendations">
                             <Recommendations />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
     
@@ -106,6 +110,10 @@ const Sidebar = () => {
                         <WeatherInfoSelector/>
                     </Form>
                 </div> */}
+
+                <div className="recommendations">
+                    <Recommendations />
+                </div>
             </div>
         </div>
     );
