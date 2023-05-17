@@ -104,6 +104,23 @@ export const openSidebar = (bool: boolean) => {
     return setIsSidebarOpen(bool);
 }
 
+// is sidebar open tab id
+export const setOpenTabId = withMatcher(
+    (id: number) => createAction(SETTINGS_ACTION_TYPES.SET_OPEN_TAB_ID, id)
+)
+
+export const updateOpenTabId = (id: number) => {
+    return setOpenTabId(id);
+}
+
+// set toggle data button checked
+export const setToggleDataButtonChecked = withMatcher(
+    (checked: boolean) => createAction(SETTINGS_ACTION_TYPES.SET_TOGGLE_DATA_BUTTON_CHECKED, checked)
+)
+
+export const updateToggleDataButtonChecked = (checked: boolean) => {
+    return setToggleDataButtonChecked(checked);
+}
 
 // set messages
 export const setInfoMsg = withMatcher(

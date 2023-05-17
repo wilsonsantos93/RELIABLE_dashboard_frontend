@@ -39,6 +39,11 @@ export const selectIsSidebarOpen = createSelector(
     (settingsSlice: SettingsState) => settingsSlice.isSidebarOpen
 )
 
+export const selectOpenTabId = createSelector(
+    [selectSettingsReducer],
+    (settingsSlice: SettingsState) => settingsSlice.openTabId
+)
+
 export const selectLoading = createSelector(
     [selectSettingsReducer],
     (settingsSlice: SettingsState) => settingsSlice.loading
@@ -67,4 +72,9 @@ export const selectRegionNamePath = createSelector(
 export const selectTableSelectedFeatures = createSelector(
     [selectSettingsReducer],
     (settingsSlice: SettingsState) => settingsSlice.tableSelectedFeatures
+)
+
+export const selectToggleDataButtonChecked = createSelector(
+    [selectSettingsReducer],
+    (settingsSlice: SettingsState) => settingsSlice.toggleDataButtonChecked
 )
