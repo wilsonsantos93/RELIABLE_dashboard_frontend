@@ -85,7 +85,7 @@ const WeatherAlerts = () => {
               <Dropdown.Item className="alerts-item" style={{ marginLeft: '5px', borderLeft: `5px solid ${getAlertColor(a.weather.value)}`}} onClick={() => onAlertClick(a.date[0]._id, a.regionBorderFeatureObjectId)} key={`alert_${i}`} href="#">
                   <span>
                     <strong>{a.regionName} {addMarkerNames(a)}</strong> 
-                    com {mainWeatherField?.displayName} de <strong>{a.weather.value}</strong>
+                    <span> com {mainWeatherField?.displayName} de <strong>{a.weather.value}</strong></span>
                     { a.weatherDateObjectId == getCurrentDateId() ?
                       <span> neste momento.</span> :
                       <span> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)}</span>
