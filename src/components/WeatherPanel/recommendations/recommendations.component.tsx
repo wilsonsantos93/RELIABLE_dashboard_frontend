@@ -75,19 +75,6 @@ const Recommendations = () => {
             el.click();
         }
 
-        /* const accordions: any = document.querySelectorAll(".accordion");
-        if (!accordions || !accordions.length) return;
-        
-        accordions.forEach((accordion: any) => {
-            const btn = accordion.querySelector(".accordion-button");
-            const body = accordion.querySelector("div.accordion-collapse");
-
-            const isOpen = body.classList.contains("show") ? true : false;
-            if ((selectedFeature && !isOpen) || (!selectedFeature && isOpen)) {
-                btn.click();
-            } 
-        }); */
-
     }, [selectedFeature])
 
 
@@ -119,7 +106,7 @@ const Recommendations = () => {
     return (
         <div style={{ width: '100%', position: "absolute", bottom: "2px" }}>
             <Accordion>
-                <Accordion.Item eventKey="0" style={{ overflow: 'auto', maxHeight: '45vh', flexDirection: "column-reverse" }}>
+                <Accordion.Item eventKey="0" style={{ overflow: 'auto', maxHeight: '65vh', flexDirection: "column-reverse" }}>
                     <Accordion.Header style={{ fontSize: 'unset', zIndex: 100, fontFamily: 'Segoe UI', top: 0, position: "sticky" }}>
                         <h6><strong>Recomendações </strong>
                         { 
