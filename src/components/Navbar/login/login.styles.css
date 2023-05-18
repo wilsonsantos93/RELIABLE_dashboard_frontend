@@ -26,9 +26,9 @@
     color: black;
     font-size: 24px;
     font-weight: 700;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
 }
 
-.login-form-btn {
+/* .login-form-btn {
     text-transform: uppercase;
-}
+} */

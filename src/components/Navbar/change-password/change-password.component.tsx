@@ -47,7 +47,7 @@ const ChangePassword = ({ show, handleClose }: ChangePasswordProps) => {
   return (
     <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-            <Modal.Title className="signup-form-header">Alterar palavra-passe</Modal.Title>
+            <Modal.Title className="update-password-form-header">Alterar palavra-passe</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -82,7 +82,12 @@ const ChangePassword = ({ show, handleClose }: ChangePasswordProps) => {
                     </Form.Control.Feedback>
                 </Form.Group>
 
-                <Button className="signup-form-btn" disabled={!password || !confirmPassword || !password.length || !confirmPassword.length} type="submit">Alterar</Button>
+                <div className="d-grid gap-2">
+                    <Button disabled={!password || !confirmPassword || !password.length || !confirmPassword.length} variant="primary" type="submit">
+                        Confirmar
+                    </Button>
+                </div>
+                {/* <Button className="signup-form-btn" disabled={!password || !confirmPassword || !password.length || !confirmPassword.length} type="submit">Confirmar</Button> */}
             </Form>
         </Modal.Body>
     </Modal>

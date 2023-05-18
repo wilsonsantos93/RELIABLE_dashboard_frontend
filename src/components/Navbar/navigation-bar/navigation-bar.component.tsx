@@ -11,24 +11,26 @@ import Contacts from "../contacts/contacts.component";
 import Login from "../login/login.component";
 import Register from "../register/register.component";
 import WeatherAlerts from "../weather-alerts/weather-alerts.component";
+import UserPreferences from "../user-preferences/user-preferences.component";
 
 const NavigationBar = () => {
     const [showContacts, setShowContacts] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
     const [showUpdatePassword, setShowUpdatePassword] = useState(false);
+    const [showUserPreferences, setShowUserPreferences] = useState(false);
 
     const user = useSelector(selectUser);
     const isLoggedIn = useSelector(selectUserIsLoggedIn);
     const dispatch = useDispatch<any>();
 
-    const handleShowContacts = () => {
+    /* const handleShowContacts = () => {
         setShowContacts(true);
-    }
+    } */
 
-    const closeContacts = () => {
+    /* const closeContacts = () => {
         setShowContacts(false);
-    }
+    } */
 
     const handleShowLogin = () => {
         setShowLogin(true);
@@ -52,6 +54,14 @@ const NavigationBar = () => {
 
     const closeUpdatePassword = () => {
         setShowUpdatePassword(false);
+    }
+
+    const handleShowUserPreferences = () => {
+        setShowUserPreferences(true);
+    }
+
+    const closeUserPreferences = () => {
+        setShowUserPreferences(false);
     }
 
     const logout = () => {
@@ -86,9 +96,10 @@ const NavigationBar = () => {
                         <Nav className="ms-auto"><WeatherAlerts /></Nav>
                         <NavDropdown align="end" title={titleComponent} id="basic-nav-dropdown">
                             <NavDropdown.Item id="updatePasswordBtn" onClick={() => handleShowUpdatePassword()} href="#">Alterar palavra-passe</NavDropdown.Item>
+                            <NavDropdown.Item id="updateUserPreferences" onClick={() => handleShowUserPreferences()} href="#">Preferências</NavDropdown.Item>
                             <NavDropdown.Divider />
                             <NavDropdown.Item id="signOutBtn" onClick={logout} href="#">
-                            Sair
+                                Sair
                             </NavDropdown.Item>
                         </NavDropdown>
                     </>
@@ -101,6 +112,7 @@ const NavigationBar = () => {
         { showLogin && <Login show={showLogin} handleClose={() => closeLogin()} /> }
         { showRegister && <Register show={showRegister} handleClose={() => closeRegister()} /> }
         { showUpdatePassword && <ChangePassword show={showUpdatePassword} handleClose={() => closeUpdatePassword()} /> }
+        { showUserPreferences && <UserPreferences show={showUserPreferences} handleClose={() => closeUserPreferences()} /> }
         </>
     );
 }
