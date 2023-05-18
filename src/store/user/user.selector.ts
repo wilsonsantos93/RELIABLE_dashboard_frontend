@@ -19,6 +19,11 @@ export const selectUserLocations = createSelector(
     (userSlice) => userSlice.locations
 ) 
 
+export const selectAlertByEmail = createSelector(
+    [selectUserReducer],
+    (userSlice: UserState) => userSlice.alertByEmail
+)
+
 export const selectUserIsLoggedIn = createSelector(
     [selectUserToken],
     (token) => !!token

@@ -8,7 +8,8 @@ export enum USER_ACTION_TYPES {
     SIGN_OUT_FAILED = "user/SIGN_OUT_FAILED",
     SET_USER_LOCATIONS_SUCCESS = "user/SET_USER_LOCATIONS_SUCCESS",
     SET_USER_LOCATIONS_FAILED = "user/SET_USER_LOCATIONS_FAILED",
-    SET_WEATHER_ALERTS = "user/SET_WEATHER_ALERTS"
+    SET_WEATHER_ALERTS = "user/SET_WEATHER_ALERTS",
+    SET_USER_PREFERENCES = "user/SET_USER_PREFERENCES"
 };
 
 export type User = {
@@ -16,7 +17,8 @@ export type User = {
     email: string,
     username?: string,
     locations: UserLocation[],
-    role: string
+    role: string,
+    alertByEmail: boolean
 }
 
 export type UserLocation = {

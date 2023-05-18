@@ -1,4 +1,4 @@
-import { signInFailed, signInSuccess, signOutFailed, signUpFailed, signOutSuccess, setUserLocationsFailed, setUserLocationsSuccess, setWeatherAlerts } from "./user.action";
+import { signInFailed, signInSuccess, signOutFailed, signUpFailed, signOutSuccess, setUserLocationsFailed, setUserLocationsSuccess, setWeatherAlerts, setUserPreferences } from "./user.action";
 import { AnyAction } from "redux";
 import { User, UserLocation, WeatherAlertObject } from "./user.types";
 
@@ -7,7 +7,8 @@ export type UserState = {
   readonly token: string | null,
   readonly locations: UserLocation[],
   readonly error: Error | null,
-  readonly weatherAlerts: WeatherAlertObject | null
+  readonly weatherAlerts: WeatherAlertObject | null,
+  readonly alertByEmail: boolean
 }
 
 const INITIAL_STATE: UserState = {
@@ -15,7 +16,8 @@ const INITIAL_STATE: UserState = {
   token: null,
   locations: [],
   error: null,
-  weatherAlerts: null
+  weatherAlerts: null,
+  alertByEmail: true
 };
 
 export const userReducer = (state = INITIAL_STATE, action: AnyAction): UserState => {
@@ -26,6 +28,7 @@ export const userReducer = (state = INITIAL_STATE, action: AnyAction): UserState
       currentUser: action.payload.user,
       locations: action.payload.user.locations,
       token: action.payload.jwt,
+      alertByEmail: action.payload.user.alertByEmail,
       error: null
     }; 
   }
@@ -62,5 +65,11 @@ export const userReducer = (state = INITIAL_STATE, action: AnyAction): UserState
     }; 
   }
 
+  if (setUserPreferences.match(action)) {
+    return {
+      ...state,
+      alertByEmail: action.payload.alertByEmail
+    }; 
+  }
   return state
 }

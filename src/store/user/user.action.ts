@@ -236,3 +236,30 @@ export const getWeatherAlerts = (): AppThunk => {
         }
     }
 };
+
+// Update user preferences
+export const setUserPreferences = withMatcher(
+    (data: any) => createAction(USER_ACTION_TYPES.SET_USER_PREFERENCES, data)
+)
+
+export const updateUserPreferences = (preferences: any): AppThunk => {
+    return async (dispatch, getState) => {
+        try {
+            const response = await fetch(`${base_url}/api/user/preferences`, {
+                method: 'POST',
+                headers: authHeader(),
+                body: JSON.stringify(preferences)
+            });
+            
+            if (!response?.ok) throw "Não foi possível alterar as preferências";
+
+            const user = { ...getState().user.currentUser };
+            user.alertByEmail = preferences.alertByEmail;
+
+            dispatch(setUserPreferences(preferences));
+            dispatch(showSuccessMsg("Preferências alteradas com sucesso!"));
+        } catch (error) {
+            dispatch(showErrorMsg(error as string));
+        }
+    }
+};
