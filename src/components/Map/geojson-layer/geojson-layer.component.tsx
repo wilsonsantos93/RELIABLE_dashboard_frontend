@@ -17,7 +17,7 @@ import { setGeoJsonLayer } from '../../../store/refs/refs.action';
 import { selectSidebarRef } from '../../../store/refs/refs.selector';
 import { selectIsSidebarOpen, selectRegionNamePath, selectSelectedDateId, selectSelectedWeatherField, selectTableSelectedFeatures, selectWeatherFields } from '../../../store/settings/settings.selector';
 import { selectComparedFeatures, selectNextLayer, selectSelectedFeature } from '../../../store/map/map.selector';
-import { changeLoading, getRegionPathName, getWeatherDates, getWeatherFields } from '../../../store/settings/settings.action';
+import { changeLoading, getRegionPathName, getWeatherDates, getWeatherFields, setOpenTabId } from '../../../store/settings/settings.action';
 import { getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
 import { getObjectValue } from '../../../utils/getObjectValue.utils';
 
@@ -297,6 +297,7 @@ const GeoJsonLayer = (props: any) => {
 
         if (sidebarRef?.current && !isSidebarOpen && !window.mobileCheck()) {
             sidebarRef.current.open("tab1");
+            dispatch(setOpenTabId(1));
         }
     }
 
