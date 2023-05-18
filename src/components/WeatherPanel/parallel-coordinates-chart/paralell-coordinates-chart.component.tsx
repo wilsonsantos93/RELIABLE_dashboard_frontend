@@ -1,5 +1,5 @@
 import "./parallel-coordinates-chart.styles.css";
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts, { Series} from 'highcharts';
 import HighchartsParallelCoordinates from 'highcharts/modules/parallel-coordinates';
@@ -9,7 +9,6 @@ import { selectIsSidebarOpen, selectOpenTabId, selectRegionNamePath, selectTable
 import { selectComparedFeatures, selectSelectedFeature } from "../../../store/map/map.selector";
 import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
 import { getObjectValue } from "../../../utils/getObjectValue.utils";
-import { Dropdown } from 'primereact/dropdown';
 import 'primereact/resources/primereact.min.css';
 import ToggleDataButton from "../toggle-data-button/toggle-data-button.component";
 
@@ -84,17 +83,10 @@ const ParallelCoordinatesChart = () => {
       },
     };
 
-    const options = [
-        { name: 'Tudo', code: 'all' } , 
-        { name: 'Seleção do mapa', code: 'selection'},
-    ];
-
     const chartRef = useRef<any>();
     const [chartOptions, setChartOptions] = useState<any>(chartConfig);
     const [previousSeries, setPreviousSeries] = useState<CustomSeries | undefined>();
-    //const [selectedOption, setSelectedOption] = useState<any>(options[0]);
     const toggleDataButtonChecked = useSelector(selectToggleDataButtonChecked);
-
     const weatherFields = useSelector(selectWeatherFields);
     const comparedFeatures = useSelector(selectComparedFeatures);
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
@@ -104,6 +96,7 @@ const ParallelCoordinatesChart = () => {
     const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
     const openTabId = useSelector(selectOpenTabId);
 
+    // Selected feature event
     useEffect(() => {
         onHoveredFeatureChanged();
     }, [selectedFeature, chartOptions])
@@ -120,6 +113,7 @@ const ParallelCoordinatesChart = () => {
         updateColor(selectedFeature._id);
     }
 
+    // Update series color for selected feature
     const updateColor = (featureId: string) => {
         if (!featureId) return;
         const series: any = chartRef?.current?.chart?.series?.find((s:CustomSeries) => s.userOptions.featureId == featureId);
@@ -130,6 +124,7 @@ const ParallelCoordinatesChart = () => {
         chartRef?.current?.chart?.redraw(); 
     }
 
+    // Set click event handler
     useEffect( () => {
         if (!geoJsonLayerRef || !geoJsonLayerRef.current) return;
 
@@ -152,23 +147,22 @@ const ParallelCoordinatesChart = () => {
                 }
             }
         })
-    }, [geoJsonLayerRef])
+    }, [geoJsonLayerRef]);
 
     const setChartData = () => {
         if (weatherFields && comparedFeatures && chartRef.current) {
             const categories = weatherFields.map(field => field.displayName);
-
+            
             const series = comparedFeatures.map((feature: any) => {
                 const data = weatherFields.map(field => feature.weather && feature.weather.hasOwnProperty(field.name) ? feature.weather[field.name] : null);
                 const name = getObjectValue(regionNamePath, feature);
-
+    
                 let visible = true;
-
-                //if (selectedOption.code == 'selection') {
+    
                 if (toggleDataButtonChecked) {
                     visible = tableSelectedFeatures.find((f: any) => f._id == feature._id) ? true : false;
                 }
-
+    
                 return {
                     featureId: feature._id,
                     name: name,
@@ -177,8 +171,8 @@ const ParallelCoordinatesChart = () => {
                     showInLegend: visible,
                     visible
                 };
-            })
-    
+            });
+
             setChartOptions((oldChartOptions: any) => { 
                 return { 
                     ...oldChartOptions, 
@@ -223,34 +217,23 @@ const ParallelCoordinatesChart = () => {
     }, [isSidebarOpen]);
 
 
-    const onSelectOption = (e: any) => {
-        /* if (e.value.code == 'all') {
-            chartRef?.current?.chart?.series.forEach((s: any) => {
-                s.setVisible(true, false);
-                s.update({ showInLegend: true }, false);
-            });
-        }
-        else {
-            updateSelectedSeriesVisibility();
-        }
-        
-        chartRef?.current?.chart.redraw(); 
-        setSelectedOption(e.value); */
-    }
-
     useEffect(() => {
         if (toggleDataButtonChecked) {
-            updateSelectedSeriesVisibility();
+            showSelectedFeatures();
         } else {
-            chartRef?.current?.chart?.series.forEach((s: any) => {
-                s.setVisible(true, false);
-                s.update({ showInLegend: true }, false);
-            });
+            showAllFeatures();
         }
-        chartRef?.current?.chart.redraw(); 
     }, [toggleDataButtonChecked]);
 
-    const updateSelectedSeriesVisibility = () => {
+    const showAllFeatures = () => {
+        chartRef?.current?.chart?.series.forEach((s: any) => {
+            s.setVisible(true, false);
+            s.update({ showInLegend: true }, false);
+        });
+        chartRef?.current?.chart.redraw(); 
+    }
+
+    const showSelectedFeatures = () => {
         chartRef?.current?.chart?.series.forEach((s: any) => {
             if (tableSelectedFeatures.find((f: any) => f._id == s.userOptions.featureId)) {
                 s.setVisible(true, false);
@@ -261,34 +244,20 @@ const ParallelCoordinatesChart = () => {
                 s.update({ showInLegend: false }, false);
             }
         });
+        chartRef?.current?.chart.redraw(); 
     }
 
     useEffect(() => {
-        //if (tableSelectedFeatures.length && selectedOption.code === 'selection') {
-        if (tableSelectedFeatures.length && toggleDataButtonChecked) {
-            updateSelectedSeriesVisibility();
-            chartRef?.current?.chart.redraw(); 
-        }
-    }, [tableSelectedFeatures])
-
-
-    useEffect(() => {
-        if (isSidebarOpen && openTabId == 1) {
+        if (isSidebarOpen && openTabId == 2) {
             setChartData();
         } else {
-            removeChartData();
+            if (chartRef?.current?.chart?.series.length) removeChartData();
         }
-    }, [isSidebarOpen, openTabId])
+    }, [isSidebarOpen, openTabId, tableSelectedFeatures])
 
     return ( 
         (comparedFeatures.length) ? 
         <>
-            {/* <div style={{ margin: '2px'}}>
-                <span>Mostrar: </span>
-                <Dropdown value={selectedOption} onChange={(e) => onSelectOption(e)} options={options} optionLabel="name" 
-                    placeholder="Selecione uma opção" className="w-full md:w-14rem" />
-                { selectedOption.code == 'selection' && <span> Selecione no mapa para visualizar no gráfico</span> }
-            </div> */}
             <div style={{ padding: "0.5rem 0.5rem" }}>
                 <ToggleDataButton />
             </div>
