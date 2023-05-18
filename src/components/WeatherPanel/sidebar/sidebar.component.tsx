@@ -56,8 +56,8 @@ const Sidebar = () => {
         <div id="sidebar" className="leaflet-sidebar collapsed">
             <div className="leaflet-sidebar-tabs">
                 <ul role="tablist" className="tablist"> 
-                    <li key="tab1"><a href="#tab1" onClick={() => onTabClick(0)} role="tab"><FontAwesomeIcon icon={faTable} /></a></li>
-                    <li key="tab2"><a href="#tab2" onClick={() => onTabClick(1)} role="tab"><FontAwesomeIcon icon={faChartLine} /></a></li>
+                    <li key="tab1"><a href="#tab1" onClick={() => onTabClick(1)} role="tab"><FontAwesomeIcon icon={faTable} /></a></li>
+                    <li key="tab2"><a href="#tab2" onClick={() => onTabClick(2)} role="tab"><FontAwesomeIcon icon={faChartLine} /></a></li>
                     {/* <li key="tab3"><a href="#tab3" role="tab"><FontAwesomeIcon icon={faCog} /></a></li> */}
                 </ul>
             </div>
