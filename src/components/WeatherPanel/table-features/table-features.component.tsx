@@ -2,7 +2,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Row } from 'primereact/row';
 import { ColumnGroup } from 'primereact/columngroup';
-import { selectRegionNamePath, selectTableSelectedFeatures, selectToggleDataButtonChecked, selectWeatherFields } from '../../../store/settings/settings.selector';
+import { selectIsSidebarOpen, selectOpenTabId, selectRegionNamePath, selectTableSelectedFeatures, selectToggleDataButtonChecked, selectWeatherFields } from '../../../store/settings/settings.selector';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getObjectValue } from '../../../utils/getObjectValue.utils';
@@ -19,7 +19,6 @@ import { FilterMatchMode } from 'primereact/api';
 import { InputText } from 'primereact/inputtext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { InputSwitch } from 'primereact/inputswitch';
 import ToggleDataButton from '../toggle-data-button/toggle-data-button.component';
 
 const TableFeatures = () => {
@@ -32,8 +31,9 @@ const TableFeatures = () => {
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
     const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
     const dt = useRef(null);
-    /* const [metaKey, setMetaKey] = useState(false); */
     const toggleDataButtonChecked = useSelector(selectToggleDataButtonChecked);
+    const isSidebarOpen = useSelector(selectIsSidebarOpen);
+    const openTabId = useSelector(selectOpenTabId);
 
     useEffect( () => {
         if (!selectedFeature) return;
@@ -53,6 +53,7 @@ const TableFeatures = () => {
 
     }, [selectedFeature]);
 
+
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         checked: { value: [false, true], matchMode: FilterMatchMode.IN }
@@ -70,17 +71,6 @@ const TableFeatures = () => {
         setGlobalFilterValue(value);
     };
 
-    /* const onCheckFilterChange = (e: any) => {
-        const value = e.value;
-        let _filters = { ...filters };
-
-        if (value == true) _filters['checked'].value = [true];
-        else _filters['checked'].value = [false, true];
-
-        setFilters(_filters);
-        setMetaKey(!metaKey);
-    } */
-
     const updateCheckedFilter = () => {
         let _filters = { ...filters };
         if (toggleDataButtonChecked) {
@@ -96,6 +86,43 @@ const TableFeatures = () => {
         updateCheckedFilter();
     }, [toggleDataButtonChecked])
 
+
+    /* const scrollToSelected = () => {
+        //let d = [...data, undefined];
+        //data = d.filter(r => r);
+
+        if (!selectedFeature) return;
+
+        const dtRef: any = dt.current;
+        if (!dtRef) return;
+
+        
+        setTimeout(() => {
+            const ix = dtRef.getVirtualScroller().props.items.findIndex((f:any) => f._id == selectedFeature._id);
+            if (ix < 0) return;
+
+            dtRef.getVirtualScroller().scrollToIndex(ix);
+            console.log("SCROLLED TO INDEX", ix);
+
+            setTimeout(() => {
+                const el = document.getElementsByClassName("p-virtualscroller")[0];
+                if (el) {
+                    el.scrollTop = el.scrollTop - 60;
+                    el.scrollTop = el.scrollTop + 60;
+                    console.log("SCROLLED BACK AND FORTH");
+                }
+            }, 1000);
+        }, 250);
+
+        return;
+    } */
+
+/*     useEffect(() => {
+        if (openTabId != 1) return;
+    }, [openTabId]) */
+
+
+    // Function to get color
     const getColor = (value: number, fieldName: string) => {
         const field = weatherFields.find(field => field.name === fieldName);
         if (field) {
@@ -110,6 +137,7 @@ const TableFeatures = () => {
         return "#808080";
     }
 
+    // Generate columns
     let columns = [
         {
             field: 'local',
@@ -127,7 +155,8 @@ const TableFeatures = () => {
 
     columns = [...columns, ...weatherColumns];
 
-    const data = useMemo(() => {
+    // Generate data
+    let data = useMemo(() => {
         if (!comparedFeatures) return [];
 
         return comparedFeatures.map((feature:any) => {
@@ -140,8 +169,9 @@ const TableFeatures = () => {
          });
     }, [comparedFeatures])
 
+
     useEffect(() => {
-        if (!data || !data.length) return;
+        if (!data) return;
         dispatch(updateTableSelectedFeatures(data.filter(f => f.checked)));
     }, [data])
 
@@ -150,6 +180,8 @@ const TableFeatures = () => {
         if (row) row.click();
     } */
 
+
+    // Change cell color
     const cellTemplate = (row: any, options: any, colName:any) => {
         if (colName !== 'local') {
             new Promise(r => setTimeout(r, 0)).then(() => {
@@ -302,10 +334,6 @@ const TableFeatures = () => {
     const searchHeader = () => {
         return (
             <div id="searchHeader">
-                {/* <div style={{ display: 'flex', flex: 1, textAlign: 'left' }}>
-                    <InputSwitch inputId="input-metakey" checked={metaKey} onChange={onCheckFilterChange} />
-                    <span style={{ marginLeft: "5px", fontSize: '11px'}}> Mostrar selecionados</span>
-                </div> */}
                 <ToggleDataButton />
 
                 <div style={{ display: 'flex', textAlign: 'right' }}>
@@ -334,6 +362,7 @@ const TableFeatures = () => {
 
 
     return (
+       /*  (isSidebarOpen && openTabId == 1) ? */
         <DataTable 
             ref={dt}
             onRowMouseEnter={onRowMouseEnter}
@@ -358,7 +387,7 @@ const TableFeatures = () => {
             size='small' 
             cellClassName={cellClassName} 
             scrollable 
-            scrollHeight="65vh" 
+            scrollHeight="65vh"
             tableStyle={{ fontSize: '12px', maxWidth: '99%' }}
             sortField="local"
             sortOrder={1}
@@ -376,7 +405,8 @@ const TableFeatures = () => {
                     />
                 ))
             }
-        </DataTable>
+        </DataTable> 
+        /* : null */
     )
 }
 
