@@ -32,7 +32,6 @@ export type WeatherField = {
     description: string,
     displayName: string,
     ranges: WeatherFieldRange[]
-
 }
 
 export type WeatherFieldRange = {
@@ -40,5 +39,6 @@ export type WeatherFieldRange = {
     max: number,
     alert: boolean,
     color: string,
-    recommendations: string[]
+    recommendations: string[],
+    label: string
 }
