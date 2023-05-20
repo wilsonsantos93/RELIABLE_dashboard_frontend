@@ -120,35 +120,33 @@ const GeoJsonLayer = (props: any) => {
     }
 
     useEffect(() => {
-        (async () => {
-            if (selectedDateId && regionNamePath) {
-                dispatch(changeLoading(true));
-                dispatch(getGeoJsonData(selectedDateId)).then((data: GeoJsonObject) => {
-                    setGeoJsonData(data);
-                    if (geoJsonLayerRef.current) {
-                        geoJsonLayerRef.current.clearLayers().addData(data);
-                        //set comparedFeatures
-                        const updatedFeatures = []
-                        for (const featureCollection of data as any) {
-                            for (const f of featureCollection.features) {
-                                const { _id, properties, weather } = f;
-                                let checked = false;
-                                if (tableSelectedFeatures.find((f: any) => f._id === _id)) checked = true;
-                                updatedFeatures.push({ _id, properties, weather, checked });
-                            }
-                        }
-                        if (updatedFeatures.length) dispatch(updateComparedFeatures(updatedFeatures));
-
-                        if (nextLayer) {
-                            const layer = geoJsonLayerRef.current.getLayer(nextLayer);
-                            layer?.fire("click");
-                            dispatch(updateNextLayer(null));
+        if (selectedDateId && regionNamePath) {
+            dispatch(changeLoading(true));
+            dispatch(getGeoJsonData(selectedDateId)).then((data: GeoJsonObject) => {
+                setGeoJsonData(data);
+                if (geoJsonLayerRef.current) {
+                    geoJsonLayerRef.current.clearLayers().addData(data);
+                    //set comparedFeatures
+                    const updatedFeatures = [];
+                    for (const featureCollection of data as any) {
+                        for (const f of featureCollection.features) {
+                            const { _id, properties, weather } = f;
+                            let checked = false;
+                            if (tableSelectedFeatures.find((f: any) => f._id === _id)) checked = true;
+                            updatedFeatures.push({ _id, properties, weather, checked });
                         }
                     }
-                    dispatch(changeLoading(false));
-                }).catch(() => dispatch(changeLoading(false)));
-            }
-        })()
+                    if (updatedFeatures.length) dispatch(updateComparedFeatures(updatedFeatures));
+
+                    if (nextLayer) {
+                        const layer = geoJsonLayerRef.current.getLayer(nextLayer);
+                        layer?.fire("click");
+                        dispatch(updateNextLayer(null));
+                    }
+                }
+                dispatch(changeLoading(false));
+            }).catch(() => dispatch(changeLoading(false)));
+        }
     }, [selectedDateId, regionNamePath]);
 
     useEffect(() => {
