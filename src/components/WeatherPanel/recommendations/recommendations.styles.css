@@ -1,4 +1,20 @@
-.accordion-button:not(.collapsed) {
+.recommendationsAccordion .accordion-button {
     background-color: #eef2ff!important;
     color: black!important;
+}
+
+.recommendationsAccordion .check-circle {
+    color: green;
+}
+
+.recommendationsAccordion {
+    width: 100%;
+    position: absolute;
+    bottom: 2px;
+}
+
+.recommendationsAccordion .accordionItem {
+    overflow: auto; 
+    max-height: 35vh;
+    flex-direction: column-reverse;
 }
