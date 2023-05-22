@@ -30,8 +30,6 @@ const Recommendations = () => {
             }
         }
 
-        recommendations = [];
-
         return recommendations.length ? 
         <ListGroup key="listgroup" variant="flush">
             { recommendations.map((r,i) => <ListGroup.Item key={`recommendation_${i}`}>{r}</ListGroup.Item>) }
