@@ -245,15 +245,19 @@ const GeoJsonLayer = (props: any) => {
 
     const getWeatherValueWithUnit = (feature: any) => {
         if (!selectedWeatherField) return;
-        if (selectedWeatherField.unit) return `(${feature.weather[selectedWeatherField.name]} ${selectedWeatherField.unit})`
-        return `(${feature.weather[selectedWeatherField.name]})`
+        if (selectedWeatherField.unit) return `${feature.weather[selectedWeatherField.name]} ${selectedWeatherField.unit}`;
+        return `${feature.weather[selectedWeatherField.name]}`;
     }
 
     // Highlights a feature of the map when hovered.
     const highlightFeature = (layer: any) => {
         if (!layer) return;
         if (layer.getPopup().isOpen()) layer.closeTooltip();
-        layer.setTooltipContent(`${getObjectValue(regionNamePath, layer.feature)} ${getWeatherValueWithUnit(layer.feature)}`)
+        layer.setTooltipContent(`
+            <strong>${getObjectValue(regionNamePath, layer.feature)}</strong>
+            </br>${selectedWeatherField?.displayName}: ${getWeatherValueWithUnit(layer.feature)}
+        `);
+        
         const isComparedFeature = existsInComparedFeatures(layer.feature._id);
         const isSelectedFeature = selectedFeature?._id == layer.feature._id;
         if (isComparedFeature || isSelectedFeature){
