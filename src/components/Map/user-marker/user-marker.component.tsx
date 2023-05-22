@@ -13,9 +13,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeUserLocation, updateUserLocation } from "../../../store/user/user.action";
 import { selectUserLocations } from "../../../store/user/user.selector";
 import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
-import { selectSelectedWeatherField } from "../../../store/settings/settings.selector";
+import { selectSelectedWeatherField, selectTableSelectedFeatures } from "../../../store/settings/settings.selector";
 import { selectComparedFeatures } from "../../../store/map/map.selector";
 import { removeFromComparedFeatures, selectFeature } from "../../../store/map/map.action";
+import { updateTableSelectedFeatures } from "../../../store/settings/settings.action";
 declare function require(name:string):any;
 const leafletPip = require('@mapbox/leaflet-pip');
 
@@ -42,6 +43,7 @@ const UserMarker = (props: any) => {
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
     const selectedWeatherField = useSelector(selectSelectedWeatherField);
     const comparedFeatures = useSelector(selectComparedFeatures);
+    const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
 
     const findLayerByLatLng = (latlngPoint: LatLng) => {
         const { lat, lng } = latlngPoint;
@@ -113,7 +115,7 @@ const UserMarker = (props: any) => {
                 <Button onClick={toggleEditable} title="Editar nome" variant="outline-primary" size="sm"><FontAwesomeIcon icon={faEdit}/></Button>
                 <Button onClick={toggleDraggable} title="Mover" variant="outline-primary" size="sm"><FontAwesomeIcon icon={faUpDownLeftRight}/></Button>
                 <Button onClick={() => onRemove()} title="Eliminar" variant="outline-danger" size="sm"><FontAwesomeIcon icon={faTrash}/></Button>
-                <Button onClick={() => onRemoveFeature()}  title="Remover da lista" variant="outline-danger" size="sm"><FontAwesomeIcon icon={faEyeSlash}/></Button>
+                {/* <Button onClick={() => onRemoveFeature()}  title="Remover da lista" variant="outline-danger" size="sm"><FontAwesomeIcon icon={faEyeSlash}/></Button> */}
             </div>
         </div>
     }
@@ -138,10 +140,16 @@ const UserMarker = (props: any) => {
         if (!geoJsonLayerRef) return;
         const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
         if (!l) return;
-        dispatch(removeUserLocation(userLocations, props.data._id));
+        dispatch(removeUserLocation(userLocations, props.data._id)).then(() => {
+            const l = geoJsonLayerRef.current.getLayer(layer.feature._id);
+            if (l) l.closePopup();
+            const marker: any = markerRef.current;
+            if (marker) marker.closePopup();
+            dispatch(selectFeature(null));
+        });
     }
 
-    const onRemoveFeature = () => {
+    /* const onRemoveFeature = () => {
         if (!layer || !geoJsonLayerRef) return;
 
         dispatch(removeFromComparedFeatures(comparedFeatures, layer.feature._id));
@@ -150,7 +158,7 @@ const UserMarker = (props: any) => {
         const marker: any = markerRef.current;
         marker.closePopup();
         dispatch(selectFeature(null));
-    }
+    } */
   
     return (
         <Marker
