@@ -150,9 +150,11 @@ const GeoJsonLayer = (props: any) => {
     }, [selectedDateId, regionNamePath]);
 
     useEffect(() => {
-        dispatch(getRegionPathName());
-        dispatch(getWeatherDates());
-        dispatch(getWeatherFields());
+        dispatch(getWeatherFields()).then(()=> {
+            dispatch(getWeatherDates()).then(() => {
+                dispatch(getRegionPathName()); 
+            });
+        });
     }, []);
 
     useEffect(() => {
