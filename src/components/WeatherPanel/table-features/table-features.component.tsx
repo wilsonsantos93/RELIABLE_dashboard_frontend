@@ -2,14 +2,11 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Row } from 'primereact/row';
 import { ColumnGroup } from 'primereact/columngroup';
-import { selectIsSidebarOpen, selectOpenTabId, selectRegionNamePath, selectTableSelectedFeatures, selectToggleDataButtonChecked, selectWeatherFields } from '../../../store/settings/settings.selector';
+import { selectRegionNamePath, selectTableSelectedFeatures, selectToggleDataButtonChecked, selectWeatherFields } from '../../../store/settings/settings.selector';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getObjectValue } from '../../../utils/getObjectValue.utils';
 import { selectComparedFeatures, selectSelectedFeature } from '../../../store/map/map.selector';
-import "primereact/resources/themes/lara-light-indigo/theme.css"; 
-import "primereact/resources/primereact.min.css";
-import "./table-features.styles.css";
 import { selectGeoJsonLayerRef } from '../../../store/refs/refs.selector';
 import { selectFeature } from '../../../store/map/map.action';
 import { WeatherField } from '../../../store/settings/settings.types';
@@ -20,6 +17,15 @@ import { InputText } from 'primereact/inputtext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import ToggleDataButton from '../toggle-data-button/toggle-data-button.component';
+import "primereact/resources/themes/lara-light-indigo/theme.css"; 
+import "primereact/resources/primereact.min.css";
+import "./table-features.styles.css";
+
+type TableFeature = {
+    _id: string,
+    checked: boolean,
+    local: string
+}
 
 const TableFeatures = () => {
     const dispatch = useDispatch<any>();
@@ -30,10 +36,10 @@ const TableFeatures = () => {
     const selectedFeature = useSelector(selectSelectedFeature);
     const geoJsonLayerRef = useSelector(selectGeoJsonLayerRef);
     const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
-    const dt = useRef(null);
     const toggleDataButtonChecked = useSelector(selectToggleDataButtonChecked);
-    const isSidebarOpen = useSelector(selectIsSidebarOpen);
-    const openTabId = useSelector(selectOpenTabId);
+    const dt = useRef(null);
+
+    /* const [data, setData] = useState<TableFeature[]>([]); */
 
     useEffect( () => {
         if (!selectedFeature) return;
@@ -84,42 +90,7 @@ const TableFeatures = () => {
 
     useEffect(() => {
         updateCheckedFilter();
-    }, [toggleDataButtonChecked])
-
-
-    /* const scrollToSelected = () => {
-        //let d = [...data, undefined];
-        //data = d.filter(r => r);
-
-        if (!selectedFeature) return;
-
-        const dtRef: any = dt.current;
-        if (!dtRef) return;
-
-        
-        setTimeout(() => {
-            const ix = dtRef.getVirtualScroller().props.items.findIndex((f:any) => f._id == selectedFeature._id);
-            if (ix < 0) return;
-
-            dtRef.getVirtualScroller().scrollToIndex(ix);
-            console.log("SCROLLED TO INDEX", ix);
-
-            setTimeout(() => {
-                const el = document.getElementsByClassName("p-virtualscroller")[0];
-                if (el) {
-                    el.scrollTop = el.scrollTop - 60;
-                    el.scrollTop = el.scrollTop + 60;
-                    console.log("SCROLLED BACK AND FORTH");
-                }
-            }, 1000);
-        }, 250);
-
-        return;
-    } */
-
-/*     useEffect(() => {
-        if (openTabId != 1) return;
-    }, [openTabId]) */
+    }, [toggleDataButtonChecked]);
 
 
     // Function to get color
@@ -155,11 +126,12 @@ const TableFeatures = () => {
 
     columns = [...columns, ...weatherColumns];
 
+
     // Generate data
-    let data = useMemo(() => {
+    const data: TableFeature[] = useMemo(() => {
         if (!comparedFeatures) return [];
 
-        return comparedFeatures.map((feature:any) => {
+        return comparedFeatures.map((feature: any) => {
              return {
                 _id: feature._id,
                 checked: feature.checked ? true : false,
@@ -167,13 +139,23 @@ const TableFeatures = () => {
                 ...feature.weather
              }
          });
-    }, [comparedFeatures])
+    }, [comparedFeatures]);
 
 
-    useEffect(() => {
-        if (!data) return;
-        dispatch(updateTableSelectedFeatures(data.filter(f => f.checked)));
-    }, [data])
+    /* useEffect(() => {
+        const data: TableFeature[] = comparedFeatures.map((feature:any) => {
+            return {
+               _id: feature._id,
+               checked: feature.checked ? true : false,
+               local: getObjectValue(regionNamePath, feature),
+               ...feature.weather
+            }
+        });
+
+
+        setData(data);
+    }, [comparedFeatures]);
+ */
 
     /* const clickRow = (id: string) => {
         const row: any = document.querySelector(`tr.row-${id}`);
@@ -219,22 +201,27 @@ const TableFeatures = () => {
         dispatch(updateTableSelectedFeatures(e.value));
     }
 
+    // On row clicked handler
     const onRowClicked = (e: any) => {
         if (!geoJsonLayerRef) return;
 
         const featureId = e.data._id;
+        
+        if (e.originalEvent.target.matches("path, .p-checkbox-icon, .p-selection-column, .p-checkbox.p-component")) return;
+
+        if (selectedFeature && selectedFeature._id == featureId) return;
 
         if (!tableSelectedFeatures.find((f:any) => f._id == featureId)) {
             const checkedFeatures = [...tableSelectedFeatures, e.data];
             dispatch(updateTableSelectedFeatures(checkedFeatures));
         }
 
-        const ix = data.findIndex((f:any) => f._id == featureId)
-        data[ix].checked = true;
-        
-        if (e.originalEvent.target.matches("path, .p-checkbox-icon, .p-selection-column, .p-checkbox.p-component")) return;
-        
-        if (selectedFeature && selectedFeature._id == featureId) return;
+        /* const newData = [...data];
+        const ix = newData.findIndex(f => f._id == featureId);
+        if (ix < 0) newData[ix].checked = true;
+        setData(newData); */
+        const ix = data.findIndex(f => f._id == featureId);
+        if (ix < 0) data[ix].checked = true;
 
         const feature = comparedFeatures.find((f:any) => f._id === featureId);
         dispatch(selectFeature(feature));
@@ -243,7 +230,7 @@ const TableFeatures = () => {
         if (layer) layer.fireEvent("click", { tableClicked: true });
     }
 
-
+    // Set Legend for weather column
     const setLegend = (colName: string) => {
         const field = weatherFields.find((f: WeatherField) => f.name === colName);
         if (!field) return;
@@ -280,27 +267,48 @@ const TableFeatures = () => {
             </div>
     }
 
+    // On row select handler
     const onRowSelect = (e: any) => {
-        const ix = data.findIndex((f:any) => f._id == e.data._id)
+        /* const newData = [...data];
+        const ix = newData.findIndex(f => f._id == e.data._id);
+        if (ix < 0) return;
+        newData[ix].checked = true;
+        setData(newData); */
+        const ix = data.findIndex(f => f._id == e.data._id);
         data[ix].checked = true;
     };
 
+    // On row unselect handler
     const onRowUnselect = (e: any) => {
-        const ix = data.findIndex((f:any) => f._id == e.data._id)
+        /* const newData = [...data];
+        const ix = newData.findIndex(f => f._id == e.data._id);
+        if (ix < 0) return;
+        newData[ix].checked = false;
+        setData(newData); */
+        const ix = data.findIndex(f => f._id == e.data._id);
+        if (ix < 0) return;
         data[ix].checked = false;
+
         if (selectedFeature?._id == e.data._id) {
-            dispatch(selectFeature(null))
+            dispatch(selectFeature(null));
             map.closePopup();
         }
+
+        if (!geoJsonLayerRef) return;
+        const layer = geoJsonLayerRef.current.getLayer(e.data._id);
+        if (layer) layer.closeTooltip();
     };
 
+    // On all rows select handler
     const onAllRowsSelect = () => {
-        data.forEach(d => d.checked = true)
+        data.forEach(d => d.checked = true);
     };
 
+    // On All rows unselect handler
     const onAllRowsUnselect = () => {
         map.closePopup();
-        data.forEach(d => d.checked = false)
+        map.closeTooltip();
+        data.forEach(d => d.checked = false);
     };
 
     const headerGroup = (
@@ -331,6 +339,7 @@ const TableFeatures = () => {
         </ColumnGroup>
     );
 
+    // Search box and Toggle button header
     const searchHeader = () => {
         return (
             <div id="searchHeader">
@@ -360,9 +369,7 @@ const TableFeatures = () => {
         if (layer) layer.fireEvent("mouseout");
     }
 
-
     return (
-       /*  (isSidebarOpen && openTabId == 1) ? */
         <DataTable 
             ref={dt}
             onRowMouseEnter={onRowMouseEnter}
@@ -406,7 +413,6 @@ const TableFeatures = () => {
                 ))
             }
         </DataTable> 
-        /* : null */
     )
 }
 
