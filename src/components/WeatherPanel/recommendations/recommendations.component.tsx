@@ -85,7 +85,7 @@ const Recommendations = () => {
     }
 
     const getFullRecommendations = () => {
-        return <><strong>No caso de temperaturas baixas:</strong>
+        return <div key="divFullRec"><strong>No caso de temperaturas baixas:</strong>
         <ul>
             <li>Mantenha a temperatura da sua casa entre os 18ºC e os 21ºC</li>
             <li>Tenha cuidado com as mudanças bruscas de temperatura</li>
@@ -137,7 +137,7 @@ const Recommendations = () => {
             mudanças bruscas de temperatura (um duche gelado, imediatamente depois de se
             ter apanhado muito calor, pode causar hipotermia, principalmente em pessoas
             idosas ou em crianças)</li>
-        </ul></>;
+        </ul></div>;
     }
 
 
