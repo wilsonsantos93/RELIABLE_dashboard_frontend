@@ -8,8 +8,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { getObjectValue } from '../../../utils/getObjectValue.utils';
 import { selectComparedFeatures, selectSelectedFeature } from '../../../store/map/map.selector';
 import { selectGeoJsonLayerRef } from '../../../store/refs/refs.selector';
-import { selectFeature } from '../../../store/map/map.action';
-import { WeatherField } from '../../../store/settings/settings.types';
+import { selectFeature, setSelectedFeature } from '../../../store/map/map.action';
+import { TableFeature, WeatherField } from '../../../store/settings/settings.types';
 import { useMap } from 'react-leaflet';
 import { updateTableSelectedFeatures } from '../../../store/settings/settings.action';
 import { FilterMatchMode } from 'primereact/api';
@@ -21,11 +21,6 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "./table-features.styles.css";
 
-type TableFeature = {
-    _id: string,
-    checked: boolean,
-    local: string
-}
 
 const TableFeatures = () => {
     const dispatch = useDispatch<any>();
@@ -38,8 +33,7 @@ const TableFeatures = () => {
     const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
     const toggleDataButtonChecked = useSelector(selectToggleDataButtonChecked);
     const dt = useRef(null);
-
-    /* const [data, setData] = useState<TableFeature[]>([]); */
+    const [lastUncheckedFeature, setLastUncheckedFeature] = useState<string | null>(null);
 
     useEffect( () => {
         if (!selectedFeature) return;
@@ -142,27 +136,6 @@ const TableFeatures = () => {
     }, [comparedFeatures]);
 
 
-    /* useEffect(() => {
-        const data: TableFeature[] = comparedFeatures.map((feature:any) => {
-            return {
-               _id: feature._id,
-               checked: feature.checked ? true : false,
-               local: getObjectValue(regionNamePath, feature),
-               ...feature.weather
-            }
-        });
-
-
-        setData(data);
-    }, [comparedFeatures]);
- */
-
-    /* const clickRow = (id: string) => {
-        const row: any = document.querySelector(`tr.row-${id}`);
-        if (row) row.click();
-    } */
-
-
     // Change cell color
     const cellTemplate = (row: any, options: any, colName:any) => {
         if (colName !== 'local') {
@@ -216,10 +189,6 @@ const TableFeatures = () => {
             dispatch(updateTableSelectedFeatures(checkedFeatures));
         }
 
-        /* const newData = [...data];
-        const ix = newData.findIndex(f => f._id == featureId);
-        if (ix < 0) newData[ix].checked = true;
-        setData(newData); */
         const ix = data.findIndex(f => f._id == featureId);
         if (ix < 0) data[ix].checked = true;
 
@@ -269,22 +238,14 @@ const TableFeatures = () => {
 
     // On row select handler
     const onRowSelect = (e: any) => {
-        /* const newData = [...data];
-        const ix = newData.findIndex(f => f._id == e.data._id);
-        if (ix < 0) return;
-        newData[ix].checked = true;
-        setData(newData); */
+        e.originalEvent.stopPropagation();
         const ix = data.findIndex(f => f._id == e.data._id);
         data[ix].checked = true;
     };
 
     // On row unselect handler
     const onRowUnselect = (e: any) => {
-        /* const newData = [...data];
-        const ix = newData.findIndex(f => f._id == e.data._id);
-        if (ix < 0) return;
-        newData[ix].checked = false;
-        setData(newData); */
+        e.originalEvent.stopPropagation();
         const ix = data.findIndex(f => f._id == e.data._id);
         if (ix < 0) return;
         data[ix].checked = false;
@@ -297,6 +258,8 @@ const TableFeatures = () => {
         if (!geoJsonLayerRef) return;
         const layer = geoJsonLayerRef.current.getLayer(e.data._id);
         if (layer) layer.closeTooltip();
+
+        setLastUncheckedFeature(e.data._id);
     };
 
     // On all rows select handler
@@ -309,6 +272,7 @@ const TableFeatures = () => {
         map.closePopup();
         map.closeTooltip();
         data.forEach(d => d.checked = false);
+        dispatch(selectFeature(null));
     };
 
     const headerGroup = (
@@ -355,14 +319,18 @@ const TableFeatures = () => {
         ); 
     }
 
+    // On mouse enter handler
     const onRowMouseEnter = (e: any) => {
+        if (lastUncheckedFeature == e.data._id) return;
         if (!geoJsonLayerRef) return;
 
         const layer = geoJsonLayerRef.current.getLayer(e.data._id);
-        if (layer) layer.fireEvent("mouseover");
+        if (layer && !window.mobileCheck()) layer.fireEvent("mouseover");
     }
 
+    // On mouse leave handler
     const onRowMouseLeave = (e: any) => {
+        setLastUncheckedFeature(null);
         if (!geoJsonLayerRef) return;
 
         const layer = geoJsonLayerRef.current.getLayer(e.data._id);
