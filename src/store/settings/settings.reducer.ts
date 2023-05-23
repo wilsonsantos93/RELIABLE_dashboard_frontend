@@ -1,6 +1,6 @@
 import { setSelectAreaMode, setSelectedWeatherField, fetchWeatherFieldsSuccess, fetchWeatherFieldsFailed, setSelectedDateId, fetchWeatherDatesFailed, fetchWeatherDatesSuccess, setLoading, setIsSidebarOpen, setSuccessMsg, setErrorMsg, setInfoMsg, setRegionNamePath, setTableSelectedFeatures, setOpenTabId, setToggleDataButtonChecked } from "./settings.action";
 import { AnyAction } from "redux";
-import { WeatherDate, WeatherField } from "./settings.types";
+import { TableFeature, WeatherDate, WeatherField } from "./settings.types";
 
 export type SettingsState = {
   readonly areaMode: boolean,
@@ -14,7 +14,7 @@ export type SettingsState = {
   readonly success: string | null,
   readonly info: string | null,
   readonly regionNamePath: string,
-  readonly tableSelectedFeatures: any[],
+  readonly tableSelectedFeatures: TableFeature[],
   readonly openTabId: number | null,
   toggleDataButtonChecked: boolean
 }

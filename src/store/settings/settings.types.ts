@@ -42,3 +42,9 @@ export type WeatherFieldRange = {
     recommendations: string[],
     label: string
 }
+
+export type TableFeature = {
+    _id: string,
+    checked: boolean,
+    local: string
+}

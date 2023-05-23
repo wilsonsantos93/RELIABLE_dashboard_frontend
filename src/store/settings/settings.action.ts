@@ -1,4 +1,4 @@
-import { SETTINGS_ACTION_TYPES, WeatherField } from "./settings.types";
+import { SETTINGS_ACTION_TYPES, TableFeature, WeatherField } from "./settings.types";
 import { createAction, withMatcher } from "../../utils/reducer/reducer.utils";
 import { AppThunk } from "../store";
 import { fetchWeatherFields } from "../../data/fetchWeatherFields";
@@ -176,7 +176,7 @@ export const setRegionNamePath = withMatcher(
 
 // set table selected features
 export const setTableSelectedFeatures = withMatcher(
-    (features: any[]) => createAction(SETTINGS_ACTION_TYPES.SET_TABLE_SELECTED_FEATURES, features)
+    (features: TableFeature[]) => createAction(SETTINGS_ACTION_TYPES.SET_TABLE_SELECTED_FEATURES, features)
 )
 
 export const updateTableSelectedFeatures = (features: any[]) => {
