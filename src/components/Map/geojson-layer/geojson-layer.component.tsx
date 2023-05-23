@@ -101,7 +101,7 @@ const GeoJsonLayer = (props: any) => {
             opacity: 1,
         };
 
-        if (tableSelectedFeatures && tableSelectedFeatures.find((f:any) => f._id == feature._id)) {
+        if (tableSelectedFeatures && tableSelectedFeatures.find(f => f._id == feature._id)) {
 
             if (selectedFeature && selectedFeature._id == feature._id) {
                 mapFeatureNotHoveredStyle = { 
@@ -324,9 +324,9 @@ const GeoJsonLayer = (props: any) => {
     const onEachFeature = (feature: any, layer: CustomLayer, map: LeafletMap | null) => {
         layer.bindPopup(`<strong>${getObjectValue(regionNamePath, feature)}</strong><br/>`);
         
-        layer.getPopup()?.on('remove', () => {   
+        /* layer.getPopup()?.on('remove', () => {   
             newClearFeature();
-        })
+        }) */
 
         if (!window.mobileCheck()) layer.bindTooltip(getObjectValue(regionNamePath, feature));
 
