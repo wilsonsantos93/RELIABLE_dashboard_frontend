@@ -14,7 +14,7 @@ const ToggleDataButton = () => {
     return (
         <div style={{ display: 'flex', flex: 1, textAlign: 'left' }}>
             <InputSwitch inputId="input-metakey" checked={toggleDataButtonChecked} onChange={(e) => onToggleChange(e)} />
-            <span style={{ marginLeft: "5px", fontSize: '11px'}}> Mostrar selecionados</span>
+            <span style={{ marginLeft: "5px", fontSize: '11px'}}> Mostrar apenas selecionados</span>
         </div>
     )
 }
