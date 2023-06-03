@@ -18,10 +18,10 @@ code {
     position:absolute;
 }
 
-.toast-container.start-33 {
+/* .toast-container.start-33 {
     left: 25%!important;
     max-width: 35vw;
-}
+} */
 
 @media (max-width: 440px)  {
     .toast-container {
