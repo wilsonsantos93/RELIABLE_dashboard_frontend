@@ -31,20 +31,21 @@
     padding-left: 15px;
 }
 
-@media (max-width: 720px)  {
+/* @media (max-width: 720px)  {
     .MapFeatureInformation, #mapLegend {
         bottom: 55px;
     }
-}
+} */
 
 #mapLegend {
     padding: 6px 8px;
     z-index: 900!important;
+    display: flex;
 }
 
-#mapLegend #mapLegendArrows {
+/* #mapLegend #mapLegendArrows {
     left: 55px;
-    display: "block";
+    display: block;
 }
 
 #mapLegendArrows > button {
@@ -57,7 +58,7 @@
 
 #mapLegendArrows.leaflet-control {
     margin-bottom: 5px;
-}
+} */
 
 color-legend.styled {
     text-align: center;
@@ -66,4 +67,22 @@ color-legend.styled {
     --cle-letter-spacing-title: 0.5px;
     --cle-color: white;
     --cle-padding: 0.25rem 0.25rem 0.75rem;
+}
+
+#map-legend-panel {
+    display: inline;
+    background: #333333b3;
+}
+
+#info-legend {
+    display: inline;
+}
+
+#info-legend > button {
+    font-size: 9px;
+    border-radius: 12px;
+    width: 20px;
+    height: 20px;
+    border: 1px solid rgba(0,0,0,0.2);
+    margin-top: 4px;
 }

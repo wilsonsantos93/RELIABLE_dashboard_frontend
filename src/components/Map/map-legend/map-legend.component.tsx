@@ -3,9 +3,9 @@ import { useSelector } from "react-redux";
 import { selectSelectedWeatherField, selectWeatherFields } from "../../../store/settings/settings.selector";
 /* import { WeatherFieldRange } from "../../../store/settings/settings.types"; */
 import "./map-legend.styles.css";
-import { Button } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faArrowRight, faInfo, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
 import { setWeatherField } from "../../../store/settings/settings.action";
 
@@ -18,6 +18,7 @@ const MapLegend = () => {
     const [domain, setDomain] = useState<any>();
     const [tickFormat, setTickFormat] = useState<any>(".0f");
     const [tickValues, setTickValues] = useState<any>();
+    const [showDescriptionModal, setShowDescriptionModal] = useState(false);
 
     useEffect(() => {
         if (!selectedWeatherField) {
@@ -65,6 +66,10 @@ const MapLegend = () => {
         dispatch(setWeatherField(weatherFields[nextIx]));
     }
 
+    const handleClose = () => {
+        setShowDescriptionModal(false);
+    }
+
     const POSITION_CLASSES = {
         bottomleft: 'leaflet-bottom leaflet-left',
         bottomright: 'leaflet-bottom leaflet-right',
@@ -73,6 +78,7 @@ const MapLegend = () => {
     };
 
     return (
+        <>
         <div id="mapLegend" className={`${POSITION_CLASSES["bottomleft"]}`}>
             {/* <div className="leaflet-control leaflet-bar MapFeatureInformation">
                 <span>{selectedWeatherField?.displayName}</span>
@@ -97,13 +103,13 @@ const MapLegend = () => {
             </div> */}
             
 
-            <div className="leaflet-control" style={{display:"block", background: "#333333b3"}}>
+            <div className="leaflet-control" id="map-legend-panel">
                 <Button style={{ margin: "5px", fontSize: "0.575rem"}} title="Informação anterior" variant="light" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
                 <Button style={{ float: "right", margin: "5px", fontSize: "0.575rem"}} title="Informação seguinte" variant="light" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
                 { selectedWeatherField && colors && domain ? 
                     <color-legend
                         class="styled"
-                        width="170"
+                        width="180"
                         tickValues={tickValues}
                         domain={domain}
                         range={colors}
@@ -115,9 +121,35 @@ const MapLegend = () => {
                     : null 
                 }
             </div>
-            
+
+            { weatherFields && weatherFields.length ?
+                <div className="leaflet-control" id="info-legend">   
+                    <Button title="Descrição" size="sm" onClick={() => setShowDescriptionModal(true)} >
+                        <FontAwesomeIcon style={{ fontSize: "11px" }} icon={faInfo} />
+                    </Button>
+                </div>
+                : null
+            }
         </div>
 
+        <Modal show={showDescriptionModal} onHide={handleClose} scrollable>
+            <Modal.Header closeButton>
+                <Modal.Title>Descrição</Modal.Title>
+            </Modal.Header>
+            <Modal.Body style={{ textAlign: "left" }}>
+                {
+                    weatherFields.map(f => 
+                        <p key={f.name}>
+                            <strong>{f.displayName}</strong>: <span>{f.description}</span>
+                        </p>
+                    )
+                }
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>Fechar</Button>
+            </Modal.Footer>
+        </Modal>
+        </>
     )
 }
 
