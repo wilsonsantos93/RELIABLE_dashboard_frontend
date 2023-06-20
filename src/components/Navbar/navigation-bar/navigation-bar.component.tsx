@@ -24,13 +24,13 @@ const NavigationBar = () => {
     const isLoggedIn = useSelector(selectUserIsLoggedIn);
     const dispatch = useDispatch<any>();
 
-    /* const handleShowContacts = () => {
+    const handleShowContacts = () => {
         setShowContacts(true);
-    } */
+    }
 
-    /* const closeContacts = () => {
+    const closeContacts = () => {
         setShowContacts(false);
-    } */
+    }
 
     const handleShowLogin = () => {
         setShowLogin(true);
@@ -75,40 +75,58 @@ const NavigationBar = () => {
 
     return (
         <>
-        <Navbar bg="dark" fixed="top" variant="dark" style={{zIndex:2200}}>
+        <Navbar bg="dark" fixed="top" variant="dark" expand="lg" style={{ zIndex: 2200 }}>
             <Container fluid>
-                <Navbar.Brand href="#home">RELIABLE</Navbar.Brand>
-                {/* <Nav className="me-auto">
-                    <Nav.Link id="contactsBtn" onClick={() => handleShowContacts()} href="#">Contactos</Nav.Link>
-                </Nav> */}
-              
-                {  !isLoggedIn ?  
-                    <>
-                        <Nav className="ms-auto">
-                            <Nav.Link id="signUpBtn" onClick={() => handleShowRegister()} href="#">Registar</Nav.Link>
-                        </Nav>
-                        <Nav>
-                            <Nav.Link id="signInBtn" onClick={() => handleShowLogin()} href="#">Entrar</Nav.Link>
-                        </Nav>
-                    </> 
-                    : 
-                    <>
-                        <Nav className="ms-auto"><WeatherAlerts /></Nav>
-                        <NavDropdown align="end" title={titleComponent} id="basic-nav-dropdown">
-                            <NavDropdown.Item id="updatePasswordBtn" onClick={() => handleShowUpdatePassword()} href="#">Alterar palavra-passe</NavDropdown.Item>
-                            <NavDropdown.Item id="updateUserPreferences" onClick={() => handleShowUserPreferences()} href="#">Preferências</NavDropdown.Item>
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item id="signOutBtn" onClick={logout} href="#">
-                                Sair
-                            </NavDropdown.Item>
-                        </NavDropdown>
-                    </>
-                }
+                <div style={{ marginRight: '10px', textAlign: 'center', fontSize: "0.635rem", color: "white", display: 'block' }}>
+                    <a href="https://www.fct.pt/">
+                        <img 
+                            alt="Fundação para Ciência e Tecnologia" 
+                            title="Fundação para Ciência e Tecnologia"
+                            height="25"
+                            className="d-inline-block align-top" 
+                            src="/logos/fct_white.png"
+                            style={{ marginRight: "5px" }}
+                        />
+                    </a>
+                    <span style={{ display: "block" }}>DSAIPA/DS/0111/2019</span>
+                </div>
+
+                <Navbar.Brand href="#home" style={{ textTransform: 'uppercase' }}>Clima Extremo</Navbar.Brand>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="me-auto">
+                        <Nav.Link id="contactsBtn" onClick={() => handleShowContacts()} href="#">Sobre o projeto</Nav.Link>
+                    </Nav>
+                
+                    {  !isLoggedIn ?  
+                        <>
+                            <Nav className="ms-auto">
+                                <Nav.Link id="signUpBtn" onClick={() => handleShowRegister()} href="#">Registar</Nav.Link>
+                            </Nav>
+                            <Nav>
+                                <Nav.Link id="signInBtn" onClick={() => handleShowLogin()} href="#">Entrar</Nav.Link>
+                            </Nav>
+                        </> 
+                        : 
+                        <>
+                            <Nav className="ms-auto"><WeatherAlerts /></Nav>
+                            <NavDropdown align="end" title={titleComponent} id="basic-nav-dropdown">
+                                <NavDropdown.Item id="updatePasswordBtn" onClick={() => handleShowUpdatePassword()} href="#">Alterar palavra-passe</NavDropdown.Item>
+                                <NavDropdown.Item id="updateUserPreferences" onClick={() => handleShowUserPreferences()} href="#">Preferências</NavDropdown.Item>
+                                <NavDropdown.Divider />
+                                <NavDropdown.Item id="signOutBtn" onClick={logout} href="#">
+                                    Sair
+                                </NavDropdown.Item>
+                            </NavDropdown>
+                        </>
+                    }
+                </Navbar.Collapse>
                 
             </Container>
         </Navbar>
 
-        {/* <Contacts show={showContacts} handleClose={() => closeContacts()} /> */}
+        <Contacts show={showContacts} handleClose={() => closeContacts()} />
         { showLogin && <Login show={showLogin} handleClose={() => closeLogin()} /> }
         { showRegister && <Register show={showRegister} handleClose={() => closeRegister()} /> }
         { showUpdatePassword && <ChangePassword show={showUpdatePassword} handleClose={() => closeUpdatePassword()} /> }

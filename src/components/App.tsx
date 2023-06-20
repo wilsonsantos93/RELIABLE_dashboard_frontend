@@ -2,14 +2,14 @@ import 'leaflet/dist/leaflet.css';
 import {Col, Container, Row, Spinner, Toast, ToastContainer} from "react-bootstrap";
 import Map from "./Map/map/map.component";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faObjectGroup, faHandPointer, faCircleInfo, faXmark, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faCircleInfo, faXmark, faCheck } from '@fortawesome/free-solid-svg-icons'
 import NavigationBar from './Navbar/navigation-bar/navigation-bar.component';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectAreaMode, selectErrorMsg, selectInfoMsg, selectIsSidebarOpen, selectLoading, selectSuccessMsg } from '../store/settings/settings.selector';
+import { selectErrorMsg, selectInfoMsg, selectIsSidebarOpen, selectLoading, selectSuccessMsg } from '../store/settings/settings.selector';
 import { useEffect } from 'react';
 import fetchIntercept from 'fetch-intercept';
 import { getWeatherAlerts, signOut } from '../store/user/user.action';
-import { getRegionPathName, getWeatherDates, getWeatherFields, showErrorMsg, showInfoMsg, showSuccessMsg } from '../store/settings/settings.action';
+import { showErrorMsg, showInfoMsg, showSuccessMsg } from '../store/settings/settings.action';
 import { selectFeature } from '../store/map/map.action';
 import { selectSidebarRef } from '../store/refs/refs.selector';
 import { selectUserIsLoggedIn } from '../store/user/user.selector';
@@ -18,7 +18,7 @@ import "./App.css";
 
 function App(): JSX.Element {
     const loading = useSelector(selectLoading);
-    const areaMode = useSelector(selectAreaMode);
+    //const areaMode = useSelector(selectAreaMode);
     const isSidebarOpen = useSelector(selectIsSidebarOpen);
     const infoMsg = useSelector(selectInfoMsg);
     const successMsg = useSelector(selectSuccessMsg);

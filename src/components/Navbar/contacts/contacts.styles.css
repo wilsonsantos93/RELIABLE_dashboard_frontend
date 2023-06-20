@@ -1,0 +1,15 @@
+#contactsModal {
+    text-align: left;
+}
+
+#contactsModal .container {
+    text-align: center;
+}
+
+#contactsModal img {
+    height: 50px;
+}
+
+#contactsModal .row:not(:first-of-type) {
+    margin-top: 20px;
+}
