@@ -5,6 +5,7 @@ import { fetchWeatherFields } from "../../data/fetchWeatherFields";
 import { fetchWeatherDates } from "../../data/fetchWeatherDates";
 import authHeader from "../../utils/authHeader.utils";
 import getCurrentDate from "../../utils/getCurrentDate.utils";
+import getFirstDate from "../../utils/getFirstDate.utils";
 const base_url = process.env.REACT_APP_API_BASE_URL;
 
 // Set "Select Area" mode
@@ -67,7 +68,7 @@ export const getWeatherDates = (): AppThunk => {
         try {
             const dates = await fetchWeatherDates();
             dispatch(fetchWeatherDatesSuccess(dates));
-            const firstDate = getCurrentDate(dates);
+            const firstDate = getCurrentDate(dates) || getFirstDate(dates);
             if (firstDate) dispatch(setDateId(firstDate?._id));
         } catch (error) {
             dispatch(showErrorMsg("Não foi possível obter as datas."));
