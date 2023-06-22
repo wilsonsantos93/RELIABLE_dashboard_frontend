@@ -20,7 +20,6 @@ import { selectComparedFeatures, selectNextLayer, selectSelectedFeature } from '
 import { changeLoading, getRegionPathName, getWeatherDates, getWeatherFields, setOpenTabId } from '../../../store/settings/settings.action';
 import { getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
 import { getObjectValue } from '../../../utils/getObjectValue.utils';
-import L from 'leaflet';
 
 type CustomLayer = { feature: any, _leaflet_id: string, markers: any[] } & Layer;
 type CustomLeafletEvent = LeafletMouseEvent & {marker: any, markerRef: any, tableClicked: boolean }
@@ -157,14 +156,6 @@ const GeoJsonLayer = (props: any) => {
                 dispatch(getRegionPathName()); 
             });
         });
-
-        map.on("dragend", () => {
-            console.log(window.innerWidth, map.getCenter())
-        })
-
-        window.addEventListener('resize', function(event: any) {
-            console.log(window.innerWidth, event.target.outerWidth)
-        }, true);
     }, []);
 
     useEffect(() => {
@@ -208,9 +199,9 @@ const GeoJsonLayer = (props: any) => {
         return tableSelectedFeatures.find((f: any) => f._id === featureId);
     }
 
-    const removeFeatureFromList = (layer: CustomLayer) => {
+    /* const removeFeatureFromList = (layer: CustomLayer) => {
         dispatch(removeFromComparedFeatures(comparedFeatures, layer.feature._id));
-    }
+    } */
 
     const updatePopupContent = (layer: any, event?: any) => {
         const div = document.createElement("div");
@@ -328,16 +319,16 @@ const GeoJsonLayer = (props: any) => {
     }
 
     // Clear the layer
-    const clearFeature = () => {
+    /* const clearFeature = () => {
         dispatch(selectFeature(null));
-    }
+    } */
 
     const newSetClickedFeatureId = useStableCallback(setClickedFeatureId);
     const newResetHighlightFeature = useStableCallback(resetHighlightFeature);
     const newHighlightFeature = useStableCallback(highlightFeature);
-    const newClearFeature = useStableCallback(clearFeature);
+    //const newClearFeature = useStableCallback(clearFeature);
     const newUpdatePopupContent = useStableCallback(updatePopupContent);
-    const newRemoveFeatureFromList = useStableCallback(removeFeatureFromList);
+    //const newRemoveFeatureFromList = useStableCallback(removeFeatureFromList);
 
 
     /**
@@ -345,10 +336,6 @@ const GeoJsonLayer = (props: any) => {
      */
     const onEachFeature = (feature: any, layer: CustomLayer, map: LeafletMap | null) => {
         layer.bindPopup(`<strong>${getObjectValue(regionNamePath, feature)}</strong><br/>`);
-        
-        /* layer.getPopup()?.on('remove', () => {   
-            newClearFeature();
-        }) */
 
         if (!window.mobileCheck()) layer.bindTooltip(getObjectValue(regionNamePath, feature));
 
