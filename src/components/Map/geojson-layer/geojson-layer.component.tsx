@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState} from 'react';
-import { GeoJSON, LayerGroup } from 'react-leaflet';
+import { GeoJSON, LayerGroup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { GeoJsonObject} from "geojson";
 import { GeoJSON as GJSON, Layer, LeafletMouseEvent, Map as LeafletMap, PathOptions } from "leaflet";
@@ -8,7 +8,7 @@ import { useStableCallback } from '../../../hooks/UseStableCallback';
 import UserMarker from '../user-marker/user-marker.component';
 import "./geojson-layer.styles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEyeSlash, faLocationDot } from '@fortawesome/free-solid-svg-icons';
+import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import ReactDOMServer from 'react-dom/server';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUserIsLoggedIn, selectUserLocations } from '../../../store/user/user.selector';
@@ -20,6 +20,7 @@ import { selectComparedFeatures, selectNextLayer, selectSelectedFeature } from '
 import { changeLoading, getRegionPathName, getWeatherDates, getWeatherFields, setOpenTabId } from '../../../store/settings/settings.action';
 import { getGeoJsonData, removeFromComparedFeatures, selectFeature, updateComparedFeatures, updateNextLayer } from '../../../store/map/map.action';
 import { getObjectValue } from '../../../utils/getObjectValue.utils';
+import L from 'leaflet';
 
 type CustomLayer = { feature: any, _leaflet_id: string, markers: any[] } & Layer;
 type CustomLeafletEvent = LeafletMouseEvent & {marker: any, markerRef: any, tableClicked: boolean }
@@ -68,6 +69,7 @@ const GeoJsonLayer = (props: any) => {
     const regionNamePath = useSelector(selectRegionNamePath);
     const tableSelectedFeatures = useSelector(selectTableSelectedFeatures);
 
+    const map = useMap();
     const dispatch = useDispatch<any>();
 
     useEffect(() => {
@@ -155,6 +157,14 @@ const GeoJsonLayer = (props: any) => {
                 dispatch(getRegionPathName()); 
             });
         });
+
+        map.on("dragend", () => {
+            console.log(window.innerWidth, map.getCenter())
+        })
+
+        window.addEventListener('resize', function(event: any) {
+            console.log(window.innerWidth, event.target.outerWidth)
+        }, true);
     }, []);
 
     useEffect(() => {
@@ -302,6 +312,18 @@ const GeoJsonLayer = (props: any) => {
         if (sidebarRef?.current && !isSidebarOpen && !window.mobileCheck()) {
             sidebarRef.current.open("tab1");
             dispatch(setOpenTabId(1));
+            const center = map.getCenter();
+
+            let lng = -3.713748947575841;
+            const innerWidth = window.innerWidth;
+
+            if (innerWidth > 1400) lng = -3.8898256347590996;
+            else if (innerWidth > 1300) lng = -4.009677615688625;
+            else if (innerWidth > 1200) lng = -4.279070182205404;
+            else if (innerWidth > 900) lng = -4.94384765625;
+            else if (innerWidth > 720) lng = -5.740178163433761;
+            
+            map.panTo({ ...center, lng: lng }, { animate: false });
         }
     }
 

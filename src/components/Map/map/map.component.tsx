@@ -10,13 +10,13 @@ import "leaflet-fullscreen";
 import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 import MapLegend from '../map-legend/map-legend.component';
 import "leaflet-area-select";
-import AreaSelect from "../area-select/area-select.component";
+/* import AreaSelect from "../area-select/area-select.component";
 import Control from 'react-leaflet-custom-control'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faObjectGroup } from '@fortawesome/free-solid-svg-icons'
+import { faObjectGroup } from '@fortawesome/free-solid-svg-icons' */
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAreaMode } from '../../../store/settings/settings.selector';
-import { setAreaMode } from '../../../store/settings/settings.action';
+/* import { setAreaMode } from '../../../store/settings/settings.action'; */
 import DateIndicator from '../date-indicator/date-indicator.component';
 
 function Map() {
@@ -26,17 +26,17 @@ function Map() {
     const areaMode = useSelector(selectAreaMode);
     const dispatch = useDispatch<any>();
 
-    const onSelectAreaMode = () => {
+    /* const onSelectAreaMode = () => {
         dispatch(setAreaMode(!areaMode));
-    }
+    } */
 
     return (
         <div>
             <MapContainer
                 ref={mapRef}
                 preferCanvas={true}
-                center={[38.686796, -9.128914]}
-                zoom={8}
+                center={[39.53781762520235, -7.800292968750001]}
+                zoom={7}
                 scrollWheelZoom={true}
                 bounceAtZoomLimits={true}
                 attributionControl={false}
