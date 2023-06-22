@@ -26,6 +26,7 @@ export type WeatherDate = {
 export type WeatherField = {
     _id: string,
     name: string,
+    viewOrder: number,
     active: boolean,
     main: boolean,
     unit: string,

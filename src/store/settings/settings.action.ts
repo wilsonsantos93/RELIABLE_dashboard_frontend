@@ -42,7 +42,8 @@ export const getWeatherFields = (): AppThunk => {
         try {
             let data = await fetchWeatherFields();
             data = data.filter((d:any) => d.active);
-            data.sort((a: WeatherField, b: WeatherField) => Number(b.main) - Number(a.main));
+            //data.sort((a: WeatherField, b: WeatherField) => Number(b.main) - Number(a.main));
+            data.sort((a: WeatherField, b: WeatherField) => a.viewOrder - b.viewOrder);
             dispatch(fetchWeatherFieldsSuccess(data));
             const mainField = data.find((f:any) => f.main === true);
             if (mainField) dispatch(setWeatherField(mainField));

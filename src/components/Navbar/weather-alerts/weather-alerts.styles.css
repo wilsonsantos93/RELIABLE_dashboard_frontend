@@ -26,6 +26,11 @@
     height: 40px;
 }
 
+.alerts-dropdown .info-circle {
+    color: grey;
+    height: 40px;
+}
+
 @media (min-width: 768px)  {
     .alerts-dropdown {
         max-width: 45vw;

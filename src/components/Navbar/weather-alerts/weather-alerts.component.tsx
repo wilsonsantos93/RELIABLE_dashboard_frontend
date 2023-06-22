@@ -5,10 +5,10 @@ import timezone from 'dayjs/plugin/timezone';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import pt from 'dayjs/locale/pt';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faCheckCircle, faLocationDot, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { setDateId } from "../../../store/settings/settings.action";
-import { selectWeatherAlerts } from "../../../store/user/user.selector";
+import { selectUserLocations, selectWeatherAlerts } from "../../../store/user/user.selector";
 import "./weather-alerts.styles.css";
 import { selectMainWeatherField, selectSelectedDateId, selectWeatherDates } from "../../../store/settings/settings.selector";
 import { selectGeoJsonLayerRef } from "../../../store/refs/refs.selector";
@@ -28,6 +28,7 @@ const WeatherAlerts = () => {
     const mainWeatherField = useSelector(selectMainWeatherField);
     const selectedDateId = useSelector(selectSelectedDateId);
     const weatherDates = useSelector(selectWeatherDates);
+    const userLocations = useSelector(selectUserLocations);
 
     const onAlertClick = (dateId: string, regionBorderFeatureObjectId: string) => {
       const layer = geoJsonLayerRef?.current.getLayer(regionBorderFeatureObjectId);
@@ -81,32 +82,41 @@ const WeatherAlerts = () => {
         </Dropdown.Toggle>
 
         <Dropdown.Menu className="alerts-dropdown" align="end">
-        <div>
-        { 
-          (weatherAlerts && weatherAlerts.alerts && weatherAlerts.alerts.length && mainWeatherField) ? <>
-          <span>Alertas atuais e para os próximos dias:</span>
-          {weatherAlerts.alerts.map((a: any, i) => 
-            <div style={{textAlign: 'left'}} key={`alert_divider_${i}`}>
-              <Dropdown.Divider />
-              <Dropdown.Item className="alerts-item" style={{ marginLeft: '5px', borderLeft: `5px solid ${getAlertColor(a.weather.value)}`}} onClick={() => onAlertClick(a.date[0]._id, a.regionBorderFeatureObjectId)} key={`alert_${i}`} href="#">
-                  <span>
-                    <strong>{a.regionName} {addMarkerNames(a)}</strong> 
-                    <span> com {mainWeatherField?.displayName} de <strong>{getValueLabel(a)}</strong></span>
-                    { a.weatherDateObjectId == getCurrentDateId() ?
-                      <span> neste momento.</span> :
-                      <span> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)}</span>
-                    }
-                  </span>
-              </Dropdown.Item>
-            </div>
-          )} </>
-          :
+         { (userLocations && userLocations.length) ?
           <div>
-            <FontAwesomeIcon icon={faCheckCircle} className="check-circle"></FontAwesomeIcon>&nbsp;
-            <span style={{display:'block'}}>Não há alertas para os próximos dias.</span>
+          { 
+            (weatherAlerts && weatherAlerts.alerts && weatherAlerts.alerts.length && mainWeatherField) ? 
+            <>
+            <span>Alertas atuais e para os próximos dias:</span>
+            { weatherAlerts.alerts.map((a: any, i) => 
+              <div style={{textAlign: 'left'}} key={`alert_divider_${i}`}>
+                <Dropdown.Divider />
+                <Dropdown.Item className="alerts-item" style={{ marginLeft: '5px', borderLeft: `5px solid ${getAlertColor(a.weather.value)}`}} onClick={() => onAlertClick(a.date[0]._id, a.regionBorderFeatureObjectId)} key={`alert_${i}`} href="#">
+                    <span>
+                      <strong>{a.regionName} {addMarkerNames(a)}</strong> 
+                      <span> com {mainWeatherField?.displayName} de <strong>{getValueLabel(a)}</strong></span>
+                      { a.weatherDateObjectId == getCurrentDateId() ?
+                        <span> neste momento.</span> :
+                        <span> em {dayjs(a.date[0].date).tz(tz).format(`dddd, D MMMM ${a.date[0].format.includes(":") ? "HH:mm" : ''}`)}</span>
+                      }
+                    </span>
+                </Dropdown.Item>
+              </div>
+            )} 
+            </>
+            :
+            <div>
+              <FontAwesomeIcon icon={faCheckCircle} className="check-circle"></FontAwesomeIcon>&nbsp;
+              <span style={{display:'block'}}>Não há alertas para os próximos dias.</span>
+            </div>
+          }
+          </div> :
+
+          <div>
+            <FontAwesomeIcon icon={faLocationDot} className="info-circle"></FontAwesomeIcon>&nbsp;
+            <span style={{display:'block'}}>Marque localidades no mapa para ver alertas.</span>
           </div>
         }
-        </div>
         </Dropdown.Menu>
       </Dropdown>
     </>
