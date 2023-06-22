@@ -33,7 +33,7 @@ const Contacts = ({ show, handleClose }: ContactsProps) => {
               <Col lg="3" xs="6"><a target="_blank" href="http://in3.dem.ist.utl.pt/"><img src="/logos/IN+.jpg"/></a></Col>
               <Col lg="3" xs="6"><a target="_blank" href="http://welcome.isr.tecnico.ulisboa.pt/"><img src="/logos/isr.png"/></a></Col>
               <Col lg="3" xs="6"><a target="_blank" href="http://www.maretec.org/"><img src="/logos/maretec.png"/></a></Col>
-              <Col lg="3" xs="6"><a target="_blank" href="https://iti.larsys.pt//"><img src="/logos/ITI.png"/></a></Col>
+              <Col lg="3" xs="6"><a target="_blank" href="https://iti.larsys.pt/"><img src="/logos/ITI.png"/></a></Col>
             </Row>
             <Row>
               <Col lg="3" xs="6"><a target="_blank" href="https://www.tecnico.ulisboa.pt/"><img src="/logos/IST.png"/></a></Col>
