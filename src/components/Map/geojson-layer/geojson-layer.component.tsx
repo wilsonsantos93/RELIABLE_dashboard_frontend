@@ -246,6 +246,7 @@ const GeoJsonLayer = (props: any) => {
 
     const getWeatherValueWithUnit = (feature: any) => {
         if (!selectedWeatherField) return;
+        if (!feature.weather) return;
         if (selectedWeatherField.unit) return `${feature.weather[selectedWeatherField.name]} ${selectedWeatherField.unit}`;
         return `${feature.weather[selectedWeatherField.name]}`;
     }

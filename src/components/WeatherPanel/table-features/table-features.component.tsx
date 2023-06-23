@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { getObjectValue } from '../../../utils/getObjectValue.utils';
 import { selectComparedFeatures, selectSelectedFeature } from '../../../store/map/map.selector';
 import { selectGeoJsonLayerRef } from '../../../store/refs/refs.selector';
-import { selectFeature, setSelectedFeature } from '../../../store/map/map.action';
+import { selectFeature } from '../../../store/map/map.action';
 import { TableFeature, WeatherField } from '../../../store/settings/settings.types';
 import { useMap } from 'react-leaflet';
 import { updateTableSelectedFeatures } from '../../../store/settings/settings.action';
@@ -37,7 +37,6 @@ const TableFeatures = () => {
 
     useEffect( () => {
         if (!selectedFeature) return;
-        //clickRow(selectedFeature._id);
 
         const featureId = selectedFeature._id;
 
@@ -132,8 +131,13 @@ const TableFeatures = () => {
                 local: getObjectValue(regionNamePath, feature),
                 ...feature.weather
              }
-         });
+        });
     }, [comparedFeatures]);
+
+    useEffect(() => {
+        const checkedFeatures = data.filter((feature: any) => feature.checked == true);
+        dispatch(updateTableSelectedFeatures(checkedFeatures));
+    }, [data]);
 
 
     // Change cell color
