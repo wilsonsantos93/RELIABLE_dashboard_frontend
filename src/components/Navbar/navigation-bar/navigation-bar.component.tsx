@@ -12,6 +12,7 @@ import Login from "../login/login.component";
 import Register from "../register/register.component";
 import WeatherAlerts from "../weather-alerts/weather-alerts.component";
 import UserPreferences from "../user-preferences/user-preferences.component";
+import "./navigation-bar.styles.css";
 
 const NavigationBar = () => {
     const [showContacts, setShowContacts] = useState(false);
@@ -91,8 +92,8 @@ const NavigationBar = () => {
                     <span style={{ display: "block" }}>DSAIPA/DS/0111/2019</span>
                 </div>
 
-                <Navbar.Brand href="#home" style={{ textTransform: 'uppercase' }}>Clima Extremo</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Brand id="navbar-title-text" href="#home" style={{ textTransform: 'uppercase' }}>Clima Extremo</Navbar.Brand>
+                <Navbar.Toggle id="navbar-title-menu" aria-controls="basic-navbar-nav" />
 
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">

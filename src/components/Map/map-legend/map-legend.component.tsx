@@ -80,29 +80,6 @@ const MapLegend = () => {
     return (
         <>
         <div id="mapLegend" className={`${POSITION_CLASSES["bottomleft"]}`}>
-            {/* <div className="leaflet-control leaflet-bar MapFeatureInformation">
-                <span>{selectedWeatherField?.displayName}</span>
-                {
-                    data && data.map((d:any) => 
-                        <div key={d.color+"_item"} className="legend-list-item">
-                            <span className="legend-color" style={{backgroundColor: d.color}}></span>
-                            <span className="legend-text">
-                                { d.min == null && `< ${d.max}` }
-                                { d.max == null && `> ${d.min}` }
-                                { (d.max != null && d.min != null) && `${d.min} - ${d.max}` }
-                            </span>
-                            
-                        </div>
-                    )
-                }
-            </div> */}
-
-            {/* <div className="leaflet-control" id="mapLegendArrows">   
-                <Button title="Informação anterior" variant="light" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
-                <Button title="Informação seguinte" variant="light" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
-            </div> */}
-            
-
             <div className="leaflet-control" id="map-legend-panel">
                 <Button style={{ margin: "5px", fontSize: "0.575rem"}} title="Informação anterior" variant="light" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
                 <Button style={{ float: "right", margin: "5px", fontSize: "0.575rem"}} title="Informação seguinte" variant="light" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>

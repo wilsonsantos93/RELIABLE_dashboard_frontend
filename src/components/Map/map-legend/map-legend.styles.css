@@ -31,34 +31,11 @@
     padding-left: 15px;
 }
 
-/* @media (max-width: 720px)  {
-    .MapFeatureInformation, #mapLegend {
-        bottom: 55px;
-    }
-} */
-
 #mapLegend {
     padding: 6px 8px;
     z-index: 900!important;
     display: flex;
 }
-
-/* #mapLegend #mapLegendArrows {
-    left: 55px;
-    display: block;
-}
-
-#mapLegendArrows > button {
-    margin-right: 2px;
-}
-
-#mapLegendArrows button {
-    font-size: 0.675rem;
-}
-
-#mapLegendArrows.leaflet-control {
-    margin-bottom: 5px;
-} */
 
 color-legend.styled {
     text-align: center;
@@ -85,4 +62,10 @@ color-legend.styled {
     height: 20px;
     border: 1px solid rgba(0,0,0,0.2);
     margin-top: 4px;
+}
+
+@media (max-width: 400px)  {
+    #mapLegend {
+        padding: 0!important;
+    }
 }

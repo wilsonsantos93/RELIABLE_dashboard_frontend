@@ -53,7 +53,7 @@ const DateIndicator = () => {
         { weatherDates && weatherDates.length && selectedDateId ?
             <div className="date-indicator">
                 <Button disabled={loading} title="Data anterior" variant="light" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
-                <span>{ selectedWeatherField?.displayName } referente a { getFormattedDate() }</span>
+                <span>{ selectedWeatherField?.displayName } <span className="d-none d-sm-inline">referente a</span> { getFormattedDate() }</span>
                 <Button disabled={loading} title="Data seguinte" variant="light" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
             </div> : null
         }
