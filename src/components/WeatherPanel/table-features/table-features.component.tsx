@@ -91,7 +91,8 @@ const TableFeatures = () => {
     const getColor = (value: number, fieldName: string) => {
         const field = weatherFields.find(field => field.name === fieldName);
         if (field) {
-            for (let r of field.ranges) {
+            const ranges = [...field.ranges].reverse();
+            for (let r of ranges) {
                 const min = (r.min != null || !isNaN(r.min)) ? r.min : -Infinity; 
                 const max = (r.max != null || !isNaN(r.max)) ? r.max : Infinity;
                 if (min <= value && value <= max) {
@@ -206,7 +207,7 @@ const TableFeatures = () => {
     }
 
     // Set Legend for weather column
-    const setLegend = (colName: string) => {
+    /* const setLegend = (colName: string) => {
         const field = weatherFields.find((f: WeatherField) => f.name === colName);
         if (!field) return;
         
@@ -240,8 +241,8 @@ const TableFeatures = () => {
                 tickFormat={tickFormat}
             ></color-legend>
             </div>
-    }
-
+    }*/
+ 
     // On row select handler
     const onRowSelect = (e: any) => {
         e.originalEvent.stopPropagation();

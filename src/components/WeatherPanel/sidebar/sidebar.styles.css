@@ -63,3 +63,12 @@ tbody tr.comparisonTblRow {
 .leaflet-sidebar-content {
     background-color: white;
 }
+
+#tableInfoBtn {
+    font-size: 9px;
+    border-radius: 12px;
+    width: 20px;
+    height: 20px;
+    border: 1px solid rgba(0,0,0,0.2);
+    margin-top: 4px;
+}

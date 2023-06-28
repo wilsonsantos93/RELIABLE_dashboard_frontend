@@ -79,10 +79,11 @@ const GeoJsonLayer = (props: any) => {
     const getColor = (value: number) => {
         const field = weatherFields.find((field:any) => field.name === selectedWeatherField?.name);
         if (field) {
-            for (let r of field.ranges) {
+            const ranges = [...field.ranges].reverse();
+            for (let r of ranges) {
                 const min = r.min != null ? r.min : -Infinity; 
                 const max = r.max != null ? r.max : Infinity;
-                if (min <= value && value < max) return r.color
+                if (min <= value && value <= max) return r.color
             }
         }
         return "#808080";

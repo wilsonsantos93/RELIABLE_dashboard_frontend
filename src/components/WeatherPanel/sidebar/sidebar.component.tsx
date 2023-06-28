@@ -6,11 +6,11 @@ import { useMap } from "react-leaflet";
 import { useEffect, useRef } from "react";
 import WeatherDateSelector from "../weather-date-selector/weather-date-selector.component";
 import WeatherInfoSelector from "../weather-info-selector/weather-info-selector.component";
-import { Form } from "react-bootstrap";
+import { Button, Form, OverlayTrigger, Popover } from "react-bootstrap";
 import ParallelCoordinatesChart from "../parallel-coordinates-chart/paralell-coordinates-chart.component";
 import "./sidebar.styles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTable, faChartLine, faCog, faWindowClose } from '@fortawesome/free-solid-svg-icons'
+import { faTable, faChartLine, faCog, faWindowClose, faInfo } from '@fortawesome/free-solid-svg-icons'
 import Recommendations from "../recommendations/recommendations.component";
 import SidebarTabHead from "../sidebar-tab-head/sidebar-tab-head.component";
 import FeaturesTable from "../features-table/features-table.component";
@@ -52,13 +52,19 @@ const Sidebar = () => {
         dispatch(updateOpenTabId(id));
     }
 
+    const popoverBottom = (
+        <Popover style={{ padding: '5px' }} id="popover-trigger-click-root-close" title="Popover bottom">
+          <p>Clique numa linha da tabela para ativar a localidade e ver as recomendações.</p>
+          <p>Clique nas caixas de seleção para criar um grupo de localidades e filtrar.</p>
+        </Popover>
+    );
+
     return (
         <div id="sidebar" className="leaflet-sidebar collapsed">
             <div className="leaflet-sidebar-tabs">
                 <ul role="tablist" className="tablist"> 
                     <li key="tab1"><a href="#tab1" onClick={() => onTabClick(1)} role="tab"><FontAwesomeIcon icon={faTable} /></a></li>
-                    <li key="tab2"><a href="#tab2" onClick={() => onTabClick(2)} role="tab"><FontAwesomeIcon icon={faChartLine} /></a></li>
-                    {/* <li key="tab3"><a href="#tab3" role="tab"><FontAwesomeIcon icon={faCog} /></a></li> */}
+                    {/* <li key="tab2"><a href="#tab2" onClick={() => onTabClick(2)} role="tab"><FontAwesomeIcon icon={faChartLine} /></a></li> */}
                 </ul>
             </div>
     
@@ -66,50 +72,37 @@ const Sidebar = () => {
                 {/* TAB 1 */}
                 <div className="leaflet-sidebar-pane" id="tab1">
                     <h1 className="leaflet-sidebar-header">Tabela
+                        <OverlayTrigger rootClose trigger={['click']} placement="bottom" overlay={popoverBottom}>
+                            <Button style={{ marginLeft: "5px", marginBottom: "5px"}} id="tableInfoBtn" size="sm">
+                                <FontAwesomeIcon style={{ fontSize: "11px" }} icon={faInfo} />
+                            </Button>
+                        </OverlayTrigger>
                         <div className="leaflet-sidebar-close"><FontAwesomeIcon icon={faWindowClose} /></div>
                     </h1>
                     <div className="containerDiv">
-                        {/* <SidebarTabHead /> */}
                 
                         <div className="featuresTable">
-                            {/* <FeaturesTable /> */}
                             <TableFeatures />
                         </div>
 
-                        {/* <div className="recommendations">
-                            <Recommendations />
-                        </div> */}
                     </div>
                 </div>
 
                 {/* TAB 2 */}                  
-                <div className="leaflet-sidebar-pane" id="tab2">
+                {/* <div className="leaflet-sidebar-pane" id="tab2">
                     <h1 className="leaflet-sidebar-header">Gráfico
                         <div className="leaflet-sidebar-close"><FontAwesomeIcon icon={faWindowClose} /></div>
                     </h1>
                     <div className="containerDiv">
-                        {/* <SidebarTabHead /> */}
                 
                         <div className="featuresChart">
                             <ParallelCoordinatesChart />
                         </div>
 
-                        {/* <div className="recommendations">
-                            <Recommendations />
-                        </div> */}
                     </div>
-                </div>
-    
-                
-                {/* <div className="leaflet-sidebar-pane" id="tab3">
-                    <h1 className="leaflet-sidebar-header">Configurar
-                        <div className="leaflet-sidebar-close"><FontAwesomeIcon icon={faWindowClose} /></div>
-                    </h1>
-                    <Form className="configuration">
-                        <WeatherDateSelector/>
-                        <WeatherInfoSelector/>
-                    </Form>
                 </div> */}
+    
+            
 
                 <div className="recommendations">
                     <Recommendations />

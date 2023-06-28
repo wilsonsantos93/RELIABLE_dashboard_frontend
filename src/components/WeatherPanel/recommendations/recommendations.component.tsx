@@ -84,7 +84,7 @@ const Recommendations = () => {
         </div>
     }
 
-    const getFullRecommendations = () => {
+    /* const getFullRecommendations = () => {
         return <div key="divFullRec"><strong>No caso de temperaturas baixas:</strong>
         <ul>
             <li>Mantenha a temperatura da sua casa entre os 18ºC e os 21ºC</li>
@@ -138,6 +138,72 @@ const Recommendations = () => {
             ter apanhado muito calor, pode causar hipotermia, principalmente em pessoas
             idosas ou em crianças)</li>
         </ul></div>;
+    } */
+
+    const isHighTemperature = () => {
+       if (!selectedFeature || !selectedFeature.weather) return false;
+
+       return selectedFeature.weather['toutdoor'] > 20;
+    }
+
+    const getConditionalRecommendations = () => {
+        return <div key="divConditoinalRec">
+            {
+                isHighTemperature() ? 
+                <ul>
+                    <li>Procurar ambientes frescos e arejados</li>
+                    <li>Beber água ou sumos naturais com regularidade e mesmo que não tenha sede</li>
+                    <li>Aumentar a ingestão de água, pelo menos 1,5 litros/dia o equivalente a 8 copos</li>
+                    <li>Evitar o consumo de bebidas quentes, alcoólicas, gaseificadas, com cafeína e ricas
+                    em açúcar</li>
+                    <li>Fazer refeições leves e comer mais vezes ao dia</li>
+                    <li>Evitar a exposição direta ao sol nas horas de maior calor, nomeadamente entre as
+                    11 e as 17 horas</li>
+                    <li>Aplicar protetor solar com fator 30 ou superior de 2 em 2 horas ou de acordo com a
+                    indicação da embalagem</li>
+                    <li>Usar roupas leves, soltas e de cor clara e preferencialmente de algodão e utilizar
+                    chapéu e óculos de sol</li>
+                    <li>Evite atividades físicas no exterior, principalmente nos horários mais quentes</li>
+                    <li>Evite atividades físicas que exijam muito esforço, principalmente nos horários mais
+                    quentes</li>
+                    <li>Não permanecer dentro de viaturas estacionadas e expostas ao sol</li>
+                    <li>Ter uma atenção especial face aos grupos de pessoas mais vulneráveis ao calor</li>
+                    <li>Evite estar em zonas de poluição elevada uma vez que as temperaturas elevadas e a
+                    poluição do ar estão, muitas vezes, associadas</li>
+                    <li>No período de maior calor tome um duche de água tépida. Evite, no entanto,
+                    mudanças bruscas de temperatura (um duche gelado, imediatamente depois de se
+                    ter apanhado muito calor, pode causar hipotermia, principalmente em pessoas
+                    idosas ou em crianças)</li>
+                </ul>
+                :
+                <ul>
+                    <li>Mantenha a temperatura da sua casa entre os 19ºC e os 22ºC</li>
+                    <li>Tenha cuidado com as mudanças bruscas de temperatura</li>
+                    <li>Se não conseguir aquecer todas as divisões da casa, tente manter a sala de 
+                    estar quente durante o dia e aqueça o quarto antes de se ir deitar</li>
+                    <li>Se utilizar lareiras, braseiras, salamandras ou equipamentos de aquecimento a gás
+                    mantenha a correta ventilação das divisões de forma a evitar a acumulação de gases
+                    nocivos à saúde, evitando os acidentes por monóxido de carbono que podem causar
+                    intoxicação ou morte</li>
+                    <li>Evite permanecer muito perto das fontes de calor</li>
+                    <li>Mantenha a pele hidratada, principalmente mãos, pés, cara e lábios</li>
+                    <li>Use várias camadas de roupa, em vez de uma única muito grossa, e não use roupas
+                    demasiado justas que dificultem a circulação sanguínea</li>
+                    <li>Escolha calçado confortável e antiderrapante para prevenir quedas e trambolhões</li>
+                    <li>Proteja as extremidades do corpo (com luvas, gorro, meias quentes e cachecol) e use
+                    calçado adequado às condições meteorológicas</li>
+                    <li>Mantenha-se ativo realizando atividades físicas controladas</li>
+                    <li>Faça refeições mais frequentes encurtando as horas entre elas</li>
+                    <li>Mesmo que não tenha sede, ingira líquidos ao longo do dia</li>
+                    <li>Dê preferência a sopas e a bebidas quentes, como leite ou chá</li>
+                    <li>Aumente o consumo de alimentos ricos em vitaminas, sais minerais e antioxidantes
+                    (por exemplo, frutos e hortícolas), pois contribuem para minimizar o aparecimento
+                    de infeções</li>
+                    <li>Evite bebidas alcoólicas que provocam vasodilatação com perda de calor e
+                    arrefecimento do corpo</li>
+                </ul>
+            }
+        </div>
     }
 
 
@@ -160,10 +226,12 @@ const Recommendations = () => {
                         !selectedFeature ? 
                         <span>Sem localidade selecionada</span> 
                         : 
-                        isAlert() ?
+                        /* isAlert() ?
                         [getFullRecommendations(), getContactRecommendation()]
                         :
-                        getRecommendations()
+                        getRecommendations() */
+
+                        [getConditionalRecommendations(), getContactRecommendation()]
                     }
                     </Accordion.Body>
                 </Accordion.Item>
