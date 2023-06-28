@@ -1,5 +1,5 @@
 import "./parallel-coordinates-chart.styles.css";
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts, { Series} from 'highcharts';
 import HighchartsParallelCoordinates from 'highcharts/modules/parallel-coordinates';
@@ -20,6 +20,7 @@ type CustomSeries = Series & {userOptions: { featureId: string }};
 const ParallelCoordinatesChart = () => {
     const chartConfig: any = {
         chart: {
+          alignTicks: false,
           type: 'spline',
           parallelCoordinates: true,
           parallelAxes: {
@@ -149,12 +150,52 @@ const ParallelCoordinatesChart = () => {
         })
     }, [geoJsonLayerRef]);
 
+
     const setChartData = () => {
+        // Set yAxis min and max
+        let ticks: any[] = [];
+        if (weatherFields) {
+            for (const field of weatherFields) {
+                const ranges = field.ranges;
+                if (field.dataType === "categorical") {
+                    const categories = ranges.map(r => r.min);
+                    ticks.push({ 
+                        max: categories.length-1,
+                        categories,
+                    });
+                } else {
+                    const minValue = ranges[0].min;
+                    const maxValue = ranges.slice(-1)[0].max;
+
+                    const sum = Math.abs(minValue) + Math.abs(maxValue);
+                    const x = sum/5;
+                    
+                    let positions: any[] = [];
+                    for (let i=minValue; i<=maxValue; i=i+x) {
+                        const value = Math.round(i * 100) / 100;
+                        const floorValue = value >= 5 ? Math.round(value) : value;
+                        positions.push(floorValue);
+                    }
+
+                    ticks.push({ 
+                        tickPositions: positions,
+                        min: ranges.length && minValue, 
+                        max: ranges.length && maxValue
+                    });
+
+                }
+            }
+        }
+
+
         if (weatherFields && comparedFeatures && chartRef.current) {
             const categories = weatherFields.map(field => field.displayName);
             
             const series = comparedFeatures.map((feature: any) => {
-                const data = weatherFields.map(field => feature.weather && feature.weather.hasOwnProperty(field.name) ? feature.weather[field.name] : null);
+                const data = weatherFields.map(field => 
+                    feature.weather && feature.weather.hasOwnProperty(field.name) ? 
+                    feature.weather[field.name] == '0.0' ? 0 : feature.weather[field.name] : null
+                );
                 const name = getObjectValue(regionNamePath, feature);
     
                 let visible = true;
@@ -177,6 +218,7 @@ const ParallelCoordinatesChart = () => {
                 return { 
                     ...oldChartOptions, 
                     series,
+                    yAxis: ticks,
                     xAxis: {
                         ...oldChartOptions.xAxis,
                         categories: categories

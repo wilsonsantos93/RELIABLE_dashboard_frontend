@@ -47,14 +47,18 @@ const WeatherAlerts = () => {
     }
 
     const getAlertColor = (value: any) => {
+      let color = "#808080";
       if (mainWeatherField) {
         for (let r of mainWeatherField.ranges) {
           const min = (r.min != null && !isNaN(r.min)) ? r.min : -Infinity; 
           const max = (r.max != null && !isNaN(r.max)) ? r.max : Infinity;
-          if (min <= value && value <= max) return r.color
+          if (min <= value && value <= max) {
+            color = r.color;
+            break;
+          }
         }
       }
-      return "#808080";
+      return color;
     }
 
     const addMarkerNames = (a: any) => {

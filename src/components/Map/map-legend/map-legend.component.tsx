@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectSelectedWeatherField, selectWeatherFields } from "../../../store/settings/settings.selector";
 /* import { WeatherFieldRange } from "../../../store/settings/settings.types"; */
@@ -18,23 +18,23 @@ const MapLegend = () => {
     const [domain, setDomain] = useState<any>();
     const [tickFormat, setTickFormat] = useState<any>(".0f");
     const [tickValues, setTickValues] = useState<any>();
+    const [scaleType, setScaleType] = useState<string>("threshold");
     const [showDescriptionModal, setShowDescriptionModal] = useState(false);
 
     useEffect(() => {
         if (!selectedWeatherField) {
-            //setData([]);
             return;
         }
-        const ranges = selectedWeatherField.ranges.sort((a, b) => b.min - a.min);
-        //setData(ranges);
+        // descending order
+        const ranges = [...selectedWeatherField.ranges].sort((a, b) => b.min - a.min);
 
         setColors(`[${ranges.map(r => `"${r.color}"`).reverse()}]`);
 
         const domain = ranges.map(r => r.min).reverse();
-        domain.push(ranges[0].max);
+        domain.push(ranges[0].max || Infinity);
         setDomain(`[${domain}]`);
 
-        setTickValues(`[${ranges.length && ranges.slice(-1)[0].min}, ${ranges.length && ranges[0].max}]`);
+        setTickValues(`[${ranges.length && ranges.slice(-1)[0].min}, ${ranges.length && (ranges[0].max || '')}]`);
 
         const sumTicks = ranges.reduce((acc, i) => acc+=i.min, 0);
         const sumTicksStr = sumTicks.toString();
@@ -90,8 +90,8 @@ const MapLegend = () => {
                         tickValues={tickValues}
                         domain={domain}
                         range={colors}
-                        titleText={`${selectedWeatherField?.displayName} ${selectedWeatherField.unit && `(${selectedWeatherField.unit})`}`}
-                        scaletype="threshold"
+                        titleText={`${selectedWeatherField?.displayName} ${selectedWeatherField?.unit && `(${selectedWeatherField?.unit})`}`}
+                        scaleType={scaleType}
                         tickFormat={tickFormat}
                     >
                     </color-legend>

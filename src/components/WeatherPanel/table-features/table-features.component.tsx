@@ -153,8 +153,9 @@ const TableFeatures = () => {
         }
 
         let value = row[colName];
+        if (value == '0.0') value = 0;
 
-        if (!value) return;
+        if (value == null || value == undefined) return;
 
         const valueStr = value.toString();
         const decimalPlaces = valueStr.split(".")[1];
@@ -208,7 +209,7 @@ const TableFeatures = () => {
         const field = weatherFields.find((f: WeatherField) => f.name === colName);
         if (!field) return;
         
-        const ranges = field.ranges.sort((a, b) => b.min - a.min);
+        const ranges = [...field.ranges].sort((a, b) => b.min - a.min);
         const colors = (`[${ranges.map(r => `"${r.color}"`).reverse()}]`);
 
         const domain = ranges.map(r => r.min).reverse();
