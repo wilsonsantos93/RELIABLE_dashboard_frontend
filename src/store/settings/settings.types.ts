@@ -33,7 +33,7 @@ export type WeatherField = {
     description: string,
     displayName: string,
     ranges: WeatherFieldRange[],
-    dataType: string
+    scaleType: string
 }
 
 export type WeatherFieldRange = {

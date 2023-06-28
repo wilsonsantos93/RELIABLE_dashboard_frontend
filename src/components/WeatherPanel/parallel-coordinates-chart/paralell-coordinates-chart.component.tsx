@@ -157,7 +157,7 @@ const ParallelCoordinatesChart = () => {
         if (weatherFields) {
             for (const field of weatherFields) {
                 const ranges = field.ranges;
-                if (field.dataType === "categorical") {
+                if (field.scaleType === "categorical") {
                     const categories = ranges.map(r => r.min);
                     ticks.push({ 
                         max: categories.length-1,
