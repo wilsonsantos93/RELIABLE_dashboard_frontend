@@ -49,7 +49,8 @@ const WeatherAlerts = () => {
     const getAlertColor = (value: any) => {
       let color = "#808080";
       if (mainWeatherField) {
-        for (let r of mainWeatherField.ranges) {
+        const ranges = [...mainWeatherField.ranges].reverse();
+        for (let r of ranges) {
           const min = (r.min != null && !isNaN(r.min)) ? r.min : -Infinity; 
           const max = (r.max != null && !isNaN(r.max)) ? r.max : Infinity;
           if (min <= value && value <= max) {
