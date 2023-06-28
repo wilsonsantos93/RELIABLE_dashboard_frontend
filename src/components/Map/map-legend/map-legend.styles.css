@@ -46,9 +46,38 @@ color-legend.styled {
     --cle-padding: 0.25rem 0.25rem 0.75rem;
 }
 
-#map-legend-panel {
+#newLegend {
+    text-align: center;
+    color: white;
+    display: inline-block;
+    padding: 0.25rem 0.25rem 0.75rem;
+    font-size: 9pt;
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-self: auto;
+    order: 0;
+    max-width: 220px;
+}
+
+#newLegend svg {
+    text-align: center;
+    color: white;
     display: inline;
+    height: 50px;
+    max-width: 220px;
+}
+
+
+#map-legend-panel {
+    /* display: inline; */
     background: #333333b3;
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: stretch;
 }
 
 #info-legend {

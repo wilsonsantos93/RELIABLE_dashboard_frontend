@@ -70,3 +70,8 @@ tr.p-highlight.border-row .p-checkbox .p-checkbox-box.p-highlight {
 #searchHeader span {
     font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
+
+th svg {
+    height: 50px;
+    max-width: 120px;
+}

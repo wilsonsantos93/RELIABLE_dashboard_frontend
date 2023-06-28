@@ -1,27 +1,28 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectSelectedWeatherField, selectWeatherFields } from "../../../store/settings/settings.selector";
-/* import { WeatherFieldRange } from "../../../store/settings/settings.types"; */
 import "./map-legend.styles.css";
 import { Button, Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight, faInfo, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faArrowRight, faInfo } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
 import { setWeatherField } from "../../../store/settings/settings.action";
+/* import Legend from "./legend";
+import * as d3 from "d3"; */
+import LegendComponent from "./legend.component";
 
 const MapLegend = () => {
     const selectedWeatherField = useSelector(selectSelectedWeatherField);
     const weatherFields = useSelector(selectWeatherFields);
     const dispatch = useDispatch<any>();
-    //const [data, setData] = useState<WeatherFieldRange[] | []>([]);
-    const [colors, setColors] = useState<any>();
+    /* const [colors, setColors] = useState<any>();
     const [domain, setDomain] = useState<any>();
     const [tickFormat, setTickFormat] = useState<any>(".0f");
     const [tickValues, setTickValues] = useState<any>();
-    const [scaleType, setScaleType] = useState<string>("threshold");
-    const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+    const [scaleType, setScaleType] = useState<string>("threshold");*/
+    const [showDescriptionModal, setShowDescriptionModal] = useState(false); 
 
-    useEffect(() => {
+    /* useEffect(() => {
         if (!selectedWeatherField) {
             return;
         }
@@ -46,7 +47,7 @@ const MapLegend = () => {
         } 
         setTickFormat(tickFormat);
 
-    }, [selectedWeatherField])
+    }, [selectedWeatherField]) */
 
     const prev = () => {
         let previousIx: number;
@@ -77,13 +78,51 @@ const MapLegend = () => {
         topright: 'leaflet-top leaflet-right',
     };
 
+    /* const legend = () => {
+        let color;
+        let tickSize;
+        const d = JSON.parse(domain.replace(/'/g, '"'));
+        const c = JSON.parse(colors.replace(/'/g, '"'));
+        let t = [0, d.length-1];
+        const width = 180;
+        let marginLeft;
+
+        if (selectedWeatherField?.scaleType === 'categorical') {
+            d.pop();
+            t[1] = d.length-1;
+            color = d3.scaleOrdinal(d, c);
+            tickSize = 0;
+            marginLeft = 25;
+        } else {
+            color = d3.scaleThreshold(d, c);
+        }
+
+        const options = {
+            tickSize,
+            marginLeft,
+            width,
+            tickValues: t,
+            tickFormat
+        };
+
+        return Legend(color, options) as any;
+    } */
+
     return (
         <>
         <div id="mapLegend" className={`${POSITION_CLASSES["bottomleft"]}`}>
             <div className="leaflet-control" id="map-legend-panel">
                 <Button style={{ margin: "5px", fontSize: "0.575rem"}} title="Informação anterior" variant="light" onClick={() => prev() } size="sm"><FontAwesomeIcon icon={faArrowLeft} /></Button>
+                
+                { selectedWeatherField /* && colors && domain */ ? 
+                    <div id="newLegend">
+                        <div>{`${selectedWeatherField?.displayName} ${selectedWeatherField?.unit && `(${selectedWeatherField?.unit})`}`}</div>
+                        {/* <svg dangerouslySetInnerHTML={{__html: legend().innerHTML}} /> */}
+                        <LegendComponent weatherField={selectedWeatherField}/>
+                    </div> : null
+                }
                 <Button style={{ float: "right", margin: "5px", fontSize: "0.575rem"}} title="Informação seguinte" variant="light" onClick={() => next() } size="sm"><FontAwesomeIcon icon={faArrowRight} /></Button>
-                { selectedWeatherField && colors && domain ? 
+               {/*  { selectedWeatherField && colors && domain ? 
                     <color-legend
                         class="styled"
                         width="180"
@@ -95,8 +134,10 @@ const MapLegend = () => {
                         tickFormat={tickFormat}
                     >
                     </color-legend>
-                    : null 
-                }
+                    : null
+                } */}
+
+                
             </div>
 
             { weatherFields && weatherFields.length ?

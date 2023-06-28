@@ -20,6 +20,7 @@ import ToggleDataButton from '../toggle-data-button/toggle-data-button.component
 import "primereact/resources/themes/lara-light-indigo/theme.css"; 
 import "primereact/resources/primereact.min.css";
 import "./table-features.styles.css";
+import LegendComponent from '../../Map/map-legend/legend.component';
 
 
 const TableFeatures = () => {
@@ -285,13 +286,16 @@ const TableFeatures = () => {
             <Row>
                 <Column selectionMode="multiple" headerStyle={{ width: '1rem' }} key="selectCol" rowSpan={2}></Column>
                 <Column header="Local" key="local" field="local" sortable rowSpan={2} />
-                {   weatherColumns.map((col, i) => (
+                {   weatherColumns.map((col, i) => {
+                    const weatherField = weatherFields.find((f => f.name == col.name));
+                    return (
                         <Column 
                             key={`col_legend_${i}`} 
-                            header={() => setLegend(col.name)}
-                            headerStyle={{ textAlign: 'center' }}
+                            //header={() => setLegend(col.name)}
+                            header={() => <LegendComponent options={{width: 100}} weatherField={weatherField}/>}
+                            headerStyle={{ textAlign: 'center', minWidth: 130 }}
                         />
-                    ))
+                    )})
                 }
             </Row>
             <Row>
